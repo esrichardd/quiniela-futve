@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "title": "Quiniela FUTVE",
+    "description": "Base inicial de la plataforma de quinielas para el futbol venezolano."
+  },
+  "home": {
+    "eyebrow": "Preparacion inicial",
+    "title": "Quiniela FUTVE",
+    "description": "Una base limpia para empezar a construir quinielas de la liga venezolana con una interfaz adaptable.",
+    "locale": {
+      "label": "Idioma activo",
+      "value": "Espanol"
+    },
+    "theme": {
+      "label": "Tema",
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
+    }
+  }
+}

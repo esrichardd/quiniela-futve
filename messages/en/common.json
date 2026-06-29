@@ -1,0 +1,21 @@
+{
+  "metadata": {
+    "title": "Quiniela FUTVE",
+    "description": "Initial foundation for the Venezuelan football prediction platform."
+  },
+  "home": {
+    "eyebrow": "Initial setup",
+    "title": "Quiniela FUTVE",
+    "description": "A clean foundation for building Venezuelan league predictions with an adaptive interface.",
+    "locale": {
+      "label": "Active language",
+      "value": "English"
+    },
+    "theme": {
+      "label": "Theme",
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  }
+}
