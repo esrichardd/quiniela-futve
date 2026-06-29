@@ -36,7 +36,11 @@ export function ThemeSelector({ label, options }: ThemeSelectorProps) {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm font-medium text-muted-foreground">{label}</p>
-      <div className="inline-grid grid-cols-3 rounded-md border border-border bg-card p-1 shadow-soft">
+      <div
+        aria-label={label}
+        className="inline-grid grid-cols-3 rounded-md border border-border bg-card p-1 shadow-soft"
+        role="group"
+      >
         {options.map((option) => {
           const isSelected = mounted && theme === option.value;
 
