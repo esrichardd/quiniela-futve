@@ -376,7 +376,7 @@ Roles conceptuales iniciales:
 
 Los permisos se evaluaran siempre con contexto. Por ejemplo, poder editar una quiniela depende de la quiniela concreta, la membresia del usuario, el estado de la quiniela y las reglas definidas. Poder cargar resultados depende de la liga o temporada asignada, no solamente de que el usuario tenga una etiqueta administrativa.
 
-La definicion detallada de tablas, relaciones y permisos persistidos vivira en documentos especificos posteriores, como `DATABASE.md` o `AUTHORIZATION.md`.
+La definicion detallada de tablas y relaciones persistidas vive en `docs/database/`. La definicion detallada de permisos vive en el documento de autorizacion correspondiente.
 
 ## Convenciones de nombres
 

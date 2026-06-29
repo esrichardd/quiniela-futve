@@ -97,7 +97,7 @@ Reglas:
 
 El tema es una preferencia de presentacion. No pertenece a la logica del dominio ni debe afectar autorizacion, visibilidad de datos o resultados de negocio.
 
-La preferencia de tema pertenece a las preferencias del usuario autenticado. `DATABASE.md` define como se persiste esa preferencia; este documento define el comportamiento esperado.
+La preferencia de tema pertenece a las preferencias del usuario autenticado. `docs/database/USERS.md` define como se persiste esa preferencia; este documento define el comportamiento esperado.
 
 ## Validacion
 

@@ -36,6 +36,8 @@ Documentos base:
 - `docs/ARCHITECTURE.md`
 - `docs/INTERNATIONALIZATION.md`
 - `docs/THEMING.md`
+- `docs/database/README.md`
+- `docs/database/MIGRATIONS.md`
 - `docs/COMMITS.md`
 
 ## Commits

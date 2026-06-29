@@ -138,14 +138,14 @@ Reglas:
 
 ## Contenido persistido
 
-Este documento no define modelos de base de datos. La capa i18n no almacena variantes localizadas de contenido persistido; esa responsabilidad pertenece a `DATABASE.md`.
+Este documento no define modelos de base de datos. La capa i18n no almacena variantes localizadas de contenido persistido; esa responsabilidad pertenece a `docs/database/README.md` y al documento del modulo correspondiente.
 
 Reglas:
 
 - El contenido de interfaz se traduce mediante mensajes.
 - El contenido de dominio almacenado en base de datos se muestra como fue definido por el producto.
 - Nombres propios y datos oficiales no se traducen automaticamente.
-- Las variantes por idioma de datos persistidos pertenecen a `DATABASE.md`.
+- Las variantes por idioma de datos persistidos pertenecen a `docs/database/README.md` y al documento del modulo correspondiente.
 
 ## Preferencias de usuario
 
