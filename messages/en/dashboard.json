@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "signOut": "Sign out"
+  },
+  "home": {
+    "metadata": {
+      "title": "Home — Quiniela FUTVE",
+      "description": "Main Quiniela FUTVE dashboard."
+    },
+    "eyebrow": "Dashboard under construction",
+    "title": "The locker room is open",
+    "subtitle": "This will be your home for creating pools, sending predictions, and following the table. For now, the flow is ready while we build the authentication logic.",
+    "statusTitle": "Next play: connect the session",
+    "statusBody": "Once login is active, you will see your pools, available matchdays, and group rankings here.",
+    "primaryStatLabel": "Status",
+    "primaryStatValue": "In progress",
+    "secondaryStatLabel": "Flow",
+    "secondaryStatValue": "Ready for auth"
+  }
+}

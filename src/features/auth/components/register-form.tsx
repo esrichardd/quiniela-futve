@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { Check, Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 
 import { AuthBrandMark } from "./auth-brand-mark";
 import { GoogleIcon } from "./google-icon";
@@ -28,6 +28,7 @@ const initialFormState: RegisterFormState = {
 
 export default function RegisterForm() {
   const t = useTranslations("auth");
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [form, setForm] = useState<RegisterFormState>(initialFormState);
@@ -53,6 +54,7 @@ export default function RegisterForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    router.push("/verify-email");
   }
 
   const strengthLabel =

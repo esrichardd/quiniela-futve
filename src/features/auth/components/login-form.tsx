@@ -5,19 +5,21 @@ import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 
 import { AuthBrandMark } from "./auth-brand-mark";
 import { GoogleIcon } from "./google-icon";
 
 export default function LoginForm() {
   const t = useTranslations("auth");
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    router.push("/home");
   }
 
   return (
@@ -77,9 +79,12 @@ export default function LoginForm() {
             >
               {t("fields.password.label")}
             </label>
-            <button type="button" className="auth-link text-xs font-medium">
+            <Link
+              href="/forgot-password"
+              className="auth-link text-xs font-medium"
+            >
               {t("login.forgotPassword")}
-            </button>
+            </Link>
           </div>
           <div className="relative">
             <input

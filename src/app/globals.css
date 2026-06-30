@@ -30,6 +30,8 @@
   --c-live-a10: rgba(185, 28, 28, 0.1);
   --c-live-a20: rgba(185, 28, 28, 0.22);
   --c-text-on-brand: #ffffff;
+  --c-link: #7c1225;
+  --c-link-hover: #a8720a;
   --c-scrollbar: rgba(124, 18, 37, 0.25);
   --c-text-gradient: linear-gradient(135deg, #7c1225 0%, #b91c1c 55%, #a8720a 100%);
 
@@ -87,6 +89,8 @@
   --c-live-a10: rgba(239, 68, 68, 0.12);
   --c-live-a20: rgba(239, 68, 68, 0.24);
   --c-text-on-brand: #ffffff;
+  --c-link: #d9a017;
+  --c-link-hover: #f3f3f3;
   --c-scrollbar: rgba(111, 17, 30, 0.45);
   --c-text-gradient: linear-gradient(135deg, #9e1d2b 0%, #c0392b 45%, #d9a017 100%);
 
@@ -128,6 +132,7 @@
   --color-muted-text: var(--c-muted);
   --color-subtle-text: var(--c-subtle);
   --color-gold: var(--c-gold);
+  --color-link: var(--c-link);
   --color-live: var(--c-live);
   --color-card-bg: var(--c-card);
   --color-card: var(--c-card);
@@ -173,6 +178,15 @@
   html {
     @apply font-sans;
     background-color: var(--c-bg);
+  }
+
+  :where(a) {
+    color: var(--c-link);
+    transition: color 0.2s ease;
+  }
+
+  :where(a:hover) {
+    color: var(--c-link-hover);
   }
 }
 

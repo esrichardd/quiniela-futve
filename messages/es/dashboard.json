@@ -1,0 +1,20 @@
+{
+  "actions": {
+    "signOut": "Cerrar sesión"
+  },
+  "home": {
+    "metadata": {
+      "title": "Home — Quiniela FUTVE",
+      "description": "Panel principal de Quiniela FUTVE."
+    },
+    "eyebrow": "Panel en construcción",
+    "title": "El vestuario ya está abierto",
+    "subtitle": "Esta será tu casa para crear quinielas, enviar pronósticos y seguir la tabla. Por ahora dejamos el flujo listo mientras armamos la lógica de autenticación.",
+    "statusTitle": "Próxima jugada: conectar la sesión",
+    "statusBody": "Cuando el login esté activo, aquí verás tus quinielas, jornadas disponibles y el ranking de tus grupos.",
+    "primaryStatLabel": "Estado",
+    "primaryStatValue": "En progreso",
+    "secondaryStatLabel": "Flujo",
+    "secondaryStatValue": "Listo para auth"
+  }
+}

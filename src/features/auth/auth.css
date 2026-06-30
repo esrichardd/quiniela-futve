@@ -78,6 +78,16 @@
   transform: translateY(-1px);
 }
 
+.auth-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-brand);
+  background: var(--c-brand-a12);
+  border: 1px solid var(--c-border-bright);
+  box-shadow: 0 0 18px var(--c-brand-a12);
+}
+
 .auth-input {
   width: 100%;
   color: var(--c-text);
@@ -107,12 +117,12 @@
 }
 
 .auth-link {
-  color: var(--c-brand);
+  color: var(--c-link);
   transition: color 0.2s ease;
 }
 
 .auth-link:hover {
-  color: var(--c-gold);
+  color: var(--c-link-hover);
 }
 
 .auth-divider-line {

@@ -303,7 +303,7 @@
 }
 
 .landing-nav-link:hover {
-  color: var(--c-brand);
+  color: var(--c-link-hover);
 }
 
 .landing-icon-badge {
