@@ -1,21 +1,24 @@
 {
-  "metadata": {
-    "title": "Quiniela FUTVE",
-    "description": "Base inicial de la plataforma de quinielas para el fútbol venezolano."
+  "navigation": {
+    "home": "Inicio",
+    "primary": "Navegación principal",
+    "footer": "Navegación del pie de página"
   },
-  "home": {
-    "eyebrow": "Preparación inicial",
-    "title": "Quiniela FUTVE",
-    "description": "Una base limpia para empezar a construir quinielas de la liga venezolana con una interfaz adaptable.",
-    "locale": {
-      "label": "Idioma activo",
-      "value": "Español"
-    },
-    "theme": {
-      "label": "Tema",
-      "light": "Claro",
-      "dark": "Oscuro",
-      "system": "Sistema"
+  "actions": {
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarte"
+  },
+  "theme": {
+    "label": "Tema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema"
+  },
+  "language": {
+    "label": "Idioma",
+    "options": {
+      "es": "Español",
+      "en": "Inglés"
     }
   }
 }

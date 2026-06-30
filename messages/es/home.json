@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "title": "Quiniela FUTVE — Pronostica la Liga FUTVE",
+    "description": "Únete a quinielas privadas, predice cada jornada y sube en el ranking. Gratis y en minutos."
+  },
+  "nav": {
+    "howItWorks": "Cómo funciona",
+    "preview": "Vista previa"
+  },
+  "hero": {
+    "badge": "Quinielas de la Liga FUTVE",
+    "title": "Pronostica la Liga <grad>FUTVE</grad> y compite con <accent>tus amigos</accent>",
+    "sub": "Únete a quinielas privadas, predice cada jornada y sube en el ranking. Gratis y en minutos.",
+    "cta1": "Registrarte gratis",
+    "cta2": "Ver cómo funciona"
+  },
+  "features": {
+    "free": "100% gratis",
+    "private": "Quinielas privadas",
+    "global": "Ranking global"
+  },
+  "matchCard": {
+    "matchday": "Jornada {value, number}",
+    "live": "En vivo",
+    "yourPrediction": "Tu pronóstico",
+    "ranking": "Ranking",
+    "points": "{value, number} pts"
+  },
+  "howItWorks": {
+    "sectionLabel": "Proceso",
+    "title": "Cómo funciona",
+    "sub": "Tres pasos para pasar de la invitación al ranking de la jornada.",
+    "step1Title": "Únete a una quiniela",
+    "step1Desc": "Crea una quiniela privada o únete a la de tus amigos con una invitación.",
+    "step2Title": "Predice cada jornada",
+    "step2Desc": "Pronostica los resultados de los partidos de la Liga FUTVE antes de que empiecen.",
+    "step3Title": "Sube en el ranking",
+    "step3Desc": "Acierta resultados, suma puntos y compite en el ranking de tu quiniela y en el global."
+  },
+  "preview": {
+    "sectionLabel": "Vista previa",
+    "title": "Así se ve por dentro",
+    "sub": "Pronósticos simples por jornada y una tabla que mantiene viva la competencia entre amigos.",
+    "statTitle": "Toda la Liga FUTVE",
+    "statSub": "jornada a jornada"
+  },
+  "cta": {
+    "title": "¿Listo para <grad>jugar?</grad>",
+    "sub": "Crea tu cuenta gratis y arma tu primera quiniela en minutos.",
+    "btn1": "Crea tu cuenta",
+    "trust": "Sin tarjeta de crédito. 100% gratis."
+  },
+  "footer": {
+    "tagline": "Quinielas de fútbol para la Liga FUTVE.",
+    "copy": "© {year} Quiniela FUTVE. Todos los derechos reservados."
+  }
+}

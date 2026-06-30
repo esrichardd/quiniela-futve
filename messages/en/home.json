@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "title": "Quiniela FUTVE — Predict the Liga FUTVE",
+    "description": "Join private pools, predict each matchday and climb the rankings. Free and in minutes."
+  },
+  "nav": {
+    "howItWorks": "How it works",
+    "preview": "Preview"
+  },
+  "hero": {
+    "badge": "Liga FUTVE pools",
+    "title": "Predict the <grad>Liga FUTVE</grad> and compete with <accent>your friends</accent>",
+    "sub": "Join private pools, predict each matchday and climb the rankings. Free and in minutes.",
+    "cta1": "Sign up free",
+    "cta2": "See how it works"
+  },
+  "features": {
+    "free": "100% free",
+    "private": "Private pools",
+    "global": "Global ranking"
+  },
+  "matchCard": {
+    "matchday": "Matchday {value, number}",
+    "live": "Live",
+    "yourPrediction": "Your prediction",
+    "ranking": "Ranking",
+    "points": "{value, number} pts"
+  },
+  "howItWorks": {
+    "sectionLabel": "Process",
+    "title": "How it works",
+    "sub": "Three steps from the invitation to the matchday ranking.",
+    "step1Title": "Join a pool",
+    "step1Desc": "Create a private pool or join your friends' pool with an invitation.",
+    "step2Title": "Predict each matchday",
+    "step2Desc": "Forecast the results of Liga FUTVE matches before they kick off.",
+    "step3Title": "Climb the rankings",
+    "step3Desc": "Nail results, earn points and compete in your pool and global rankings."
+  },
+  "preview": {
+    "sectionLabel": "Preview",
+    "title": "See it from the inside",
+    "sub": "Simple predictions each matchday and a leaderboard that keeps the competition alive among friends.",
+    "statTitle": "The whole Liga FUTVE",
+    "statSub": "matchday by matchday"
+  },
+  "cta": {
+    "title": "Ready to <grad>play?</grad>",
+    "sub": "Create your free account and set up your first pool in minutes.",
+    "btn1": "Create account",
+    "trust": "No credit card. 100% free."
+  },
+  "footer": {
+    "tagline": "Football pools for the Liga FUTVE.",
+    "copy": "© {year} Quiniela FUTVE. All rights reserved."
+  }
+}

@@ -11,6 +11,7 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
       disableTransitionOnChange
       enableColorScheme
       enableSystem
+      storageKey="quiniela-futve-theme"
       themes={["light", "dark"]}
       {...props}
     >

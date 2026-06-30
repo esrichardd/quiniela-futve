@@ -1,0 +1,397 @@
+@keyframes landing-float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes landing-pulse-glow {
+
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes landing-shimmer {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes landing-live-blink {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes landing-orb-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -20px) scale(1.05);
+  }
+
+  66% {
+    transform: translate(-20px, 15px) scale(0.97);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.landing-animate-float {
+  animation: landing-float 6s ease-in-out infinite;
+}
+
+.landing-animate-pulse-glow {
+  animation: landing-pulse-glow 2s ease-in-out infinite;
+}
+
+.landing-animate-live-blink {
+  animation: landing-live-blink 1.5s ease-in-out infinite;
+}
+
+.landing-animate-orb-drift {
+  animation: landing-orb-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .landing-animate-float,
+  .landing-animate-pulse-glow,
+  .landing-animate-live-blink,
+  .landing-animate-orb-drift {
+    animation: none;
+  }
+}
+
+.landing-text-gradient {
+  background: var(--c-text-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-glass-card {
+  background: var(--c-card-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--c-border);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.18),
+    0 0 0 1px var(--c-brand-a06) inset;
+}
+
+.landing-bright-border {
+  border: 1px solid var(--c-border-bright);
+}
+
+.landing-glass-card-hover {
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.landing-glass-card-hover:hover {
+  border-color: var(--c-border-bright);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.22),
+    0 0 24px var(--c-brand-a12);
+  transform: translateY(-2px);
+}
+
+.landing-btn-glow {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--c-brand-dim) 0%, var(--c-brand) 60%, var(--c-gold-dim) 100%);
+  box-shadow: 0 0 20px var(--c-brand-a35);
+  transition: box-shadow 0.25s, transform 0.15s;
+  color: var(--c-text-on-brand);
+  isolation: isolate;
+}
+
+.landing-btn-glow:hover {
+  box-shadow: 0 0 38px var(--c-brand-a60);
+  transform: translateY(-1px);
+}
+
+.landing-btn-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.14) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: landing-shimmer 2.5s linear infinite;
+  pointer-events: none;
+}
+
+.landing-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.landing-orb-hero-brand {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, var(--c-brand-a12) 0%, transparent 70%);
+  top: -100px;
+  left: -150px;
+}
+
+.landing-orb-hero-gold {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--c-gold-a10) 0%, transparent 70%);
+  right: -80px;
+  bottom: 80px;
+  animation-delay: 6s;
+}
+
+.landing-orb-hero-subtle {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--c-brand-a06) 0%, transparent 70%);
+  top: 200px;
+  right: 200px;
+}
+
+.landing-orb-process {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, var(--c-brand-a08) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.landing-orb-preview {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, var(--c-brand-a08) 0%, transparent 70%);
+  bottom: -80px;
+  left: -80px;
+}
+
+.landing-orb-cta {
+  width: 700px;
+  height: 400px;
+  background: radial-gradient(ellipse, var(--c-brand-a12) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.landing-hero-grid {
+  background-image:
+    linear-gradient(var(--c-brand) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c-brand) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.landing-hero-fade {
+  background: linear-gradient(to bottom, transparent, var(--c-bg));
+}
+
+.landing-section-fade {
+  background: linear-gradient(180deg, transparent 0%, var(--c-brand-a06) 50%, transparent 100%);
+}
+
+.landing-section-label {
+  display: inline-block;
+  color: var(--c-brand);
+  background: var(--c-brand-a06);
+  border: 1px solid var(--c-border-bright);
+}
+
+.landing-match-row {
+  transition: background 0.2s;
+}
+
+.landing-match-row:hover {
+  background: var(--c-brand-a06);
+}
+
+.landing-score-muted {
+  background: var(--c-brand-a08);
+}
+
+.landing-fixture-row-highlight {
+  background: var(--c-brand-a08);
+  border: 1px solid var(--c-brand-a20);
+}
+
+.landing-fixture-row-default {
+  background: var(--c-brand-a06);
+  border: 1px solid var(--c-border);
+}
+
+.landing-card-shadow-full {
+  box-shadow:
+    0 0 60px var(--c-brand-a12),
+    0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.landing-card-shadow-compact {
+  box-shadow:
+    0 0 50px var(--c-brand-a12),
+    0 16px 48px rgba(0, 0, 0, 0.45);
+}
+
+.landing-brand-hairline {
+  background: linear-gradient(90deg, transparent, var(--c-brand-a60), transparent);
+}
+
+.landing-border-bottom {
+  border-bottom: 1px solid var(--c-border);
+}
+
+.landing-muted-panel {
+  background: var(--c-brand-a06);
+  border: 1px solid var(--c-border);
+}
+
+.landing-row-divider {
+  border-bottom: 1px solid var(--c-border);
+}
+
+.landing-ranking-medal-default {
+  background: var(--c-brand-a12);
+}
+
+.landing-ranking-medal-gold {
+  background: linear-gradient(135deg, var(--c-gold), var(--c-gold-dim));
+  box-shadow: 0 0 10px var(--c-brand-a35);
+}
+
+.landing-live-badge {
+  background: var(--c-live-a10);
+  border: 1px solid var(--c-live-a20);
+}
+
+.landing-live-dot {
+  background: var(--c-live);
+}
+
+.landing-nav-link {
+  color: var(--c-muted);
+  transition: color 0.2s;
+}
+
+.landing-nav-link:hover {
+  color: var(--c-brand);
+}
+
+.landing-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-brand);
+  background: var(--c-brand-a12);
+  border: 1px solid var(--c-border-bright);
+}
+
+.landing-icon-badge-glow-sm {
+  box-shadow: 0 0 16px var(--c-brand-a12);
+}
+
+.landing-icon-badge-glow-lg {
+  box-shadow: 0 0 24px var(--c-brand-a20);
+}
+
+.landing-brand-dot {
+  background: var(--c-brand);
+  box-shadow: 0 0 8px var(--c-brand);
+}
+
+.landing-brand-mark-fill {
+  fill: var(--c-text-on-brand);
+}
+
+.landing-brand-mark-detail {
+  fill: var(--c-brand-dim);
+}
+
+.landing-accent-underline {
+  background: linear-gradient(90deg, var(--c-brand), var(--c-gold));
+}
+
+.landing-process-line-primary {
+  background: linear-gradient(90deg, var(--c-border-bright) 0%, var(--c-border) 100%);
+}
+
+.landing-process-line-secondary {
+  background: linear-gradient(90deg, var(--c-border) 0%, transparent 100%);
+}
+
+.landing-step-number {
+  color: var(--c-border-bright);
+}
+
+.landing-preview-plus {
+  background: linear-gradient(135deg, var(--c-brand-dim), var(--c-brand));
+  box-shadow: 0 0 14px var(--c-brand-a35);
+}
+
+.landing-cta-panel {
+  background: var(--c-card-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--c-border-bright);
+  box-shadow:
+    0 0 80px var(--c-brand-a12),
+    0 40px 80px rgba(0, 0, 0, 0.4);
+}
+
+.landing-cta-top-line {
+  background: linear-gradient(90deg, transparent 0%, var(--c-brand-a60) 50%, transparent 100%);
+}
+
+.landing-cta-brand-corner {
+  background: radial-gradient(circle at top left, var(--c-brand-a12), transparent 70%);
+}
+
+.landing-cta-gold-corner {
+  background: radial-gradient(circle at bottom right, var(--c-gold-a10), transparent 70%);
+}
+
+.landing-locale-switch {
+  background: var(--c-brand-a08);
+}
+
+.landing-locale-option-active {
+  background: var(--c-brand);
+  box-shadow: 0 0 8px var(--c-brand-a35);
+}
+
+.landing-locale-option-inactive {
+  opacity: 0.55;
+}
+
+.landing-footer-border {
+  border-top: 1px solid var(--c-border);
+}
