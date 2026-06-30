@@ -132,9 +132,24 @@ Las validaciones deben producir mensajes traducibles.
 Reglas:
 
 - Los schemas de validacion no deben acoplarse a frases en un solo idioma.
-- Las validaciones deben devolver codigos, claves o estructuras que puedan traducirse.
+- Las validaciones deben devolver claves o estructuras que puedan traducirse.
 - Los errores de servidor mostrados al usuario deben tener mensaje localizado.
 - Los errores tecnicos internos no deben exponerse literalmente.
+- Los errores de Neon Auth deben mapearse a claves propias antes de mostrarse en UI.
+- Los flujos de login, registro, verificacion de email, recuperacion y OAuth deben tener mensajes en `es` y `en`.
+
+Claves esperadas para auth:
+
+- `invalid_credentials`
+- `email_not_verified`
+- `email_already_registered`
+- `verification_link_sent`
+- `password_reset_link_sent`
+- `password_reset_link_expired`
+- `password_updated`
+- `user_banned`
+- `oauth_error`
+- `unknown_error`
 
 ## Contenido persistido
 
@@ -154,6 +169,7 @@ El idioma es una preferencia de presentacion. No modifica permisos, reglas de ne
 Reglas:
 
 - Para usuarios autenticados, la preferencia de idioma pertenece al perfil del usuario.
+- La preferencia autenticada se persiste en tablas app-owned, no en tablas internas de Neon Auth.
 - Para usuarios anonimos, la preferencia puede persistirse localmente.
 - La URL localizada siempre tiene prioridad sobre la preferencia guardada.
 - Toda pantalla visible debe existir en los locales soportados. Cambiar idioma preserva la pantalla actual en el nuevo locale.

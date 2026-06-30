@@ -26,6 +26,7 @@ Referencias externas utiles:
 
 - Next.js docs: https://nextjs.org/docs
 - React docs: https://react.dev
+- Neon Auth docs: https://neon.com/docs/auth
 - Better Auth docs: https://www.better-auth.com/docs
 - Drizzle ORM docs: https://orm.drizzle.team/docs
 - next-intl docs: https://next-intl.dev/docs
@@ -65,16 +66,25 @@ Referencias externas utiles:
 - Migraciones: Drizzle Kit.
 - Validacion: Zod.
 
-PostgreSQL encaja bien porque la aplicacion tendra un dominio relacional y necesitara integridad fuerte entre sus conceptos principales. Neon sera el proveedor gestionado de PostgreSQL por su ajuste natural con aplicaciones Next.js modernas y despliegues serverless. Drizzle mantiene el esquema en TypeScript, permite SQL explicito cuando haga falta y se integra bien con PostgreSQL y Better Auth.
+PostgreSQL encaja bien porque la aplicacion tendra un dominio relacional y necesitara integridad fuerte entre sus conceptos principales. Neon sera el proveedor gestionado de PostgreSQL por su ajuste natural con aplicaciones Next.js modernas y despliegues serverless. Drizzle mantiene el esquema app-owned en TypeScript y permite SQL explicito cuando haga falta. Neon Auth mantiene su propia infraestructura de identidad y sesiones fuera del ownership de las migraciones de producto.
 
 ### Autenticacion y autorizacion
 
-- Auth: Better Auth.
-- Estrategia inicial: email/password o OAuth segun producto, con sesiones gestionadas por la libreria.
-- Roles de aplicacion: `super_admin`, `league_admin`, `pool_admin`, `player`.
+- Auth: Neon Auth gestionado.
+- SDK de auth: `@neondatabase/auth`.
+- Implementacion subyacente: Neon Auth expone APIs compatibles con Better Auth, pero la aplicacion debe depender de la integracion oficial de Neon Auth, no de tablas internas propias de Better Auth.
+- Estrategia inicial: email/password con verificacion de correo habilitada y OAuth con Google.
+- Email transaccional de auth: Neon Auth envia links de verificacion y recuperacion usando Resend como SMTP custom.
+- Sesiones: gestionadas por Neon Auth.
+- Roles globales de aplicacion: `user`, `super_admin`.
+- Roles contextuales futuros: `league_admin`, `pool_admin`, `player`.
 - Permisos: helpers centralizados en `src/server/auth/permissions.ts`.
 
-Better Auth sera la capa de identidad, sesiones y flujos de autenticacion. La autorizacion del dominio se mantendra en codigo propio, porque los permisos dependen del contexto de negocio: liga, temporada, quiniela, membresia, estado del partido y rol del usuario dentro de cada ambito.
+Neon Auth sera la capa de identidad, credenciales, proveedores OAuth, verificacion de correo y sesiones. Neon Auth guarda usuarios, sesiones y configuracion OAuth en la base Neon bajo el schema `neon_auth`; ese schema no es ownership del proyecto y no debe modelar permisos de producto. La autorizacion del dominio se mantendra en codigo propio, porque los permisos dependen del contexto de negocio: liga, temporada, quiniela, membresia, estado del partido y rol del usuario dentro de cada ambito.
+
+La aplicacion mantendra datos propios de usuario en tablas app-owned, como perfil de aplicacion, preferencias, bloqueo administrativo y auditoria. Esas tablas usan el `user_id` emitido por Neon Auth como identificador externo estable.
+
+Resend se configura en Neon Auth como proveedor SMTP custom. El flujo inicial no requiere agregar el SDK de Resend al runtime de Next.js.
 
 ### Formularios y mutaciones
 
@@ -135,6 +145,8 @@ src/
 |   |       +-- seasons/page.tsx
 |   |       +-- matches/page.tsx
 |   +-- api/
+|   |   +-- auth/[...path]/
+|   |   |   +-- route.ts
 |   |   +-- webhooks/
 |   |       +-- route.ts
 |   +-- layout.tsx
@@ -149,6 +161,9 @@ src/
 +-- i18n/
 +-- features/
 |   +-- auth/
+|   |   +-- actions.ts
+|   |   +-- schemas.ts
+|   |   +-- types.ts
 |   +-- leagues/
 |   +-- seasons/
 |   +-- teams/
@@ -158,6 +173,10 @@ src/
 |   +-- leaderboards/
 +-- server/
 |   +-- auth/
+|   |   +-- client.ts
+|   |   +-- permissions.ts
+|   |   +-- server.ts
+|   |   +-- session.ts
 |   +-- db/
 |   |   +-- client.ts
 |   |   +-- schema/
@@ -240,7 +259,7 @@ Codigo que solo debe ejecutarse en servidor.
 
 Subcarpetas:
 
-- `auth`: configuracion de Better Auth, session helpers y permisos.
+- `auth`: configuracion de Neon Auth, helpers de sesion y permisos de aplicacion.
 - `db`: cliente Drizzle, schema y migraciones.
 - `dal`: lecturas/escrituras seguras que devuelven DTOs.
 - `services`: orquestacion de casos de negocio que combinan varias entidades.
@@ -309,7 +328,8 @@ Reglas:
 
 Usar `app/api/**/route.ts` para:
 
-- webhooks de auth, pagos o proveedores externos
+- handlers requeridos por Neon Auth, como `app/api/auth/[...path]/route.ts`
+- webhooks de pagos o proveedores externos
 - endpoints consumidos por apps externas
 - callbacks OAuth si la libreria lo requiere
 - importaciones o sincronizaciones externas
@@ -369,10 +389,13 @@ La autorizacion se modelara como permisos contextuales, no solo como roles globa
 
 Roles conceptuales iniciales:
 
+- `user`: usuario autenticado normal.
 - `super_admin`: administra toda la plataforma.
 - `league_admin`: administra ligas, temporadas, equipos y partidos dentro de su ambito.
 - `pool_admin`: administra una quiniela especifica.
 - `player`: participa en quinielas.
+
+`user` y `super_admin` son roles globales app-owned. `league_admin`, `pool_admin` y `player` son roles contextuales futuros y no deben guardarse como atributo global del usuario.
 
 Los permisos se evaluaran siempre con contexto. Por ejemplo, poder editar una quiniela depende de la quiniela concreta, la membresia del usuario, el estado de la quiniela y las reglas definidas. Poder cargar resultados depende de la liga o temporada asignada, no solamente de que el usuario tenga una etiqueta administrativa.
 

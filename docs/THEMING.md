@@ -31,7 +31,7 @@ El tema efectivo se resuelve asi:
 La preferencia de tema debe persistirse para evitar que el usuario tenga que elegirla en cada visita.
 
 - Para usuarios anonimos, la preferencia se persiste con el mecanismo de `next-themes`.
-- Para usuarios autenticados, la preferencia pertenece al perfil del usuario.
+- Para usuarios autenticados, la preferencia pertenece a `user_preferences`, una tabla app-owned vinculada al `user_id` de Neon Auth.
 - Al iniciar sesion, la preferencia del perfil del usuario tiene prioridad sobre la preferencia anonima.
 - Al cerrar sesion, la interfaz conserva la ultima preferencia local conocida.
 
@@ -97,7 +97,7 @@ Reglas:
 
 El tema es una preferencia de presentacion. No pertenece a la logica del dominio ni debe afectar autorizacion, visibilidad de datos o resultados de negocio.
 
-La preferencia de tema pertenece a las preferencias del usuario autenticado. `docs/database/USERS.md` define como se persiste esa preferencia; este documento define el comportamiento esperado.
+La preferencia de tema pertenece a las preferencias app-owned del usuario autenticado. Neon Auth no es la fuente de verdad para el tema. `docs/database/USERS.md` define como se persiste esa preferencia; este documento define el comportamiento esperado.
 
 ## Validacion
 

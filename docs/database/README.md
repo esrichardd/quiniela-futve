@@ -21,16 +21,19 @@ Este documento define la arquitectura general de base de datos. Los modelos conc
 
 Las tablas se clasifican por ownership:
 
-- Auth-owned: tablas requeridas por Better Auth para identidad, sesiones, cuentas y verificaciones.
-- App-owned: tablas propias de la aplicacion para preferencias, auditoria y dominio del producto.
+- Neon Auth-managed: datos internos que Neon Auth guarda en el schema `neon_auth` para identidad, credenciales, proveedores OAuth, verificaciones y sesiones.
+- App-owned: tablas propias de la aplicacion para perfil de aplicacion, roles globales, preferencias, auditoria y dominio del producto.
 
 Reglas:
 
-- Las tablas auth-owned siguen los requisitos de Better Auth.
+- Las tablas Neon Auth-managed no se modelan ni migran desde el schema Drizzle del proyecto.
+- El schema `neon_auth` pertenece al proveedor gestionado aunque viva dentro de la base Neon.
+- La aplicacion puede referenciar el `user_id` emitido por Neon Auth, pero no debe depender de la estructura interna de sus tablas.
 - Las tablas app-owned siguen las convenciones del proyecto.
-- El codigo de aplicacion no debe depender de detalles internos de Better Auth fuera del modulo `src/server/auth`.
+- El codigo de aplicacion no debe depender de detalles internos de Neon Auth fuera del modulo `src/server/auth`.
 - La DAL expone DTOs seguros y evita filtrar modelos completos hacia UI.
-- Better Auth puede exponer nombres de modelo en camelCase; la persistencia del proyecto usa `snake_case` mediante configuracion de adapter/schema.
+- La persistencia app-owned del proyecto usa `snake_case`.
+- Las migraciones versionadas del proyecto solo administran tablas app-owned.
 
 ## Convenciones de nombres
 
@@ -76,7 +79,7 @@ Reglas:
 
 - Indices para foreign keys consultadas frecuentemente.
 - Indices unicos para valores que identifican entidades.
-- Indices para tokens o identificadores usados en auth.
+- Indices para identificadores externos usados por integraciones, como `user_id` de Neon Auth.
 - No crear indices especulativos sin query conocida.
 
 ## Seguridad
@@ -95,7 +98,7 @@ Reglas:
 
 Modelos definidos:
 
-- `docs/database/USERS.md`: usuarios, auth, preferencias y auditoria.
+- `docs/database/USERS.md`: perfil de usuario app-owned, preferencias y auditoria.
 
 Proceso de cambios:
 

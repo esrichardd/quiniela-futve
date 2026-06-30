@@ -23,11 +23,10 @@ src/
     +-- db/
         +-- client.ts
         +-- schema/
-        |   +-- auth.ts
         |   +-- users.ts
         |   +-- index.ts
         +-- migrations/
-            +-- 0000_initial_auth_users.sql
+            +-- 0000_initial_user_app_data.sql
             +-- meta/
 drizzle.config.ts
 ```
@@ -79,16 +78,18 @@ Reglas:
 - Despues se actualiza el codigo de aplicacion.
 - Al final se elimina la estructura antigua.
 
-## Better Auth
+## Neon Auth
 
-Better Auth define requisitos para tablas auth-owned. Drizzle mantiene el schema y las migraciones versionadas.
+Neon Auth gestiona identidad, credenciales, proveedores OAuth, verificaciones y sesiones. Esos datos viven en el schema `neon_auth`, pero no son ownership del schema Drizzle del proyecto.
 
 Reglas:
 
-- La compatibilidad con Better Auth se preserva al modificar `users`, `sessions`, `accounts` y `verifications`.
-- Cambios requeridos por plugins de Better Auth se reflejan en schema Drizzle.
-- No se usa un migrador runtime de Better Auth como fuente principal de verdad.
-- El schema versionado del proyecto es la fuente de verdad.
+- Las migraciones del proyecto no crean ni modifican tablas internas de Neon Auth.
+- Las migraciones del proyecto no deben incluir objetos del schema `neon_auth`.
+- El schema versionado del proyecto es la fuente de verdad solo para tablas app-owned.
+- Los datos app-owned que referencian usuarios usan el `user_id` emitido por Neon Auth.
+- Si Neon Auth requiere configuracion o migraciones internas, se administran desde el flujo oficial de Neon Auth, no desde Drizzle Kit del proyecto.
+- Si en el futuro se migra a Better Auth self-hosted, debe abrirse un cambio documental y migratorio separado antes de crear tablas auth-owned propias.
 
 ## Neon
 
@@ -98,6 +99,7 @@ Reglas:
 
 - Cada ambiente usa su propia URL de conexion.
 - `DATABASE_URL` no se versiona.
+- La configuracion de Neon Auth y OAuth no se versiona cuando contiene secretos.
 - Las migraciones no deben depender de datos locales no versionados.
 - Las migraciones deben poder ejecutarse desde cero en una base vacia.
 
