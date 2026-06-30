@@ -11,7 +11,7 @@ export default async function HeroSection() {
   const t = await getTranslations("home");
 
   return (
-    <section className="relative flex items-center overflow-hidden px-4 pb-16 pt-28">
+    <section className="relative flex items-center overflow-hidden px-4 pb-12 pt-24 md:pb-16 md:pt-28">
       <Orb className="landing-orb-hero-brand" drift />
       <Orb className="landing-orb-hero-gold" drift />
       <Orb className="landing-orb-hero-subtle" />

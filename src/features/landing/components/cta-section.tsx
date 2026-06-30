@@ -10,11 +10,11 @@ export default async function CtaSection() {
   const common = await getTranslations("common");
 
   return (
-    <section className="relative overflow-hidden px-4 py-24">
+    <section className="relative overflow-hidden px-4 py-14 md:py-24">
       <Orb className="landing-orb-cta" />
 
       <div className="relative z-10 mx-auto max-w-4xl">
-        <div className="landing-cta-panel relative overflow-hidden rounded-3xl px-8 py-14 text-center md:px-16 md:py-20">
+        <div className="landing-cta-panel relative overflow-hidden rounded-3xl px-6 py-10 text-center md:px-16 md:py-20">
           <div
             aria-hidden="true"
             className="landing-cta-top-line absolute inset-x-0 top-0 h-px"
@@ -28,8 +28,8 @@ export default async function CtaSection() {
             className="landing-cta-gold-corner pointer-events-none absolute bottom-0 right-0 size-40"
           />
 
-          <div className="landing-icon-badge landing-icon-badge-glow-lg mx-auto mb-6 size-16 rounded-2xl">
-            <Trophy aria-hidden="true" className="size-8" strokeWidth={1.5} />
+          <div className="landing-icon-badge landing-icon-badge-glow-lg mx-auto mb-5 size-14 rounded-2xl md:mb-6 md:size-16">
+            <Trophy aria-hidden="true" className="size-7 md:size-8" strokeWidth={1.5} />
           </div>
 
           <h2 className="mb-4 text-balance text-3xl font-bold md:text-4xl lg:text-5xl">
@@ -39,7 +39,7 @@ export default async function CtaSection() {
               ),
             })}
           </h2>
-          <p className="mx-auto mb-10 max-w-md text-lg leading-relaxed text-muted-foreground">
+          <p className="mx-auto mb-8 max-w-md text-base leading-relaxed text-muted-foreground md:mb-10 md:text-lg">
             {t("cta.sub")}
           </p>
 

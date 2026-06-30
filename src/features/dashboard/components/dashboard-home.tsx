@@ -1,5 +1,6 @@
 import { CalendarDays, Construction, Trophy } from "lucide-react";
 
+import { BrandMark } from "@/components/brand-mark";
 import { Link } from "@/i18n/navigation";
 
 import LogoutButton from "./logout-button";
@@ -38,9 +39,7 @@ export default function DashboardHome({
             aria-label={homeLabel}
             className="inline-flex min-w-0 items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-sm font-black text-primary-foreground shadow-soft">
-              Q
-            </span>
+            <BrandMark className="size-9 rounded-lg" />
             <span className="truncate text-base font-bold tracking-tight">
               Quiniela <span className="text-brand">FUTVE</span>
             </span>

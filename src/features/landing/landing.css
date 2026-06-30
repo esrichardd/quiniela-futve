@@ -328,14 +328,6 @@
   box-shadow: 0 0 8px var(--c-brand);
 }
 
-.landing-brand-mark-fill {
-  fill: var(--c-text-on-brand);
-}
-
-.landing-brand-mark-detail {
-  fill: var(--c-brand-dim);
-}
-
 .landing-accent-underline {
   background: linear-gradient(90deg, var(--c-brand), var(--c-gold));
 }

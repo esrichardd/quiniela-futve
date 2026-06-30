@@ -32,6 +32,9 @@
   --c-text-on-brand: #ffffff;
   --c-link: #7c1225;
   --c-link-hover: #a8720a;
+  --c-flag-yellow: #fcd116;
+  --c-flag-blue: #003893;
+  --c-flag-red: #ce1126;
   --c-scrollbar: rgba(124, 18, 37, 0.25);
   --c-text-gradient: linear-gradient(135deg, #7c1225 0%, #b91c1c 55%, #a8720a 100%);
 
@@ -91,6 +94,9 @@
   --c-text-on-brand: #ffffff;
   --c-link: #d9a017;
   --c-link-hover: #f3f3f3;
+  --c-flag-yellow: #fcd116;
+  --c-flag-blue: #003893;
+  --c-flag-red: #ce1126;
   --c-scrollbar: rgba(111, 17, 30, 0.45);
   --c-text-gradient: linear-gradient(135deg, #9e1d2b 0%, #c0392b 45%, #d9a017 100%);
 

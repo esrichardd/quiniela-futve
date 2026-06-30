@@ -16,7 +16,7 @@ export default async function HowItWorks() {
   ];
 
   return (
-    <section id="how-it-works" className="relative overflow-hidden px-4 py-24">
+    <section id="how-it-works" className="relative overflow-hidden px-4 py-14 md:py-24">
       <div aria-hidden="true" className="landing-section-fade pointer-events-none absolute inset-0" />
       <Orb className="landing-orb-process" />
 
@@ -28,11 +28,11 @@ export default async function HowItWorks() {
         <h2 className="mb-3 text-balance text-center text-3xl font-bold text-foreground md:text-4xl">
           {t("howItWorks.title")}
         </h2>
-        <p className="mx-auto mb-14 max-w-md text-center text-muted-foreground">
+        <p className="mx-auto mb-8 max-w-md text-center text-sm text-muted-foreground md:mb-14 md:text-base">
           {t("howItWorks.sub")}
         </p>
 
-        <div className="relative grid gap-6 md:grid-cols-3">
+        <div className="relative grid gap-4 md:grid-cols-3 md:gap-6">
           <div
             aria-hidden="true"
             className="landing-process-line-primary absolute left-[33%] right-[33%] top-12 hidden h-px md:block"
@@ -48,7 +48,7 @@ export default async function HowItWorks() {
             return (
               <div
                 key={step.title}
-                className="landing-glass-card landing-glass-card-hover group relative rounded-2xl p-6"
+                className="landing-glass-card landing-glass-card-hover group relative rounded-2xl p-5 md:p-6"
               >
                 <div
                   aria-hidden="true"
@@ -58,9 +58,9 @@ export default async function HowItWorks() {
                 </div>
 
                 <div
-                  className="landing-icon-badge landing-icon-badge-glow-sm mb-5 size-12 rounded-xl transition-all group-hover:scale-110"
+                  className="landing-icon-badge landing-icon-badge-glow-sm mb-4 size-11 rounded-xl transition-all group-hover:scale-110 md:mb-5 md:size-12"
                 >
-                  <Icon aria-hidden="true" className="size-6" strokeWidth={1.5} />
+                  <Icon aria-hidden="true" className="size-5 md:size-6" strokeWidth={1.5} />
                 </div>
 
                 <h3 className="mb-2 text-lg font-bold text-foreground">{step.title}</h3>
