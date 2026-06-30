@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-El primer modelo app-owned de usuarios cubre perfil de aplicacion, rol global, bloqueo administrativo, preferencias transversales y auditoria.
+El primer modelo app-owned de usuarios cubre perfil de aplicacion, datos personales opcionales, rol global, bloqueo administrativo, preferencias transversales y auditoria.
 
 La identidad, credenciales, proveedores OAuth, verificacion de email y sesiones son responsabilidad de Neon Auth. Neon Auth guarda esos datos en el schema `neon_auth`, pero la aplicacion no administra esas tablas con Drizzle ni con migraciones propias.
 
@@ -68,6 +68,10 @@ Ownership: app-owned.
 | ---------------- | -------------------------- | --------- | ------------------------------------------------------ |
 | `user_id`        | `text`                     | si        | Identificador del usuario emitido por Neon Auth.       |
 | `display_name`   | `text`                     | no        | Nombre visible preferido dentro de la aplicacion.      |
+| `first_name`     | `text`                     | no        | Nombre del usuario para perfil de aplicacion.          |
+| `last_name`      | `text`                     | no        | Apellido del usuario para perfil de aplicacion.        |
+| `birth_date`     | `date`                     | no        | Fecha de nacimiento del usuario.                       |
+| `gender`         | `text`                     | no        | Genero declarado por el usuario.                       |
 | `avatar_url`     | `text`                     | no        | URL de imagen visible para UI cuando aplique.          |
 | `global_role`    | `text`                     | si        | Rol global app-owned: `user` o `super_admin`.          |
 | `banned`         | `boolean`                  | si        | Indica si el usuario esta bloqueado por la aplicacion. |
@@ -82,7 +86,9 @@ Constraints:
 - `global_role` solo acepta `user` o `super_admin`.
 - `global_role` por defecto es `user`.
 - `banned` por defecto es `false`.
-- `display_name` no debe ser obligatorio porque Google o email/password pueden entregar datos distintos.
+- `display_name`, `first_name`, `last_name`, `birth_date` y `gender` son opcionales.
+- `gender` solo acepta valores controlados por la aplicacion, inicialmente `female`, `male`, `non_binary`, `prefer_not_to_say` u `other`.
+- `birth_date` no puede ser una fecha futura.
 
 Indices:
 
@@ -95,6 +101,9 @@ Reglas:
 - Cada usuario de Neon Auth tiene como maximo un perfil app-owned.
 - El perfil debe crearse o asegurarse despues de registro o primer login exitoso.
 - `display_name` y `avatar_url` son datos de presentacion y pueden sincronizarse desde Neon Auth o ser editados por la aplicacion si se habilita ese flujo.
+- `first_name`, `last_name`, `birth_date` y `gender` son datos personales opcionales; no pertenecen a Neon Auth ni a `user_preferences`.
+- Estos datos personales no deben exponerse en DTOs publicos salvo que una pantalla o caso de uso lo necesite explicitamente.
+- La edad debe derivarse en servidor a partir de `birth_date`; no se persiste como columna.
 - `global_role` representa autorizacion global, no permisos contextuales.
 - No guardar email como dato app-owned salvo que exista una necesidad de producto documentada.
 
@@ -155,6 +164,7 @@ Acciones iniciales:
 - `user.created`
 - `user.first_login`
 - `user.email_verification_required`
+- `user.profile_updated`
 - `user.password_reset_requested`
 - `user.password_changed`
 - `user.google_login`
