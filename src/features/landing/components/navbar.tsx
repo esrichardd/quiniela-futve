@@ -49,13 +49,13 @@ export default async function Navbar() {
           />
 
           <Link
-            href="/sign-in"
+            href="/login"
             className="landing-nav-link hidden px-4 py-2 text-sm font-medium sm:block"
           >
             {common("actions.signIn")}
           </Link>
           <Link
-            href="/sign-up"
+            href="/register"
             className="landing-btn-glow hidden rounded-xl px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:block"
           >
             {common("actions.signUp")}

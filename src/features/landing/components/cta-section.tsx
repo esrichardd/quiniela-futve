@@ -14,9 +14,7 @@ export default async function CtaSection() {
       <Orb className="landing-orb-cta" />
 
       <div className="relative z-10 mx-auto max-w-4xl">
-        <div
-          className="landing-cta-panel relative overflow-hidden rounded-3xl px-8 py-14 text-center md:px-16 md:py-20"
-        >
+        <div className="landing-cta-panel relative overflow-hidden rounded-3xl px-8 py-14 text-center md:px-16 md:py-20">
           <div
             aria-hidden="true"
             className="landing-cta-top-line absolute inset-x-0 top-0 h-px"
@@ -36,7 +34,9 @@ export default async function CtaSection() {
 
           <h2 className="mb-4 text-balance text-3xl font-bold md:text-4xl lg:text-5xl">
             {t.rich("cta.title", {
-              grad: (chunks) => <span className="landing-text-gradient">{chunks}</span>,
+              grad: (chunks) => (
+                <span className="landing-text-gradient">{chunks}</span>
+              ),
             })}
           </h2>
           <p className="mx-auto mb-10 max-w-md text-lg leading-relaxed text-muted-foreground">
@@ -45,14 +45,14 @@ export default async function CtaSection() {
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href="/sign-up"
+              href="/register"
               className="landing-btn-glow flex w-full items-center justify-center gap-2 rounded-xl px-8 py-4 text-base font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:w-auto"
             >
               {t("cta.btn1")}
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
             <Link
-              href="/sign-in"
+              href="/login"
               className="landing-glass-card landing-glass-card-hover landing-bright-border w-full rounded-xl px-8 py-4 text-center text-base font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:w-auto"
             >
               {common("actions.signIn")}

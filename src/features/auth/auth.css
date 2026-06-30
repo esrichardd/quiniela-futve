@@ -1,0 +1,147 @@
+@keyframes auth-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-shell {
+  background:
+    linear-gradient(var(--c-brand-a06) 1px, transparent 1px),
+    linear-gradient(90deg, var(--c-brand-a06) 1px, transparent 1px),
+    var(--c-bg);
+  background-size: 48px 48px;
+}
+
+.auth-card {
+  animation: auth-slide-up 0.45s ease both;
+  background: var(--c-card-glass);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--c-border);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 0 0 1px var(--c-brand-a06) inset;
+}
+
+.auth-btn-glow {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--c-text-on-brand);
+  background: linear-gradient(135deg, var(--c-brand-dim) 0%, var(--c-brand) 60%, var(--c-gold-dim) 100%);
+  box-shadow: 0 0 20px var(--c-brand-a35);
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
+    opacity 0.2s ease;
+}
+
+.auth-btn-glow:hover {
+  box-shadow: 0 0 34px var(--c-brand-a60);
+  transform: translateY(-1px);
+}
+
+.auth-btn-glow:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.auth-btn-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.14) 50%, transparent 100%);
+  background-size: 200% 100%;
+}
+
+.auth-secondary-button {
+  color: var(--c-text);
+  background: var(--c-brand-a06);
+  border: 1px solid var(--c-border);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.auth-secondary-button:hover {
+  border-color: var(--c-border-bright);
+  box-shadow: 0 8px 28px var(--c-brand-a12);
+  transform: translateY(-1px);
+}
+
+.auth-input {
+  width: 100%;
+  color: var(--c-text);
+  background: var(--c-brand-a06);
+  border: 1px solid var(--c-border);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.auth-input::placeholder {
+  color: var(--c-subtle);
+}
+
+.auth-input:focus {
+  border-color: var(--c-brand);
+  box-shadow: 0 0 0 3px var(--c-brand-a12);
+}
+
+.auth-input-success {
+  border-color: var(--c-brand);
+}
+
+.auth-input-error {
+  border-color: var(--c-live);
+}
+
+.auth-link {
+  color: var(--c-brand);
+  transition: color 0.2s ease;
+}
+
+.auth-link:hover {
+  color: var(--c-gold);
+}
+
+.auth-divider-line {
+  background: var(--c-border);
+}
+
+.auth-strength-track {
+  background: var(--c-border);
+}
+
+.auth-strength-weak {
+  background: var(--c-live);
+}
+
+.auth-strength-medium {
+  background: var(--c-gold);
+}
+
+.auth-strength-strong {
+  background: var(--c-brand);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-card {
+    animation: none;
+  }
+
+  .auth-btn-glow,
+  .auth-secondary-button {
+    transition: none;
+  }
+}
