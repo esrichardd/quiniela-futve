@@ -1,26 +1,37 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
-import { Link, useRouter } from "@/i18n/navigation";
+import { signInAction } from "@/features/auth/actions";
+import {
+  initialAuthFormState,
+  type AuthFormErrorCode,
+  type AuthFormState,
+} from "@/features/auth/types";
+import { Link } from "@/i18n/navigation";
 
 import { AuthBrandMark } from "./auth-brand-mark";
 import { GoogleIcon } from "./google-icon";
 
-export default function LoginForm() {
+type LoginFormProps = Readonly<{
+  initialError?: AuthFormErrorCode;
+}>;
+
+export default function LoginForm({ initialError }: LoginFormProps) {
   const t = useTranslations("auth");
-  const router = useRouter();
+  const locale = useLocale();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    router.push("/home");
-  }
+  const initialState: AuthFormState = initialError
+    ? { status: "error", error: initialError }
+    : initialAuthFormState;
+  const [state, formAction, pending] = useActionState(
+    signInAction,
+    initialState,
+  );
 
   return (
     <section className="auth-card w-full max-w-md rounded-2xl p-6 sm:p-8">
@@ -36,10 +47,14 @@ export default function LoginForm() {
 
       <button
         type="button"
-        className="auth-secondary-button mb-6 flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        disabled
+        className="auth-secondary-button mb-6 flex w-full cursor-not-allowed flex-wrap items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <GoogleIcon />
-        {t("login.google")}
+        <span>{t("login.google")}</span>
+        <span className="rounded-full border border-border bg-brand/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand">
+          {t("shared.comingSoon")}
+        </span>
       </button>
 
       <div className="mb-6 flex items-center gap-3">
@@ -50,7 +65,8 @@ export default function LoginForm() {
         <div className="auth-divider-line h-px flex-1" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form action={formAction} className="space-y-4">
+        <input type="hidden" name="locale" value={locale} />
         <div>
           <label
             htmlFor="login-email"
@@ -64,6 +80,7 @@ export default function LoginForm() {
             type="email"
             autoComplete="email"
             required
+            disabled={pending}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder={t("fields.email.placeholder")}
@@ -93,6 +110,7 @@ export default function LoginForm() {
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               required
+              disabled={pending}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               placeholder={t("login.passwordPlaceholder")}
@@ -101,6 +119,7 @@ export default function LoginForm() {
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
+              disabled={pending}
               className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-subtle-text transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={
                 showPassword
@@ -117,11 +136,22 @@ export default function LoginForm() {
           </div>
         </div>
 
+        {state.status === "error" ? (
+          <p
+            role="alert"
+            aria-live="polite"
+            className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+          >
+            {t(`errors.${state.error}`)}
+          </p>
+        ) : null}
+
         <button
           type="submit"
-          className="auth-btn-glow mt-2 w-full rounded-xl py-3 text-sm font-bold"
+          disabled={pending}
+          className="auth-btn-glow mt-2 w-full rounded-xl py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {t("login.submit")}
+          {pending ? t("login.submitting") : t("login.submit")}
         </button>
       </form>
 

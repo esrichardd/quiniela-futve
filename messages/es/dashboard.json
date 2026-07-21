@@ -9,12 +9,12 @@
     },
     "eyebrow": "Panel en construcción",
     "title": "El vestuario ya está abierto",
-    "subtitle": "Esta será tu casa para crear quinielas, enviar pronósticos y seguir la tabla. Por ahora dejamos el flujo listo mientras armamos la lógica de autenticación.",
-    "statusTitle": "Próxima jugada: conectar la sesión",
-    "statusBody": "Cuando el login esté activo, aquí verás tus quinielas, jornadas disponibles y el ranking de tus grupos.",
+    "subtitle": "Tu cuenta ya está conectada. Esta será tu casa para crear quinielas, enviar pronósticos y seguir la tabla mientras terminamos la experiencia de juego.",
+    "statusTitle": "Próxima jugada: tu primera quiniela",
+    "statusBody": "Aquí verás tus quinielas, jornadas disponibles y el ranking de tus grupos cuando incorporemos el primer flujo jugable.",
     "primaryStatLabel": "Estado",
-    "primaryStatValue": "En progreso",
+    "primaryStatValue": "Cuenta activa",
     "secondaryStatLabel": "Flujo",
-    "secondaryStatValue": "Listo para auth"
+    "secondaryStatValue": "Sesión protegida"
   }
 }

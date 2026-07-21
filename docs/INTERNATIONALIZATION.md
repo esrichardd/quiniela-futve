@@ -136,20 +136,21 @@ Reglas:
 - Los errores de servidor mostrados al usuario deben tener mensaje localizado.
 - Los errores tecnicos internos no deben exponerse literalmente.
 - Los errores de Neon Auth deben mapearse a claves propias antes de mostrarse en UI.
-- Los flujos de login, registro, verificacion de email, recuperacion y OAuth deben tener mensajes en `es` y `en`.
+- Los flujos de login, registro, verificacion de email y recuperacion deben tener mensajes en `es` y `en`. OAuth debe cumplir la misma regla cuando se habilite.
 
 Claves esperadas para auth:
 
 - `invalid_credentials`
 - `email_not_verified`
 - `email_already_registered`
-- `verification_link_sent`
-- `password_reset_link_sent`
-- `password_reset_link_expired`
-- `password_updated`
+- `invalid_form`
+- `invalid_reset_token`
+- `network_error`
+- `rate_limited`
 - `user_banned`
-- `oauth_error`
 - `unknown_error`
+
+Los emails de autenticacion reutilizan shells HTML en `templates/emails/`, pero todo su contenido traducible vive bajo `auth.emails` en los archivos de mensajes. El locale se obtiene del callback localizado incluido en el link generado por Neon Auth y usa `es` como fallback.
 
 ## Contenido persistido
 

@@ -1,11 +1,19 @@
 "use client";
 
-import type { ChangeEvent, FormEvent } from "react";
-import { useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { Check, Eye, EyeOff } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
-import { Link, useRouter } from "@/i18n/navigation";
+import { signUpAction } from "@/features/auth/actions";
+import {
+  evaluatePassword,
+  PASSWORD_INPUT_PATTERN,
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "@/features/auth/password-policy";
+import { initialAuthFormState } from "@/features/auth/types";
+import { Link } from "@/i18n/navigation";
 
 import { AuthBrandMark } from "./auth-brand-mark";
 import { GoogleIcon } from "./google-icon";
@@ -28,33 +36,32 @@ const initialFormState: RegisterFormState = {
 
 export default function RegisterForm() {
   const t = useTranslations("auth");
-  const router = useRouter();
+  const locale = useLocale();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [form, setForm] = useState<RegisterFormState>(initialFormState);
+  const [state, formAction, pending] = useActionState(
+    signUpAction,
+    initialAuthFormState,
+  );
 
   const passwordChecks = useMemo(
-    () => [
-      { key: "length" as const, ok: form.password.length >= 8 },
-      { key: "uppercase" as const, ok: /[A-Z]/.test(form.password) },
-      { key: "number" as const, ok: /[0-9]/.test(form.password) },
-    ],
+    () => evaluatePassword(form.password),
     [form.password],
   );
 
   const passwordScore = passwordChecks.filter((check) => check.ok).length;
-  const passwordMatch = Boolean(form.confirmPassword && form.password === form.confirmPassword);
-  const passwordMismatch = Boolean(form.confirmPassword && form.password !== form.confirmPassword);
+  const passwordMatch = Boolean(
+    form.confirmPassword && form.password === form.confirmPassword,
+  );
+  const passwordMismatch = Boolean(
+    form.confirmPassword && form.password !== form.confirmPassword,
+  );
 
   function handleChange(field: keyof RegisterFormState) {
     return (event: ChangeEvent<HTMLInputElement>) => {
       setForm((current) => ({ ...current, [field]: event.target.value }));
     };
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    router.push("/verify-email");
   }
 
   const strengthLabel =
@@ -64,22 +71,34 @@ export default function RegisterForm() {
         ? t("register.strength.medium")
         : t("register.strength.weak");
   const strengthClass =
-    passwordScore === 3 ? "auth-strength-strong" : passwordScore === 2 ? "auth-strength-medium" : "auth-strength-weak";
+    passwordScore === 3
+      ? "auth-strength-strong"
+      : passwordScore === 2
+        ? "auth-strength-medium"
+        : "auth-strength-weak";
 
   return (
     <section className="auth-card w-full max-w-md rounded-2xl p-6 sm:p-8">
       <div className="mb-7 text-center">
         <AuthBrandMark className="mx-auto mb-4 size-12 rounded-xl" />
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("register.title")}</h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">{t("register.subtitle")}</p>
+        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+          {t("register.title")}
+        </h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          {t("register.subtitle")}
+        </p>
       </div>
 
       <button
         type="button"
-        className="auth-secondary-button mb-5 flex w-full items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        disabled
+        className="auth-secondary-button mb-5 flex w-full cursor-not-allowed flex-wrap items-center justify-center gap-3 rounded-xl px-4 py-3 text-sm font-medium opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <GoogleIcon />
-        {t("register.google")}
+        <span>{t("register.google")}</span>
+        <span className="rounded-full border border-border bg-brand/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand">
+          {t("shared.comingSoon")}
+        </span>
       </button>
 
       <div className="mb-5 flex items-center gap-3">
@@ -88,10 +107,14 @@ export default function RegisterForm() {
         <div className="auth-divider-line h-px flex-1" />
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form action={formAction} className="space-y-4">
+        <input type="hidden" name="locale" value={locale} />
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
-            <label htmlFor="register-first-name" className="mb-1.5 block text-sm font-medium text-foreground">
+            <label
+              htmlFor="register-first-name"
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
               {t("fields.firstName.label")}
             </label>
             <input
@@ -100,6 +123,7 @@ export default function RegisterForm() {
               type="text"
               autoComplete="given-name"
               required
+              disabled={pending}
               value={form.firstName}
               onChange={handleChange("firstName")}
               placeholder={t("fields.firstName.placeholder")}
@@ -107,7 +131,10 @@ export default function RegisterForm() {
             />
           </div>
           <div>
-            <label htmlFor="register-last-name" className="mb-1.5 block text-sm font-medium text-foreground">
+            <label
+              htmlFor="register-last-name"
+              className="mb-1.5 block text-sm font-medium text-foreground"
+            >
               {t("fields.lastName.label")}
             </label>
             <input
@@ -116,6 +143,7 @@ export default function RegisterForm() {
               type="text"
               autoComplete="family-name"
               required
+              disabled={pending}
               value={form.lastName}
               onChange={handleChange("lastName")}
               placeholder={t("fields.lastName.placeholder")}
@@ -125,7 +153,10 @@ export default function RegisterForm() {
         </div>
 
         <div>
-          <label htmlFor="register-email" className="mb-1.5 block text-sm font-medium text-foreground">
+          <label
+            htmlFor="register-email"
+            className="mb-1.5 block text-sm font-medium text-foreground"
+          >
             {t("fields.email.label")}
           </label>
           <input
@@ -134,6 +165,7 @@ export default function RegisterForm() {
             type="email"
             autoComplete="email"
             required
+            disabled={pending}
             value={form.email}
             onChange={handleChange("email")}
             placeholder={t("fields.email.placeholder")}
@@ -142,7 +174,10 @@ export default function RegisterForm() {
         </div>
 
         <div>
-          <label htmlFor="register-password" className="mb-1.5 block text-sm font-medium text-foreground">
+          <label
+            htmlFor="register-password"
+            className="mb-1.5 block text-sm font-medium text-foreground"
+          >
             {t("fields.password.label")}
           </label>
           <div className="relative">
@@ -152,8 +187,10 @@ export default function RegisterForm() {
               type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               required
-              minLength={8}
-              pattern="(?=.*[A-Z])(?=.*\d).{8,}"
+              disabled={pending}
+              minLength={PASSWORD_MIN_LENGTH}
+              maxLength={PASSWORD_MAX_LENGTH}
+              pattern={PASSWORD_INPUT_PATTERN}
               title={t("register.passwordTitle")}
               value={form.password}
               onChange={handleChange("password")}
@@ -163,10 +200,19 @@ export default function RegisterForm() {
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
+              disabled={pending}
               className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-subtle-text transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label={showPassword ? t("shared.hidePassword") : t("shared.showPassword")}
+              aria-label={
+                showPassword
+                  ? t("shared.hidePassword")
+                  : t("shared.showPassword")
+              }
             >
-              {showPassword ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
+              {showPassword ? (
+                <EyeOff aria-hidden="true" className="size-4" />
+              ) : (
+                <Eye aria-hidden="true" className="size-4" />
+              )}
             </button>
           </div>
 
@@ -176,18 +222,28 @@ export default function RegisterForm() {
                 {[0, 1, 2].map((index) => (
                   <div
                     key={index}
-                    className={`h-1 flex-1 rounded-full transition-colors ${index < passwordScore ? strengthClass : "auth-strength-track"}`}
+                    className={`h-1 flex-1 rounded-full transition-colors ${
+                      index < passwordScore
+                        ? strengthClass
+                        : "auth-strength-track"
+                    }`}
                   />
                 ))}
               </div>
-              <p className="text-xs font-medium text-muted-foreground">{strengthLabel}</p>
+              <p className="text-xs font-medium text-muted-foreground">
+                {strengthLabel}
+              </p>
               <div className="flex flex-wrap items-center gap-3">
                 {passwordChecks.map((check) => (
                   <span
                     key={check.key}
-                    className={`flex items-center gap-1 text-xs transition-colors ${check.ok ? "text-brand" : "text-subtle-text"}`}
+                    className={`flex items-center gap-1 text-xs transition-colors ${
+                      check.ok ? "text-brand" : "text-subtle-text"
+                    }`}
                   >
-                    {check.ok ? <Check aria-hidden="true" className="size-3.5" /> : null}
+                    {check.ok ? (
+                      <Check aria-hidden="true" className="size-3.5" />
+                    ) : null}
                     {t(`register.rules.${check.key}`)}
                   </span>
                 ))}
@@ -197,7 +253,10 @@ export default function RegisterForm() {
         </div>
 
         <div>
-          <label htmlFor="register-confirm-password" className="mb-1.5 block text-sm font-medium text-foreground">
+          <label
+            htmlFor="register-confirm-password"
+            className="mb-1.5 block text-sm font-medium text-foreground"
+          >
             {t("fields.confirmPassword.label")}
           </label>
           <div className="relative">
@@ -207,24 +266,42 @@ export default function RegisterForm() {
               type={showConfirm ? "text" : "password"}
               autoComplete="new-password"
               required
+              disabled={pending}
               value={form.confirmPassword}
               onChange={handleChange("confirmPassword")}
               placeholder={t("fields.confirmPassword.placeholder")}
               aria-invalid={passwordMismatch}
               className={`auth-input rounded-xl px-4 py-3 pr-11 text-base outline-none ${
-                passwordMismatch ? "auth-input-error" : passwordMatch ? "auth-input-success" : ""
+                passwordMismatch
+                  ? "auth-input-error"
+                  : passwordMatch
+                    ? "auth-input-success"
+                    : ""
               }`}
             />
             <button
               type="button"
               onClick={() => setShowConfirm((current) => !current)}
+              disabled={pending}
               className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-subtle-text transition-colors hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label={showConfirm ? t("shared.hidePassword") : t("shared.showPassword")}
+              aria-label={
+                showConfirm
+                  ? t("shared.hidePassword")
+                  : t("shared.showPassword")
+              }
             >
-              {showConfirm ? <EyeOff aria-hidden="true" className="size-4" /> : <Eye aria-hidden="true" className="size-4" />}
+              {showConfirm ? (
+                <EyeOff aria-hidden="true" className="size-4" />
+              ) : (
+                <Eye aria-hidden="true" className="size-4" />
+              )}
             </button>
           </div>
-          {passwordMismatch ? <p className="mt-1.5 text-xs text-live">{t("register.passwordMismatch")}</p> : null}
+          {passwordMismatch ? (
+            <p className="mt-1.5 text-xs text-live">
+              {t("register.passwordMismatch")}
+            </p>
+          ) : null}
           {passwordMatch ? (
             <p className="mt-1.5 flex items-center gap-1 text-xs text-brand">
               <Check aria-hidden="true" className="size-3.5" />
@@ -233,8 +310,22 @@ export default function RegisterForm() {
           ) : null}
         </div>
 
-        <button type="submit" className="auth-btn-glow mt-1 w-full rounded-xl py-3 text-sm font-bold" disabled={passwordMismatch}>
-          {t("register.submit")}
+        {state.status === "error" ? (
+          <p
+            role="alert"
+            aria-live="polite"
+            className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+          >
+            {t(`errors.${state.error}`)}
+          </p>
+        ) : null}
+
+        <button
+          type="submit"
+          className="auth-btn-glow mt-1 w-full rounded-xl py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={passwordMismatch || pending}
+        >
+          {pending ? t("register.submitting") : t("register.submit")}
         </button>
       </form>
 

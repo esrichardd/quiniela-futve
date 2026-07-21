@@ -73,18 +73,18 @@ PostgreSQL encaja bien porque la aplicacion tendra un dominio relacional y neces
 - Auth: Neon Auth gestionado.
 - SDK de auth: `@neondatabase/auth`.
 - Implementacion subyacente: Neon Auth expone APIs compatibles con Better Auth, pero la aplicacion debe depender de la integracion oficial de Neon Auth, no de tablas internas propias de Better Auth.
-- Estrategia inicial: email/password con verificacion de correo habilitada y OAuth con Google.
-- Email transaccional de auth: Neon Auth envia links de verificacion y recuperacion usando Resend como SMTP custom.
+- Estrategia actual: email/password con verificacion de correo habilitada. OAuth con Google queda diferido y su UI permanece deshabilitada hasta una fase posterior.
+- Email transaccional de auth: Neon Auth genera los links y emite eventos `send.magic_link`; un Route Handler verifica la firma del webhook y entrega los templates propios mediante Resend.
 - Sesiones: gestionadas por Neon Auth.
 - Roles globales de aplicacion: `user`, `super_admin`.
 - Roles contextuales futuros: `league_admin`, `pool_admin`, `player`.
-- Permisos: helpers centralizados en `src/server/auth/permissions.ts`.
+- Permisos: los checks actuales de sesion, bloqueo y verificacion viven en `src/server/auth`; los permisos contextuales se centralizaran en `src/server/auth/permissions.ts` cuando el dominio los introduzca.
 
 Neon Auth sera la capa de identidad, credenciales, proveedores OAuth, verificacion de correo y sesiones. Neon Auth guarda usuarios, sesiones y configuracion OAuth en la base Neon bajo el schema `neon_auth`; ese schema no es ownership del proyecto y no debe modelar permisos de producto. La autorizacion del dominio se mantendra en codigo propio, porque los permisos dependen del contexto de negocio: liga, temporada, quiniela, membresia, estado del partido y rol del usuario dentro de cada ambito.
 
 La aplicacion mantendra datos propios de usuario en tablas app-owned, como perfil de aplicacion, preferencias, bloqueo administrativo y auditoria. Esas tablas usan el `user_id` emitido por Neon Auth como identificador externo estable.
 
-Resend se configura en Neon Auth como proveedor SMTP custom. El flujo inicial no requiere agregar el SDK de Resend al runtime de Next.js.
+La aplicacion usa el SDK de Resend exclusivamente desde codigo server-only. El webhook de Neon Auth es bloqueante: reemplaza el envio predeterminado, valida una firma Ed25519 sobre el body original y responde con exito solo despues de que Resend acepta el correo. Los reintentos usan `event_id` como clave de idempotencia y los templates HTML viven fuera de la UI en `templates/emails/`.
 
 ### Formularios y mutaciones
 
@@ -148,7 +148,7 @@ src/
 |   |   +-- auth/[...path]/
 |   |   |   +-- route.ts
 |   |   +-- webhooks/
-|   |       +-- route.ts
+|   |       +-- neon-auth/route.ts
 |   +-- layout.tsx
 |   +-- globals.css
 |   +-- error.tsx
@@ -184,6 +184,7 @@ src/
 |   +-- dal/
 |   +-- services/
 |   +-- integrations/
+|   +-- email/
 +-- lib/
 |   +-- env.ts
 |   +-- routes.ts

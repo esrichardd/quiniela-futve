@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="{{LOCALE}}" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no" />
+    <title>{{DOCUMENT_TITLE}}</title>
+    <style>
+      @media only screen and (max-width: 620px) {
+        .email-shell {
+          width: 100% !important;
+        }
+
+        .email-card {
+          border-radius: 16px !important;
+        }
+
+        .email-padding {
+          padding-left: 24px !important;
+          padding-right: 24px !important;
+        }
+
+        .email-title {
+          font-size: 28px !important;
+          line-height: 34px !important;
+        }
+      }
+
+      @media (prefers-color-scheme: dark) {
+        .email-body,
+        .email-background {
+          background-color: #0c0809 !important;
+        }
+
+        .email-card {
+          background-color: #23141a !important;
+          border-color: #3b2930 !important;
+        }
+
+        .email-heading,
+        .email-brand {
+          color: #f3f3f3 !important;
+        }
+
+        .email-copy {
+          color: #d8cfd1 !important;
+        }
+
+        .email-muted {
+          color: #b0a6a8 !important;
+        }
+
+        .email-note {
+          background-color: #2b191f !important;
+          border-color: #4a2b35 !important;
+        }
+
+        .email-link {
+          color: #d9a017 !important;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="email-body"
+    style="margin: 0; padding: 0; background-color: #f8f8f8; color: #111111; font-family: Arial, Helvetica, sans-serif;"
+  >
+    <!-- Auth email values are injected by the server-side template renderer. -->
+    <div
+      style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: transparent;"
+    >
+      {{PREHEADER}}
+    </div>
+
+    <table
+      role="presentation"
+      width="100%"
+      cellspacing="0"
+      cellpadding="0"
+      border="0"
+      class="email-background"
+      style="width: 100%; background-color: #f8f8f8;"
+    >
+      <tr>
+        <td align="center" style="padding: 32px 12px;">
+          <table
+            role="presentation"
+            width="600"
+            cellspacing="0"
+            cellpadding="0"
+            border="0"
+            class="email-shell"
+            style="width: 600px; max-width: 600px;"
+          >
+            <tr>
+              <td style="padding: 0 8px 18px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td
+                      width="44"
+                      height="44"
+                      align="center"
+                      valign="middle"
+                      style="width: 44px; height: 44px; background-color: #7c1225; border-radius: 11px; box-shadow: 0 6px 18px rgba(124, 18, 37, 0.28);"
+                    >
+                      <table
+                        role="presentation"
+                        width="26"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        style="width: 26px; border: 2px solid #ffffff; border-radius: 50%; overflow: hidden;"
+                      >
+                        <tr><td height="7" style="height: 7px; background-color: #fcd116; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+                        <tr><td height="7" style="height: 7px; background-color: #003893; color: #ffffff; font-size: 8px; line-height: 7px; text-align: center;">••••</td></tr>
+                        <tr><td height="7" style="height: 7px; background-color: #ce1126; font-size: 0; line-height: 0;">&nbsp;</td></tr>
+                      </table>
+                    </td>
+                    <td
+                      class="email-brand"
+                      style="padding-left: 11px; color: #111111; font-size: 18px; font-weight: 700; letter-spacing: -0.3px;"
+                    >
+                      Quiniela <span style="color: #7c1225;">FUTVE</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td
+                class="email-card"
+                style="overflow: hidden; background-color: #ffffff; border: 1px solid #e7dde0; border-radius: 22px; box-shadow: 0 20px 50px rgba(35, 20, 26, 0.10);"
+              >
+                <div
+                  style="height: 5px; background-color: #7c1225; background-image: linear-gradient(90deg, #5a0d1a 0%, #7c1225 58%, #a8720a 100%); font-size: 0; line-height: 0;"
+                >&nbsp;</div>
+
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                  <tr>
+                    <td class="email-padding" style="padding: 44px 52px 20px; text-align: center;">
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                        <tr>
+                          <td
+                            width="58"
+                            height="58"
+                            align="center"
+                            valign="middle"
+                            style="width: 58px; height: 58px; background-color: #f5e8eb; border: 1px solid #dfbcc4; border-radius: 16px; color: #7c1225; font-size: 30px; font-weight: 700; line-height: 58px;"
+                          >
+                            ✓
+                          </td>
+                        </tr>
+                      </table>
+
+                      <p
+                        style="margin: 24px 0 12px; color: #7c1225; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; line-height: 16px; text-transform: uppercase;"
+                      >
+                        {{EYEBROW}}
+                      </p>
+                      <h1
+                        class="email-title email-heading"
+                        style="margin: 0; color: #111111; font-size: 34px; font-weight: 700; letter-spacing: -0.9px; line-height: 40px;"
+                      >
+                        {{HEADING}}
+                      </h1>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="email-padding" style="padding: 0 52px;">
+                      <p
+                        class="email-copy"
+                        style="margin: 0; color: #555555; font-size: 16px; line-height: 26px; text-align: center;"
+                      >
+                        {{BODY}}
+                      </p>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="email-padding" style="padding: 30px 52px 0;">
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                        <tr>
+                          <td
+                            align="center"
+                            bgcolor="#7c1225"
+                            style="background-color: #7c1225; background-image: linear-gradient(135deg, #5a0d1a 0%, #7c1225 62%, #a8720a 100%); border-radius: 12px;"
+                          >
+                            <a
+                              href="{{VERIFICATION_URL}}"
+                              target="_blank"
+                              style="display: block; padding: 15px 24px; color: #ffffff; font-size: 15px; font-weight: 700; line-height: 20px; text-align: center; text-decoration: none;"
+                            >
+                              {{BUTTON_LABEL}}
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="email-padding" style="padding: 24px 52px 0;">
+                      <table
+                        role="presentation"
+                        width="100%"
+                        cellspacing="0"
+                        cellpadding="0"
+                        border="0"
+                        class="email-note"
+                        style="background-color: #faf5f6; border: 1px solid #eedfe3; border-radius: 12px;"
+                      >
+                        <tr>
+                          <td style="padding: 15px 17px;">
+                            <p
+                              class="email-muted"
+                              style="margin: 0; color: #777777; font-size: 13px; line-height: 20px;"
+                            >
+                              <strong style="color: #7c1225;">{{NOTE_LEAD}}</strong>
+                              {{NOTE_BODY}}
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td class="email-padding" style="padding: 24px 52px 44px;">
+                      <p
+                        class="email-muted"
+                        style="margin: 0 0 7px; color: #888888; font-size: 12px; line-height: 18px; text-align: center;"
+                      >
+                        {{FALLBACK_INSTRUCTIONS}}
+                      </p>
+                      <p style="margin: 0; font-size: 12px; line-height: 18px; text-align: center; word-break: break-all;">
+                        <a
+                          href="{{VERIFICATION_URL}}"
+                          target="_blank"
+                          class="email-link"
+                          style="color: #7c1225; text-decoration: underline;"
+                        >{{VERIFICATION_URL}}</a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding: 22px 20px 0; text-align: center;">
+                <p
+                  class="email-muted"
+                  style="margin: 0; color: #888888; font-size: 11px; line-height: 17px;"
+                >
+                  {{FOOTER}}
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

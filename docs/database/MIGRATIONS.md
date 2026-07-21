@@ -43,11 +43,13 @@ Reglas:
 Todo cambio de base de datos sigue este flujo:
 
 1. Actualizar el schema TypeScript en `src/server/db/schema/`.
-2. Generar migracion con Drizzle Kit.
+2. Generar migracion con `pnpm db:generate`.
 3. Revisar el SQL generado.
 4. Ajustar el schema o SQL si la migracion no expresa correctamente la intencion.
-5. Aplicar la migracion en el ambiente correspondiente.
+5. Aplicar la migracion con `pnpm db:migrate` en el ambiente correspondiente.
 6. Versionar schema, SQL y metadata en el mismo commit.
+
+Los dos comandos usan `DATABASE_URL` del ambiente actual. Nunca ejecutar `db:migrate` sin confirmar primero el destino y revisar el SQL pendiente.
 
 ## Reglas de migracion
 
@@ -134,7 +136,3 @@ Reglas:
 - No asumir que una migracion destructiva puede revertirse sin perdida.
 - Para cambios riesgosos, usar migraciones por fases.
 - Restaurar backups es una accion operativa, no reemplaza una migracion correctiva.
-
-## Fuera de alcance
-
-Este documento no define comandos exactos de package scripts. Los scripts se agregan al `package.json` cuando Drizzle y la conexion de base de datos esten instalados.

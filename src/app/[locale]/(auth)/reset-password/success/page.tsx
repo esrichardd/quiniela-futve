@@ -1,24 +1,21 @@
 import type { Metadata } from "next";
+import { BadgeCheck } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import AuthLayout from "@/features/auth/components/auth-layout";
-import LoginForm from "@/features/auth/components/login-form";
-import type { AuthFormErrorCode } from "@/features/auth/types";
+import AuthStatusCard from "@/features/auth/components/auth-status-card";
 import { isLocale } from "@/i18n/routing";
 
-type LoginPageProps = Readonly<{
+type ResetPasswordSuccessPageProps = Readonly<{
   params: Promise<{
     locale: string;
-  }>;
-  searchParams: Promise<{
-    reason?: string | string[];
   }>;
 }>;
 
 export async function generateMetadata({
   params,
-}: LoginPageProps): Promise<Metadata> {
+}: ResetPasswordSuccessPageProps): Promise<Metadata> {
   const { locale } = await params;
 
   if (!isLocale(locale)) {
@@ -28,12 +25,14 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "auth" });
 
   return {
-    title: t("login.metadata.title"),
-    description: t("login.metadata.description"),
+    title: t("resetPasswordSuccess.metadata.title"),
+    description: t("resetPasswordSuccess.metadata.description"),
   };
 }
 
-export default async function LoginPage({ params, searchParams }: LoginPageProps) {
+export default async function ResetPasswordSuccessPage({
+  params,
+}: ResetPasswordSuccessPageProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {
@@ -42,14 +41,19 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
 
   setRequestLocale(locale);
 
+  const t = await getTranslations("auth");
   const common = await getTranslations("common");
-  const { reason } = await searchParams;
-  const initialError: AuthFormErrorCode | undefined =
-    reason === "user_banned" ? "user_banned" : undefined;
 
   return (
     <AuthLayout homeLabel={common("navigation.home")}>
-      <LoginForm initialError={initialError} />
+      <AuthStatusCard
+        title={t("resetPasswordSuccess.title")}
+        subtitle={t("resetPasswordSuccess.subtitle")}
+        note={t("resetPasswordSuccess.note")}
+        actionLabel={t("resetPasswordSuccess.action")}
+        actionHref="/login"
+        icon={BadgeCheck}
+      />
     </AuthLayout>
   );
 }

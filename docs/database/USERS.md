@@ -138,6 +138,7 @@ Indices:
 Reglas:
 
 - Cada usuario tiene como maximo un registro de preferencias.
+- Al crear preferencias durante registro o primer login, se conserva el locale validado de la ruta cuando esta disponible; el fallback de base de datos es `es`.
 - `locale` no modifica permisos ni datos disponibles.
 - `theme` no modifica permisos ni datos disponibles.
 - `time_zone` se usa para presentacion de fechas y horas.
@@ -159,7 +160,7 @@ Ownership: app-owned.
 | `metadata`       | `jsonb`                    | si        | Detalles estructurados del evento.           |
 | `created_at`     | `timestamp with time zone` | si        | Fecha del evento.                            |
 
-Acciones iniciales:
+Acciones admitidas inicialmente por el schema:
 
 - `user.created`
 - `user.first_login`
@@ -172,6 +173,8 @@ Acciones iniciales:
 - `user.banned`
 - `user.unbanned`
 - `user.session_revoked`
+
+Los flujos implementados actualmente emiten `user.created` y `user.email_verification_required`. Las demas acciones quedan reservadas para los casos de uso que todavia no existen; no deben documentarse como eventos emitidos hasta que el servicio correspondiente las implemente.
 
 Constraints:
 
@@ -222,21 +225,23 @@ Registro email/password:
 2. La configuracion de Neon Auth exige verificacion de correo por link.
 3. La aplicacion crea o asegura `user_profiles`.
 4. La aplicacion crea o asegura `user_preferences`.
-5. Neon Auth envia el link de verificacion usando Resend como proveedor SMTP custom.
-6. La aplicacion registra auditoria app-owned cuando corresponda, sin guardar links ni tokens.
+5. Neon Auth emite un webhook bloqueante `send.magic_link` con el link de verificacion.
+6. La aplicacion valida la firma, renderiza el template localizado y envia el correo mediante Resend.
+7. La aplicacion registra auditoria app-owned cuando corresponda, sin guardar links ni tokens.
 
 Recuperacion de contrasena:
 
 1. Neon Auth genera el link/token de recuperacion.
-2. Neon Auth envia el email usando Resend como proveedor SMTP custom.
-3. La aplicacion puede registrar eventos app-owned sin guardar links ni tokens.
+2. Neon Auth emite `send.magic_link` con `link_type=forget-password`.
+3. La aplicacion valida el webhook y envia el template localizado mediante Resend.
+4. La aplicacion puede registrar eventos app-owned sin guardar links ni tokens.
 
-Eventos opcionales si se habilitan webhooks de email en el futuro:
+Eventos app-owned opcionales si se amplia la auditoria del webhook:
 
 - `user.email_verification_link_sent`
 - `user.password_reset_link_sent`
 
-Primer login con Google:
+Primer login con Google (diferido; no implementado en la fase actual):
 
 1. Neon Auth resuelve la identidad OAuth.
 2. La aplicacion crea o asegura `user_profiles`.

@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import DashboardHome from "@/features/dashboard/components/dashboard-home";
 import { isLocale } from "@/i18n/routing";
+import { getCurrentAppUser } from "@/server/auth/session";
+import { isUserBanned } from "@/server/services/users";
+
+export const dynamic = "force-dynamic";
 
 type DashboardHomePageProps = Readonly<{
   params: Promise<{
@@ -38,6 +42,20 @@ export default async function DashboardHomePage({
   }
 
   setRequestLocale(locale);
+
+  const appUser = await getCurrentAppUser();
+
+  if (!appUser) {
+    redirect(`/${locale}/login`);
+  }
+
+  if (isUserBanned(appUser.profile)) {
+    redirect(`/${locale}/login?reason=user_banned`);
+  }
+
+  if (!appUser.emailVerified) {
+    redirect(`/${locale}/verify-email`);
+  }
 
   const t = await getTranslations("dashboard");
   const common = await getTranslations("common");

@@ -1,21 +1,21 @@
 "use client";
 
-import type { FormEvent } from "react";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { Mail } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
-import { Link, useRouter } from "@/i18n/navigation";
+import { requestPasswordResetAction } from "@/features/auth/actions";
+import { initialAuthFormState } from "@/features/auth/types";
+import { Link } from "@/i18n/navigation";
 
 export default function ForgotPasswordForm() {
   const t = useTranslations("auth");
-  const router = useRouter();
+  const locale = useLocale();
   const [email, setEmail] = useState("");
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    router.push("/forgot-password/sent");
-  }
+  const [state, formAction, pending] = useActionState(
+    requestPasswordResetAction,
+    initialAuthFormState,
+  );
 
   return (
     <section className="auth-card w-full max-w-md rounded-2xl p-6 sm:p-8">
@@ -31,7 +31,8 @@ export default function ForgotPasswordForm() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form action={formAction} className="space-y-4">
+        <input type="hidden" name="locale" value={locale} />
         <div>
           <label
             htmlFor="forgot-password-email"
@@ -45,6 +46,7 @@ export default function ForgotPasswordForm() {
             type="email"
             autoComplete="email"
             required
+            disabled={pending}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder={t("fields.email.placeholder")}
@@ -52,11 +54,24 @@ export default function ForgotPasswordForm() {
           />
         </div>
 
+        {state.status === "error" ? (
+          <p
+            role="alert"
+            aria-live="polite"
+            className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-sm text-destructive"
+          >
+            {t(`errors.${state.error}`)}
+          </p>
+        ) : null}
+
         <button
           type="submit"
-          className="auth-btn-glow mt-2 w-full rounded-xl py-3 text-sm font-bold"
+          disabled={pending}
+          className="auth-btn-glow mt-2 w-full rounded-xl py-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {t("forgotPassword.submit")}
+          {pending
+            ? t("forgotPassword.submitting")
+            : t("forgotPassword.submit")}
         </button>
       </form>
 

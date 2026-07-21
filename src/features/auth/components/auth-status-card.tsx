@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import type { ComponentProps, ComponentType } from "react";
 import type { LucideProps } from "lucide-react";
 import { ArrowLeft } from "lucide-react";
 
@@ -9,7 +9,7 @@ type AuthStatusCardProps = Readonly<{
   subtitle: string;
   note: string;
   actionLabel: string;
-  actionHref: "/" | "/login" | "/register";
+  actionHref: ComponentProps<typeof Link>["href"];
   icon: ComponentType<LucideProps>;
 }>;
 
