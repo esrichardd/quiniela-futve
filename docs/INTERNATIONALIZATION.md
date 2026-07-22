@@ -100,6 +100,16 @@ Reglas:
 - Los componentes no deben formatear fechas o numeros manualmente.
 - Los componentes cliente solo deben cargar los mensajes necesarios para su render.
 
+### Mensajes en Client Components
+
+- El provider localizado raiz usa `messages={null}`. Conserva locale y formatos sin serializar automaticamente todos los namespaces.
+- Preferir strings traducidos como props cuando el componente cliente necesita pocos textos estaticos.
+- Cada formulario interactivo de Auth recibe solo sus grupos compartidos y los de su pantalla; los mensajes de emails nunca se serializan al navegador.
+- Los boundaries de home y quinielas reciben solo `pools.status`.
+- El asistente de creacion recibe solo los grupos de `pools` que utiliza a lo largo de sus pasos; excluye metadata, listado, detalle, ingreso y estados.
+- El formulario para unirse recibe solo `pools.join` y `pools.errors`.
+- Todo provider nuevo debe seleccionar sus mensajes con el helper de `src/i18n/client-messages.ts`; omitir `messages` en un provider vuelve a serializar el catalogo completo.
+
 ## Metadata y SEO
 
 La metadata visible para usuarios y buscadores debe ser localizable.

@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { CircleAlert } from "lucide-react";
 import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 
 import AuthLayout from "@/features/auth/components/auth-layout";
 import AuthStatusCard from "@/features/auth/components/auth-status-card";
 import ResetPasswordForm from "@/features/auth/components/reset-password-form";
+import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
 import { isLocale } from "@/i18n/routing";
 
 type ResetPasswordPageProps = Readonly<{
@@ -49,6 +55,7 @@ export default async function ResetPasswordPage({
 
   const t = await getTranslations("auth");
   const common = await getTranslations("common");
+  const messages = await getMessages();
   const { error, token } = await searchParams;
   const validToken =
     error === undefined && typeof token === "string" && token.length > 0
@@ -58,7 +65,17 @@ export default async function ResetPasswordPage({
   return (
     <AuthLayout homeLabel={common("navigation.home")}>
       {validToken ? (
-        <ResetPasswordForm token={validToken} />
+        <NextIntlClientProvider
+          messages={pickNestedMessageNamespaces(messages, "auth", [
+            "shared",
+            "errors",
+            "fields",
+            "register",
+            "resetPassword",
+          ])}
+        >
+          <ResetPasswordForm token={validToken} />
+        </NextIntlClientProvider>
       ) : (
         <AuthStatusCard
           title={t("resetPassword.invalid.title")}

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { BrandMark } from "@/components/brand-mark";
 import { Link } from "@/i18n/navigation";
@@ -13,6 +13,7 @@ type DashboardShellProps = Readonly<{
 export default async function DashboardShell({ children }: DashboardShellProps) {
   const common = await getTranslations("common");
   const dashboard = await getTranslations("dashboard");
+  const locale = await getLocale();
 
   return (
     <main className="min-h-dvh bg-background px-4 py-5 text-foreground sm:px-6">
@@ -48,7 +49,10 @@ export default async function DashboardShell({ children }: DashboardShellProps) 
           </nav>
 
           <div className="order-2 sm:order-3">
-            <LogoutButton />
+            <LogoutButton
+              label={dashboard("actions.signOut")}
+              locale={locale}
+            />
           </div>
         </header>
 

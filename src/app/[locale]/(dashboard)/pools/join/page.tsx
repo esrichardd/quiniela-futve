@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 
 import DashboardShell from "@/features/dashboard/components/dashboard-shell";
 import JoinPoolForm from "@/features/pools/components/join-pool-form";
+import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
 import { isLocale } from "@/i18n/routing";
 import { requireDashboardUser } from "@/server/auth/dashboard";
 
@@ -30,10 +36,18 @@ export default async function JoinPoolPage({ params }: JoinPoolPageProps) {
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
   await requireDashboardUser(locale);
+  const messages = await getMessages();
 
   return (
     <DashboardShell>
-      <JoinPoolForm />
+      <NextIntlClientProvider
+        messages={pickNestedMessageNamespaces(messages, "pools", [
+          "join",
+          "errors",
+        ])}
+      >
+        <JoinPoolForm />
+      </NextIntlClientProvider>
     </DashboardShell>
   );
 }

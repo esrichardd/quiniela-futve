@@ -79,7 +79,9 @@ export default async function LocaleLayout({
     >
       <body className="flex min-h-full flex-col font-sans">
         <ThemeProvider>
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider messages={null}>
+            {children}
+          </NextIntlClientProvider>
         </ThemeProvider>
       </body>
     </html>
