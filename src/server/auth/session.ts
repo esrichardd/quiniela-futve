@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { auth } from "@/server/auth/server";
 import {
   ensureAppUser,
@@ -33,7 +35,7 @@ export class EmailVerificationRequiredError extends Error {
   }
 }
 
-export async function getAuthSession(): Promise<AuthSession | null> {
+const resolveAuthSession = cache(async (): Promise<AuthSession | null> => {
   const { data, error } = await auth.getSession();
 
   if (error) {
@@ -41,26 +43,36 @@ export async function getAuthSession(): Promise<AuthSession | null> {
   }
 
   return data;
+});
+
+export function getAuthSession(): Promise<AuthSession | null> {
+  return resolveAuthSession();
 }
 
-export async function getCurrentAppUser(
+const resolveCurrentAppUser = cache(
+  async (provider: AuthProvider): Promise<AppUser | null> => {
+    const session = await getAuthSession();
+
+    if (!session?.user) {
+      return null;
+    }
+
+    return ensureAppUser({
+      authUser: {
+        id: session.user.id,
+        emailVerified: session.user.emailVerified,
+        name: session.user.name,
+        image: session.user.image,
+      },
+      provider,
+    });
+  },
+);
+
+export function getCurrentAppUser(
   provider: AuthProvider = "unknown",
 ): Promise<AppUser | null> {
-  const session = await getAuthSession();
-
-  if (!session?.user) {
-    return null;
-  }
-
-  return ensureAppUser({
-    authUser: {
-      id: session.user.id,
-      emailVerified: session.user.emailVerified,
-      name: session.user.name,
-      image: session.user.image,
-    },
-    provider,
-  });
+  return resolveCurrentAppUser(provider);
 }
 
 export async function requireCurrentAppUser(
