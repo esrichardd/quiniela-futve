@@ -180,6 +180,7 @@
     "prizesTitle": "Premios",
     "predictionTitle": "Reglas y puntuación",
     "memberListTitle": "Miembros y administradores",
+    "memberListSummary": "Mostrando los primeros {visible, number} de {total, number} miembros.",
     "unnamedMember": "Miembro",
     "joinedAt": "Se unió el {date}",
     "currentPrize": "Premio acumulado actual: {amount}",

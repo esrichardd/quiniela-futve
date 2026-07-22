@@ -6,6 +6,7 @@ import {
   INVITATION_CODE_ALPHABET,
   INVITATION_CODE_LENGTH,
   MAX_INVITATION_CODE_ATTEMPTS,
+  POOL_DETAIL_MEMBER_LIMIT,
 } from "@/features/pools/constants";
 import {
   calculatePercentageAmount,
@@ -23,7 +24,7 @@ import type {
 } from "@/features/pools/types";
 import {
   assertPoolAdmin,
-  requirePoolMembership,
+  PoolMembershipRequiredError,
 } from "@/server/auth/permissions";
 import { requireVerifiedAppUser } from "@/server/auth/session";
 import {
@@ -171,25 +172,27 @@ export async function getCurrentUserPoolDetail(
   poolId: string,
 ): Promise<PoolDetail> {
   const appUser = await requireVerifiedAppUser();
-  const currentRole = await requirePoolMembership(poolId, appUser.id);
   const core = await getPoolCoreRecordForUser(poolId, appUser.id);
 
   if (!core) {
-    throw new Error("Pool detail could not be resolved.");
+    throw new PoolMembershipRequiredError();
   }
 
+  const currentRole = parsePoolRole(core.currentUserRole);
+
   const [allocations, members, invitationCode] = await Promise.all([
-    listPoolAllocationRecords(poolId),
-    listPoolMemberRecords(poolId),
+    core.prizeModel === "winner_takes_all"
+      ? Promise.resolve<ReadonlyArray<PoolAllocationRecord>>([])
+      : listPoolAllocationRecords(poolId),
+    listPoolMemberRecords(poolId, POOL_DETAIL_MEMBER_LIMIT),
     currentRole === "pool_admin"
       ? getInvitationCodeForAdmin(poolId, currentRole)
       : Promise.resolve(null),
   ]);
   const currency = parsePoolCurrency(core.currency);
-  const memberCount = members.length;
   const pooledAmount = calculatePooledAmount(
     core.participationFeeMinor,
-    memberCount,
+    core.memberCount,
   );
 
   return {
@@ -197,9 +200,9 @@ export async function getCurrentUserPoolDetail(
     name: core.name,
     description: core.description,
     competitionName: core.competitionName,
-    currentUserRole: parsePoolRole(core.currentUserRole),
+    currentUserRole: currentRole,
     invitationCode,
-    memberCount,
+    memberCount: core.memberCount,
     currency,
     participationFeeMinor: core.participationFeeMinor?.toString() ?? null,
     prize: mapPrizeDetails(core, allocations, pooledAmount),

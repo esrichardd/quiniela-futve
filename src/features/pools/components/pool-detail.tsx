@@ -113,6 +113,14 @@ export default async function PoolDetail({
           <Users aria-hidden="true" className="size-5 text-brand" />
           <h2 className="text-lg font-bold">{t("detail.memberListTitle")}</h2>
         </div>
+        {pool.members.length < pool.memberCount ? (
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t("detail.memberListSummary", {
+              total: pool.memberCount,
+              visible: pool.members.length,
+            })}
+          </p>
+        ) : null}
         <ul className="mt-4 divide-y divide-border">
           {pool.members.map((member) => (
             <li key={member.id} className="flex items-center justify-between gap-4 py-3">

@@ -76,6 +76,7 @@ export type PoolCoreRecord = Readonly<{
   description: string | null;
   competitionName: string;
   currentUserRole: string;
+  memberCount: number;
   currency: string;
   participationFeeMinor: bigint | null;
   prizeModel: string;
@@ -230,6 +231,11 @@ export async function getPoolCoreRecordForUser(
       description: pools.description,
       competitionName: competitions.name,
       currentUserRole: poolMemberships.role,
+      memberCount: sql<number>`(
+        select count(*)::integer
+        from ${poolMemberships} member_count
+        where member_count.pool_id = ${pools.id}
+      )`,
       currency: poolFinancialSettings.currency,
       participationFeeMinor: poolFinancialSettings.participationFeeMinor,
       prizeModel: poolPrizeConfigurations.model,
@@ -288,6 +294,7 @@ export async function listPoolAllocationRecords(
 
 export async function listPoolMemberRecords(
   poolId: string,
+  limit: number,
 ): Promise<ReadonlyArray<PoolMemberRecord>> {
   return db
     .select({
@@ -299,22 +306,8 @@ export async function listPoolMemberRecords(
     .from(poolMemberships)
     .innerJoin(userProfiles, eq(poolMemberships.userId, userProfiles.userId))
     .where(eq(poolMemberships.poolId, poolId))
-    .orderBy(asc(poolMemberships.createdAt));
-}
-
-export async function getPoolMembershipRole(
-  poolId: string,
-  userId: string,
-): Promise<PoolRole | null> {
-  const [membership] = await db
-    .select({ role: poolMemberships.role })
-    .from(poolMemberships)
-    .where(
-      and(eq(poolMemberships.poolId, poolId), eq(poolMemberships.userId, userId)),
-    )
-    .limit(1);
-
-  return membership ? parsePoolRole(membership.role) : null;
+    .orderBy(asc(poolMemberships.createdAt), asc(poolMemberships.id))
+    .limit(limit);
 }
 
 export async function getPoolIdByInvitationCode(

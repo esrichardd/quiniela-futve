@@ -96,6 +96,15 @@ El ingreso normaliza y valida el codigo, inserta la membresia con `ON CONFLICT D
 - Los roles se resuelven desde `pool_memberships`, nunca desde `user_profiles.global_role` ni desde datos enviados por el cliente.
 - Las Server Actions vuelven a validar sesion, verificacion, bloqueo, entrada y permisos.
 
+### Lectura del detalle
+
+- La consulta core parte de la membresia del usuario actual. Un resultado ausente representa de la misma forma una quiniela inexistente y una quiniela a la que el usuario no pertenece.
+- La misma consulta devuelve el rol contextual y el total de miembros mediante un agregado; no existe una consulta previa separada de autorizacion.
+- Despues del core se ejecutan en paralelo las lecturas necesarias: primer bloque de miembros, asignaciones cuando el modelo las usa y codigo de invitacion solo para administradores.
+- El primer bloque de miembros esta limitado a 25 y usa orden estable por `created_at` e `id`. La paginacion completa se incorpora como parte del contrato de listas paginadas.
+- `winner_takes_all` no consulta `pool_prize_allocations`.
+- El maximo actual es cuatro consultas de dominio para un administrador con premios configurables, sin contar autenticacion ni lectura app-owned del usuario.
+
 ## Indices
 
 - Codigo y estado activo de competicion.

@@ -180,6 +180,7 @@
     "prizesTitle": "Prizes",
     "predictionTitle": "Rules and scoring",
     "memberListTitle": "Members and administrators",
+    "memberListSummary": "Showing the first {visible, number} of {total, number} members.",
     "unnamedMember": "Member",
     "joinedAt": "Joined on {date}",
     "currentPrize": "Current pooled prize: {amount}",
