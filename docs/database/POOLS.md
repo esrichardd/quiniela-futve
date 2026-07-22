@@ -10,6 +10,10 @@ Este modelo implementa quinielas privadas configurables. Persiste la competicion
 
 Catalogo app-owned de ligas y competiciones con UUID estable, codigo unico, nombre propio, estado activo y timestamps. El registro inicial es Liga FUTVE, insertado de forma idempotente mediante `pnpm db:seed`. El modelo no limita el catalogo a esa competicion.
 
+La lista activa usada por el asistente de creacion se cachea globalmente durante una hora bajo el tag `competition-catalog`. La entrada solo contiene `id`, `code` y `name`; no incorpora sesion, permisos ni datos personales. Toda futura mutacion administrativa debe llamar `invalidateCompetitionCatalog()` despues de confirmar la escritura. La validacion al crear una quiniela consulta directamente la tabla y nunca confia en el valor cacheado.
+
+El TTL es una red de seguridad para cambios externos, como `pnpm db:seed`, que no pueden invalidar el Data Cache de un deployment por si mismos. Si se incorporan actualizaciones frecuentes fuera de Next.js, deben notificar una ruta protegida que invalide el tag en vez de depender solamente del TTL.
+
 ### `pools`
 
 Entidad principal de una quiniela privada.

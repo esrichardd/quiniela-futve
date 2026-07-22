@@ -29,10 +29,8 @@ import {
   PoolMembershipRequiredError,
 } from "@/server/auth/permissions";
 import { requireVerifiedAppUser } from "@/server/auth/session";
-import {
-  isCompetitionActive,
-  listActiveCompetitions,
-} from "@/server/dal/competitions";
+import { getCachedActiveCompetitions } from "@/server/cache/competition-catalog";
+import { isCompetitionActive } from "@/server/dal/competitions";
 import {
   createPlayerMembershipIfMissing,
   createPoolRecord,
@@ -76,7 +74,7 @@ export async function getAvailableCompetitionOptions(): Promise<
   ReadonlyArray<CompetitionOption>
 > {
   await requireVerifiedAppUser();
-  return listActiveCompetitions();
+  return getCachedActiveCompetitions();
 }
 
 export async function createPool(input: CreatePoolInput): Promise<string> {

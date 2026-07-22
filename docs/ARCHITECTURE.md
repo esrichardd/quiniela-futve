@@ -356,9 +356,11 @@ No usar Proxy como autorizacion definitiva ni para consultas lentas.
 Next 16 introduce un modelo donde Cache Components y `use cache` pueden ser importantes. Decision inicial:
 
 - No activar `cacheComponents` hasta tener los primeros flujos y mediciones.
+- Mientras `cacheComponents` permanezca desactivado, cachear consultas compartidas de base de datos con `unstable_cache`, tags especificos y un TTL de respaldo.
 - Usar Server Components y streaming con `loading.tsx` o `Suspense` para datos dinamicos.
 - Cuando haya datos publicos relativamente estables, como ligas, equipos o fixture publicado, evaluar `use cache`, `cacheLife` y tags.
 - Datos personalizados, permisos y sesiones no deben cachearse globalmente.
+- Toda mutacion de un catalogo cacheado debe invalidar su tag despues de confirmar la escritura. Las escrituras externas a Next.js dependen del TTL hasta que exista un webhook de invalidacion.
 
 ## Internacionalizacion y theming
 
