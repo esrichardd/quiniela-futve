@@ -92,6 +92,10 @@ ngrok http 3000
 
 Configura en Neon la URL resultante con el path `/api/webhooks/neon-auth` y elimina o deshabilita el webhook temporal cuando termine la prueba. El procedimiento completo esta documentado en [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
 
+## Infraestructura
+
+Las regiones de Vercel, Neon y el procedimiento para medir latencia desde el runtime desplegado se documentan en [docs/INFRASTRUCTURE.md](docs/INFRASTRUCTURE.md).
+
 ## Comandos
 
 | Comando | Descripcion |
