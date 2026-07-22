@@ -261,8 +261,16 @@ export const poolMemberships = pgTable(
       table.poolId,
       table.userId,
     ),
-    index("pool_memberships_pool_id_idx").on(table.poolId),
-    index("pool_memberships_user_id_idx").on(table.userId),
+    index("pool_memberships_pool_created_id_idx").on(
+      table.poolId,
+      table.createdAt,
+      table.id,
+    ),
+    index("pool_memberships_user_created_id_idx").on(
+      table.userId,
+      table.createdAt,
+      table.id,
+    ),
     check(
       "pool_memberships_role_check",
       sql`${table.role} in ('pool_admin', 'player')`,

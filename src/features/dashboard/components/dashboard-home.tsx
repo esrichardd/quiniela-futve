@@ -2,16 +2,17 @@ import { CalendarDays, Plus, Ticket, Trophy, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { formatMinorCurrency } from "@/features/pools/format";
-import type { PoolListItem } from "@/features/pools/types";
+import type { PoolListPage } from "@/features/pools/types";
 import { Link } from "@/i18n/navigation";
 
 type DashboardHomeProps = Readonly<{
   locale: string;
-  pools: ReadonlyArray<PoolListItem>;
+  page: PoolListPage;
 }>;
 
-export default async function DashboardHome({ locale, pools }: DashboardHomeProps) {
+export default async function DashboardHome({ locale, page }: DashboardHomeProps) {
   const t = await getTranslations("pools");
+  const pools = page.items;
 
   return (
     <section>
@@ -43,7 +44,7 @@ export default async function DashboardHome({ locale, pools }: DashboardHomeProp
         </div>
       </div>
 
-      {pools.length === 0 ? (
+      {pools.length === 0 && page.isFirstPage ? (
         <div className="mt-8 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center shadow-soft">
           <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-brand/10 text-brand">
             <Trophy aria-hidden="true" className="size-6" />
@@ -54,8 +55,9 @@ export default async function DashboardHome({ locale, pools }: DashboardHomeProp
           </p>
         </div>
       ) : (
-        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {pools.map((pool) => (
+        <>
+          <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {pools.map((pool) => (
             <article
               key={pool.id}
               className="flex flex-col rounded-2xl border border-border bg-card p-5 shadow-soft"
@@ -126,8 +128,32 @@ export default async function DashboardHome({ locale, pools }: DashboardHomeProp
                 {t("actions.open")}
               </Link>
             </article>
-          ))}
-        </div>
+            ))}
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+            {!page.isFirstPage ? (
+              <Link
+                href="/home"
+                className="inline-flex items-center justify-center rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-foreground hover:border-brand/40 hover:bg-brand/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {t("list.pagination.first")}
+              </Link>
+            ) : null}
+            {page.nextCursor ? (
+              <Link
+                href={`/home?cursor=${encodeURIComponent(page.nextCursor)}`}
+                className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-soft hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {t("list.pagination.next")}
+              </Link>
+            ) : !page.isFirstPage ? (
+              <p className="text-sm text-muted-foreground">
+                {t("list.pagination.end")}
+              </p>
+            ) : null}
+          </div>
+        </>
       )}
     </section>
   );

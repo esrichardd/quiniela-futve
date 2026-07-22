@@ -10,6 +10,7 @@ import type {
   PoolPredictionDetails,
   PoolPrizeDetails,
 } from "@/features/pools/types";
+import { Link } from "@/i18n/navigation";
 
 import InvitationCode from "./invitation-code";
 
@@ -113,7 +114,7 @@ export default async function PoolDetail({
           <Users aria-hidden="true" className="size-5 text-brand" />
           <h2 className="text-lg font-bold">{t("detail.memberListTitle")}</h2>
         </div>
-        {pool.members.length < pool.memberCount ? (
+        {pool.members.length < pool.memberCount || !pool.membersPageIsFirst ? (
           <p className="mt-1 text-sm text-muted-foreground">
             {t("detail.memberListSummary", {
               total: pool.memberCount,
@@ -150,6 +151,28 @@ export default async function PoolDetail({
             </li>
           ))}
         </ul>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          {!pool.membersPageIsFirst ? (
+            <Link
+              href={`/pools/${pool.id}`}
+              className="inline-flex items-center justify-center rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-foreground hover:border-brand/40 hover:bg-brand/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {t("detail.memberPagination.first")}
+            </Link>
+          ) : null}
+          {pool.membersNextCursor ? (
+            <Link
+              href={`/pools/${pool.id}?membersCursor=${encodeURIComponent(pool.membersNextCursor)}`}
+              className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-soft hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {t("detail.memberPagination.next")}
+            </Link>
+          ) : !pool.membersPageIsFirst ? (
+            <p className="text-sm text-muted-foreground">
+              {t("detail.memberPagination.end")}
+            </p>
+          ) : null}
+        </div>
       </section>
     </section>
   );

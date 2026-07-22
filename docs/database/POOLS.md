@@ -101,9 +101,20 @@ El ingreso normaliza y valida el codigo, inserta la membresia con `ON CONFLICT D
 - La consulta core parte de la membresia del usuario actual. Un resultado ausente representa de la misma forma una quiniela inexistente y una quiniela a la que el usuario no pertenece.
 - La misma consulta devuelve el rol contextual y el total de miembros mediante un agregado; no existe una consulta previa separada de autorizacion.
 - Despues del core se ejecutan en paralelo las lecturas necesarias: primer bloque de miembros, asignaciones cuando el modelo las usa y codigo de invitacion solo para administradores.
-- El primer bloque de miembros esta limitado a 25 y usa orden estable por `created_at` e `id`. La paginacion completa se incorpora como parte del contrato de listas paginadas.
+- Los miembros se paginan de 25 en 25 mediante cursor sobre `(created_at, id)` y orden ascendente estable.
 - `winner_takes_all` no consulta `pool_prize_allocations`.
 - El maximo actual es cuatro consultas de dominio para un administrador con premios configurables, sin contar autenticacion ni lectura app-owned del usuario.
+
+### Paginacion de listas
+
+- La home pagina las membresias del usuario de 24 en 24, ordenadas en forma descendente por la fecha de ingreso y el ID de membresia.
+- El detalle pagina miembros de 25 en 25, ordenados en forma ascendente por fecha de ingreso e ID de membresia.
+- Ambas consultas solicitan `page_size + 1`; el registro adicional solo determina si existe una pagina siguiente y no forma parte del DTO.
+- Los cursores son opacos, versionados y contienen el timestamp UTC con precision de microsegundos y el UUID de membresia usado como desempate.
+- Conservar los microsegundos evita omisiones cuando PostgreSQL almacena varias filas dentro del mismo milisegundo, precision que `Date` de JavaScript no puede representar.
+- Un cursor malformado se rechaza. Alterar un cursor valido no concede acceso porque cada consulta vuelve a filtrar por el usuario o pool autorizado.
+- La navegacion usa URLs GET localizadas y los Server Components existentes; no se agregaron Route Handlers ni Server Actions de lectura.
+- Las pantallas ofrecen pagina siguiente, regreso al primer bloque y un estado de fin. Los boundaries existentes cubren carga y error.
 
 ## Indices
 
@@ -111,6 +122,8 @@ El ingreso normaliza y valida el codigo, inserta la membresia con `ON CONFLICT D
 - Competicion y creador de quiniela.
 - Token idempotente por creador.
 - Membresias por quiniela y por usuario.
+- Membresias por `(pool_id, created_at, id)` para paginar miembros.
+- Membresias por `(user_id, created_at, id)` para paginar la home.
 - Membresia unica por usuario y quiniela.
 - Codigo de invitacion unico.
 

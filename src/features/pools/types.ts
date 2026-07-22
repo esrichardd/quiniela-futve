@@ -97,6 +97,12 @@ export type PoolListItem = Readonly<{
   createdAt: string;
 }>;
 
+export type PoolListPage = Readonly<{
+  items: ReadonlyArray<PoolListItem>;
+  isFirstPage: boolean;
+  nextCursor: string | null;
+}>;
+
 export type PoolMember = Readonly<{
   id: string;
   displayName: string | null;
@@ -162,5 +168,7 @@ export type PoolDetail = Readonly<{
   prize: PoolPrizeDetails;
   prediction: PoolPredictionDetails;
   members: ReadonlyArray<PoolMember>;
+  membersPageIsFirst: boolean;
+  membersNextCursor: string | null;
   createdAt: string;
 }>;

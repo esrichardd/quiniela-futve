@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, lt, or, sql } from "drizzle-orm";
 
 import type {
   PoolCurrency,
@@ -11,6 +11,7 @@ import type {
   NormalizedPrizeConfiguration,
 } from "@/features/pools/rules";
 import { db } from "@/server/db/client";
+import type { PaginationCursor } from "@/server/pagination";
 import {
   competitions,
   poolFinancialSettings,
@@ -59,6 +60,7 @@ export type CreatePoolRecordInput = Readonly<{
 
 export type PoolListRecord = Readonly<{
   id: string;
+  cursorId: string;
   name: string;
   description: string | null;
   competitionName: string;
@@ -68,6 +70,7 @@ export type PoolListRecord = Readonly<{
   participationFeeMinor: bigint | null;
   predictionMode: string;
   createdAt: Date;
+  cursorCreatedAt: string;
 }>;
 
 export type PoolCoreRecord = Readonly<{
@@ -98,6 +101,7 @@ export type PoolMemberRecord = Readonly<{
   displayName: string | null;
   role: string;
   createdAt: Date;
+  cursorCreatedAt: string;
 }>;
 
 export async function createPoolRecord(
@@ -190,10 +194,13 @@ export async function getPoolIdByCreationToken(
 
 export async function listPoolRecordsForUser(
   userId: string,
+  cursor: PaginationCursor | null,
+  limit: number,
 ): Promise<ReadonlyArray<PoolListRecord>> {
   return db
     .select({
       id: pools.id,
+      cursorId: poolMemberships.id,
       name: pools.name,
       description: pools.description,
       competitionName: competitions.name,
@@ -207,6 +214,10 @@ export async function listPoolRecordsForUser(
       participationFeeMinor: poolFinancialSettings.participationFeeMinor,
       predictionMode: poolPredictionRules.mode,
       createdAt: pools.createdAt,
+      cursorCreatedAt: sql<string>`to_char(
+        ${poolMemberships.createdAt} at time zone 'UTC',
+        'YYYY-MM-DD"T"HH24:MI:SS.US"Z"'
+      )`,
     })
     .from(poolMemberships)
     .innerJoin(pools, eq(poolMemberships.poolId, pools.id))
@@ -216,8 +227,22 @@ export async function listPoolRecordsForUser(
       eq(poolFinancialSettings.poolId, pools.id),
     )
     .innerJoin(poolPredictionRules, eq(poolPredictionRules.poolId, pools.id))
-    .where(eq(poolMemberships.userId, userId))
-    .orderBy(desc(pools.createdAt));
+    .where(
+      and(
+        eq(poolMemberships.userId, userId),
+        cursor
+          ? or(
+              sql`${poolMemberships.createdAt} < ${cursor.createdAt}::timestamptz`,
+              and(
+                sql`${poolMemberships.createdAt} = ${cursor.createdAt}::timestamptz`,
+                lt(poolMemberships.id, cursor.id),
+              ),
+            )
+          : undefined,
+      ),
+    )
+    .orderBy(desc(poolMemberships.createdAt), desc(poolMemberships.id))
+    .limit(limit);
 }
 
 export async function getPoolCoreRecordForUser(
@@ -294,6 +319,7 @@ export async function listPoolAllocationRecords(
 
 export async function listPoolMemberRecords(
   poolId: string,
+  cursor: PaginationCursor | null,
   limit: number,
 ): Promise<ReadonlyArray<PoolMemberRecord>> {
   return db
@@ -302,10 +328,27 @@ export async function listPoolMemberRecords(
       displayName: userProfiles.displayName,
       role: poolMemberships.role,
       createdAt: poolMemberships.createdAt,
+      cursorCreatedAt: sql<string>`to_char(
+        ${poolMemberships.createdAt} at time zone 'UTC',
+        'YYYY-MM-DD"T"HH24:MI:SS.US"Z"'
+      )`,
     })
     .from(poolMemberships)
     .innerJoin(userProfiles, eq(poolMemberships.userId, userProfiles.userId))
-    .where(eq(poolMemberships.poolId, poolId))
+    .where(
+      and(
+        eq(poolMemberships.poolId, poolId),
+        cursor
+          ? or(
+              sql`${poolMemberships.createdAt} > ${cursor.createdAt}::timestamptz`,
+              and(
+                sql`${poolMemberships.createdAt} = ${cursor.createdAt}::timestamptz`,
+                gt(poolMemberships.id, cursor.id),
+              ),
+            )
+          : undefined,
+      ),
+    )
     .orderBy(asc(poolMemberships.createdAt), asc(poolMemberships.id))
     .limit(limit);
 }

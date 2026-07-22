@@ -8,13 +8,17 @@ import PoolDetail from "@/features/pools/components/pool-detail";
 import { isLocale } from "@/i18n/routing";
 import { PoolMembershipRequiredError } from "@/server/auth/permissions";
 import { requireDashboardUser } from "@/server/auth/dashboard";
+import { InvalidPaginationCursorError } from "@/server/pagination";
 import { getCurrentUserPoolDetail } from "@/server/services/pools";
 
 export const dynamic = "force-dynamic";
 
 type PoolDetailPageProps = Readonly<{
   params: Promise<{ locale: string; poolId: string }>;
-  searchParams: Promise<{ created?: string }>;
+  searchParams: Promise<{
+    created?: string | Array<string>;
+    membersCursor?: string | Array<string>;
+  }>;
 }>;
 
 export async function generateMetadata({
@@ -40,17 +44,24 @@ export default async function PoolDetailPage({
   setRequestLocale(locale);
   await requireDashboardUser(locale);
 
+  const query = await searchParams;
+
+  if (Array.isArray(query.membersCursor)) {
+    notFound();
+  }
+
   let pool;
   try {
-    pool = await getCurrentUserPoolDetail(poolId);
+    pool = await getCurrentUserPoolDetail(poolId, query.membersCursor);
   } catch (error) {
-    if (error instanceof PoolMembershipRequiredError) {
+    if (
+      error instanceof PoolMembershipRequiredError ||
+      error instanceof InvalidPaginationCursorError
+    ) {
       notFound();
     }
     throw error;
   }
-
-  const query = await searchParams;
 
   return (
     <DashboardShell>

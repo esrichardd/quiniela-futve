@@ -37,6 +37,11 @@
     "empty": {
       "title": "You do not have any pools yet",
       "body": "Create your first private group or join with a code shared by an administrator."
+    },
+    "pagination": {
+      "first": "Back to the first page",
+      "next": "Next page",
+      "end": "There are no more pools."
     }
   },
   "create": {
@@ -180,7 +185,12 @@
     "prizesTitle": "Prizes",
     "predictionTitle": "Rules and scoring",
     "memberListTitle": "Members and administrators",
-    "memberListSummary": "Showing the first {visible, number} of {total, number} members.",
+    "memberListSummary": "Showing {visible, number} of {total, number} members on this page.",
+    "memberPagination": {
+      "first": "Back to the first members",
+      "next": "Next page",
+      "end": "There are no more members."
+    },
     "unnamedMember": "Member",
     "joinedAt": "Joined on {date}",
     "currentPrize": "Current pooled prize: {amount}",
@@ -200,6 +210,9 @@
   },
   "status": {
     "loading": "Loading pool…",
+    "listLoading": "Loading your pools…",
+    "listErrorTitle": "We could not load your pools",
+    "listErrorBody": "An error occurred while loading this page. You can try again.",
     "errorTitle": "We could not load this screen",
     "errorBody": "An unexpected error occurred. You can try again.",
     "retry": "Try again"

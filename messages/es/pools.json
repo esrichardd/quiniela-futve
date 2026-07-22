@@ -37,6 +37,11 @@
     "empty": {
       "title": "Todavía no tienes quinielas",
       "body": "Crea tu primer grupo privado o únete con el código que te compartió un administrador."
+    },
+    "pagination": {
+      "first": "Volver a la primera página",
+      "next": "Siguiente página",
+      "end": "No hay más quinielas."
     }
   },
   "create": {
@@ -180,7 +185,12 @@
     "prizesTitle": "Premios",
     "predictionTitle": "Reglas y puntuación",
     "memberListTitle": "Miembros y administradores",
-    "memberListSummary": "Mostrando los primeros {visible, number} de {total, number} miembros.",
+    "memberListSummary": "Mostrando {visible, number} de {total, number} miembros en esta página.",
+    "memberPagination": {
+      "first": "Volver a los primeros miembros",
+      "next": "Siguiente página",
+      "end": "No hay más miembros."
+    },
     "unnamedMember": "Miembro",
     "joinedAt": "Se unió el {date}",
     "currentPrize": "Premio acumulado actual: {amount}",
@@ -200,6 +210,9 @@
   },
   "status": {
     "loading": "Cargando quiniela…",
+    "listLoading": "Cargando tus quinielas…",
+    "listErrorTitle": "No pudimos cargar tus quinielas",
+    "listErrorBody": "Ocurrió un error al cargar esta página. Puedes intentarlo nuevamente.",
     "errorTitle": "No pudimos cargar esta pantalla",
     "errorBody": "Ocurrió un error inesperado. Puedes intentar nuevamente.",
     "retry": "Reintentar"

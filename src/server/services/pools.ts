@@ -6,7 +6,8 @@ import {
   INVITATION_CODE_ALPHABET,
   INVITATION_CODE_LENGTH,
   MAX_INVITATION_CODE_ATTEMPTS,
-  POOL_DETAIL_MEMBER_LIMIT,
+  POOL_LIST_PAGE_SIZE,
+  POOL_MEMBER_PAGE_SIZE,
 } from "@/features/pools/constants";
 import {
   calculatePercentageAmount,
@@ -19,6 +20,7 @@ import type {
   CreatePoolInput,
   PoolDetail,
   PoolListItem,
+  PoolListPage,
   PoolPredictionDetails,
   PoolPrizeDetails,
 } from "@/features/pools/types";
@@ -46,7 +48,12 @@ import {
   parsePoolRole,
   type PoolAllocationRecord,
   type PoolCoreRecord,
+  type PoolListRecord,
 } from "@/server/dal/pools";
+import {
+  decodePaginationCursor,
+  encodePaginationCursor,
+} from "@/server/pagination";
 
 const INVITATION_CODE_CONSTRAINT = "pool_invitation_codes_code_unique";
 const CREATION_TOKEN_CONSTRAINT = "pools_creator_creation_token_unique";
@@ -148,28 +155,35 @@ export async function joinPool(code: string): Promise<string> {
   return poolId;
 }
 
-export async function listCurrentUserPools(): Promise<
-  ReadonlyArray<PoolListItem>
-> {
+export async function listCurrentUserPools(
+  encodedCursor?: string,
+): Promise<PoolListPage> {
   const appUser = await requireVerifiedAppUser();
-  const records = await listPoolRecordsForUser(appUser.id);
+  const cursor = decodePaginationCursor(encodedCursor);
+  const records = await listPoolRecordsForUser(
+    appUser.id,
+    cursor,
+    POOL_LIST_PAGE_SIZE + 1,
+  );
+  const pageRecords = records.slice(0, POOL_LIST_PAGE_SIZE);
+  const lastRecord = pageRecords.at(-1);
 
-  return records.map((record) => ({
-    id: record.id,
-    name: record.name,
-    description: record.description,
-    competitionName: record.competitionName,
-    role: parsePoolRole(record.role),
-    memberCount: record.memberCount,
-    currency: parsePoolCurrency(record.currency),
-    participationFeeMinor: record.participationFeeMinor?.toString() ?? null,
-    predictionMode: parsePredictionMode(record.predictionMode),
-    createdAt: record.createdAt.toISOString(),
-  }));
+  return {
+    items: pageRecords.map(mapPoolListItem),
+    isFirstPage: cursor === null,
+    nextCursor:
+      records.length > POOL_LIST_PAGE_SIZE && lastRecord
+        ? encodePaginationCursor({
+            createdAt: lastRecord.cursorCreatedAt,
+            id: lastRecord.cursorId,
+          })
+        : null,
+  };
 }
 
 export async function getCurrentUserPoolDetail(
   poolId: string,
+  encodedMembersCursor?: string,
 ): Promise<PoolDetail> {
   const appUser = await requireVerifiedAppUser();
   const core = await getPoolCoreRecordForUser(poolId, appUser.id);
@@ -179,16 +193,23 @@ export async function getCurrentUserPoolDetail(
   }
 
   const currentRole = parsePoolRole(core.currentUserRole);
+  const membersCursor = decodePaginationCursor(encodedMembersCursor);
 
-  const [allocations, members, invitationCode] = await Promise.all([
+  const [allocations, memberRecords, invitationCode] = await Promise.all([
     core.prizeModel === "winner_takes_all"
       ? Promise.resolve<ReadonlyArray<PoolAllocationRecord>>([])
       : listPoolAllocationRecords(poolId),
-    listPoolMemberRecords(poolId, POOL_DETAIL_MEMBER_LIMIT),
+    listPoolMemberRecords(
+      poolId,
+      membersCursor,
+      POOL_MEMBER_PAGE_SIZE + 1,
+    ),
     currentRole === "pool_admin"
       ? getInvitationCodeForAdmin(poolId, currentRole)
       : Promise.resolve(null),
   ]);
+  const pageMemberRecords = memberRecords.slice(0, POOL_MEMBER_PAGE_SIZE);
+  const lastMemberRecord = pageMemberRecords.at(-1);
   const currency = parsePoolCurrency(core.currency);
   const pooledAmount = calculatePooledAmount(
     core.participationFeeMinor,
@@ -207,13 +228,36 @@ export async function getCurrentUserPoolDetail(
     participationFeeMinor: core.participationFeeMinor?.toString() ?? null,
     prize: mapPrizeDetails(core, allocations, pooledAmount),
     prediction: mapPredictionDetails(core),
-    members: members.map((member) => ({
+    members: pageMemberRecords.map((member) => ({
       id: member.id,
       displayName: member.displayName,
       role: parsePoolRole(member.role),
       joinedAt: member.createdAt.toISOString(),
     })),
+    membersPageIsFirst: membersCursor === null,
+    membersNextCursor:
+      memberRecords.length > POOL_MEMBER_PAGE_SIZE && lastMemberRecord
+        ? encodePaginationCursor({
+            createdAt: lastMemberRecord.cursorCreatedAt,
+            id: lastMemberRecord.id,
+          })
+        : null,
     createdAt: core.createdAt.toISOString(),
+  };
+}
+
+function mapPoolListItem(record: PoolListRecord): PoolListItem {
+  return {
+    id: record.id,
+    name: record.name,
+    description: record.description,
+    competitionName: record.competitionName,
+    role: parsePoolRole(record.role),
+    memberCount: record.memberCount,
+    currency: parsePoolCurrency(record.currency),
+    participationFeeMinor: record.participationFeeMinor?.toString() ?? null,
+    predictionMode: parsePredictionMode(record.predictionMode),
+    createdAt: record.createdAt.toISOString(),
   };
 }
 

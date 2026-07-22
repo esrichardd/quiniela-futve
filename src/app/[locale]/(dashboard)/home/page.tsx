@@ -6,6 +6,7 @@ import DashboardHome from "@/features/dashboard/components/dashboard-home";
 import DashboardShell from "@/features/dashboard/components/dashboard-shell";
 import { isLocale } from "@/i18n/routing";
 import { requireDashboardUser } from "@/server/auth/dashboard";
+import { InvalidPaginationCursorError } from "@/server/pagination";
 import { listCurrentUserPools } from "@/server/services/pools";
 
 export const dynamic = "force-dynamic";
@@ -13,6 +14,9 @@ export const dynamic = "force-dynamic";
 type DashboardHomePageProps = Readonly<{
   params: Promise<{
     locale: string;
+  }>;
+  searchParams: Promise<{
+    cursor?: string | Array<string>;
   }>;
 }>;
 
@@ -35,6 +39,7 @@ export async function generateMetadata({
 
 export default async function DashboardHomePage({
   params,
+  searchParams,
 }: DashboardHomePageProps) {
   const { locale } = await params;
 
@@ -46,11 +51,25 @@ export default async function DashboardHomePage({
 
   await requireDashboardUser(locale);
 
-  const pools = await listCurrentUserPools();
+  const query = await searchParams;
+
+  if (Array.isArray(query.cursor)) {
+    notFound();
+  }
+
+  let pools;
+  try {
+    pools = await listCurrentUserPools(query.cursor);
+  } catch (error) {
+    if (error instanceof InvalidPaginationCursorError) {
+      notFound();
+    }
+    throw error;
+  }
 
   return (
     <DashboardShell>
-      <DashboardHome locale={locale} pools={pools} />
+      <DashboardHome locale={locale} page={pools} />
     </DashboardShell>
   );
 }
