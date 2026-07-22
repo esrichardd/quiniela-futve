@@ -7,7 +7,6 @@ import { LocaleSwitch } from "./locale-switch";
 import { ThemeToggle } from "./theme-toggle";
 
 export default async function Navbar() {
-  const t = await getTranslations("home");
   const common = await getTranslations("common");
 
   return (
@@ -23,18 +22,6 @@ export default async function Navbar() {
             Quiniela <span className="text-brand">FUTVE</span>
           </span>
         </Link>
-
-        <nav
-          aria-label={common("navigation.primary")}
-          className="hidden items-center gap-6 text-sm md:flex"
-        >
-          <a href="#how-it-works" className="landing-nav-link">
-            {t("nav.howItWorks")}
-          </a>
-          <a href="#preview" className="landing-nav-link">
-            {t("nav.preview")}
-          </a>
-        </nav>
 
         <div className="flex items-center gap-2">
           <LocaleSwitch />
