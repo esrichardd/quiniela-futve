@@ -26,6 +26,13 @@ export class UserBannedError extends Error {
   }
 }
 
+export class EmailVerificationRequiredError extends Error {
+  constructor() {
+    super("Email verification is required.");
+    this.name = "EmailVerificationRequiredError";
+  }
+}
+
 export async function getAuthSession(): Promise<AuthSession | null> {
   const { data, error } = await auth.getSession();
 
@@ -67,6 +74,18 @@ export async function requireCurrentAppUser(
 
   if (isUserBanned(appUser.profile)) {
     throw new UserBannedError();
+  }
+
+  return appUser;
+}
+
+export async function requireVerifiedAppUser(
+  provider: AuthProvider = "unknown",
+): Promise<AppUser> {
+  const appUser = await requireCurrentAppUser(provider);
+
+  if (!appUser.emailVerified) {
+    throw new EmailVerificationRequiredError();
   }
 
   return appUser;

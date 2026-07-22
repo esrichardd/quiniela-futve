@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import DashboardHome from "@/features/dashboard/components/dashboard-home";
+import DashboardShell from "@/features/dashboard/components/dashboard-shell";
 import { isLocale } from "@/i18n/routing";
-import { getCurrentAppUser } from "@/server/auth/session";
-import { isUserBanned } from "@/server/services/users";
+import { requireDashboardUser } from "@/server/auth/dashboard";
+import { listCurrentUserPools } from "@/server/services/pools";
 
 export const dynamic = "force-dynamic";
 
@@ -43,35 +44,13 @@ export default async function DashboardHomePage({
 
   setRequestLocale(locale);
 
-  const appUser = await getCurrentAppUser();
+  await requireDashboardUser(locale);
 
-  if (!appUser) {
-    redirect(`/${locale}/login`);
-  }
-
-  if (isUserBanned(appUser.profile)) {
-    redirect(`/${locale}/login?reason=user_banned`);
-  }
-
-  if (!appUser.emailVerified) {
-    redirect(`/${locale}/verify-email`);
-  }
-
-  const t = await getTranslations("dashboard");
-  const common = await getTranslations("common");
+  const pools = await listCurrentUserPools();
 
   return (
-    <DashboardHome
-      homeLabel={common("navigation.home")}
-      eyebrow={t("home.eyebrow")}
-      title={t("home.title")}
-      subtitle={t("home.subtitle")}
-      statusTitle={t("home.statusTitle")}
-      statusBody={t("home.statusBody")}
-      primaryStatLabel={t("home.primaryStatLabel")}
-      primaryStatValue={t("home.primaryStatValue")}
-      secondaryStatLabel={t("home.secondaryStatLabel")}
-      secondaryStatValue={t("home.secondaryStatValue")}
-    />
+    <DashboardShell>
+      <DashboardHome locale={locale} pools={pools} />
+    </DashboardShell>
   );
 }

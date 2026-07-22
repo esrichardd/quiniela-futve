@@ -8,6 +8,13 @@
       "when": 1782790127919,
       "tag": "0000_ambiguous_warlock",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784732322409,
+      "tag": "0001_lowly_sunfire",
+      "breakpoints": true
     }
   ]
 }

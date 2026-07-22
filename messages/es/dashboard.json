@@ -2,6 +2,10 @@
   "actions": {
     "signOut": "Cerrar sesión"
   },
+  "navigation": {
+    "pools": "Mis quinielas",
+    "join": "Unirme"
+  },
   "home": {
     "metadata": {
       "title": "Home — Quiniela FUTVE",

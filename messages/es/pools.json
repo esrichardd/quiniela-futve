@@ -1,0 +1,206 @@
+{
+  "metadata": {
+    "create": {
+      "title": "Crear quiniela — Quiniela FUTVE",
+      "description": "Configura una nueva quiniela privada."
+    },
+    "join": {
+      "title": "Unirme a una quiniela — Quiniela FUTVE",
+      "description": "Ingresa un código para unirte a una quiniela privada."
+    },
+    "detail": {
+      "title": "Detalle de quiniela — Quiniela FUTVE",
+      "description": "Configuración y miembros de la quiniela privada."
+    }
+  },
+  "actions": {
+    "create": "Crear quiniela",
+    "join": "Unirme con código",
+    "open": "Abrir quiniela",
+    "back": "Volver",
+    "continue": "Continuar",
+    "creating": "Creando…",
+    "confirmCreate": "Confirmar y crear"
+  },
+  "roles": {
+    "pool_admin": "Administrador",
+    "player": "Jugador"
+  },
+  "list": {
+    "eyebrow": "Tu vestuario",
+    "title": "Mis quinielas",
+    "subtitle": "Crea grupos privados, comparte su código y consulta las reglas acordadas.",
+    "members": "Miembros",
+    "fee": "Participación",
+    "prediction": "Predicción",
+    "created": "Creada",
+    "empty": {
+      "title": "Todavía no tienes quinielas",
+      "body": "Crea tu primer grupo privado o únete con el código que te compartió un administrador."
+    }
+  },
+  "create": {
+    "eyebrow": "Nueva quiniela privada",
+    "title": "Configura las reglas del grupo",
+    "subtitle": "Nada se guardará hasta que revises el resumen y confirmes la creación.",
+    "unavailableTitle": "No hay competiciones disponibles",
+    "unavailableBody": "Inténtalo nuevamente más tarde o contacta al administrador de la plataforma.",
+    "progressLabel": "Progreso de creación",
+    "stepCount": "Paso {current} de {total}",
+    "steps": {
+      "general": "Información general",
+      "financial": "Participación",
+      "prizes": "Premios",
+      "prediction": "Puntuación",
+      "summary": "Resumen"
+    }
+  },
+  "general": {
+    "title": "Información general",
+    "body": "Identifica la quiniela y selecciona la competición que utilizará.",
+    "name": {
+      "label": "Nombre",
+      "placeholder": "Ej. Quiniela de la oficina"
+    },
+    "description": {
+      "label": "Descripción opcional",
+      "placeholder": "Explica brevemente para quién es esta quiniela."
+    },
+    "competition": {
+      "label": "Liga o competición"
+    }
+  },
+  "financial": {
+    "title": "Costo de participación",
+    "body": "El costo y los montos son informativos; la aplicación no procesa pagos.",
+    "type": "Tipo de participación",
+    "free": "Gratuita",
+    "freeHelp": "No se solicitará un monto de participación.",
+    "paid": "Con costo",
+    "paidHelp": "Cada miembro aporta el monto configurado.",
+    "currency": "Moneda",
+    "amount": "Monto por participante"
+  },
+  "prizes": {
+    "title": "Configuración de premios",
+    "body": "Define cómo se calcula y distribuye el premio informativo.",
+    "model": "Modelo de premios",
+    "mode": "Forma de cálculo",
+    "percentage": "Porcentaje",
+    "amount": "Monto",
+    "first": "Primer lugar",
+    "second": "Segundo lugar",
+    "third": "Tercer lugar",
+    "remainderHelp": "Los porcentajes pueden sumar menos de 100%. El porcentaje restante no se muestra como premio ni se distribuye automáticamente.",
+    "models": {
+      "winner_takes_all": {
+        "label": "Cantidad acumulada",
+        "description": "El ganador recibe el costo de participación multiplicado por todos los miembros."
+      },
+      "first_place": {
+        "label": "Premio para el primer lugar",
+        "description": "Configura un porcentaje del acumulado o un monto fijo para el ganador."
+      },
+      "top_three": {
+        "label": "Premios para primero, segundo y tercero",
+        "description": "Distribuye porcentajes del acumulado o tres montos fijos."
+      }
+    },
+    "modes": {
+      "percentage": "Porcentajes",
+      "fixed": "Montos fijos"
+    },
+    "modeHelp": {
+      "percentage": "Se calcula sobre lo acumulado por participaciones.",
+      "fixed": "Usa valores definidos en la moneda de la quiniela."
+    },
+    "positions": {
+      "1": "Primer lugar",
+      "2": "Segundo lugar",
+      "3": "Tercer lugar"
+    }
+  },
+  "prediction": {
+    "title": "Predicción y puntuación",
+    "body": "Estas reglas se guardarán para calcular resultados en una siguiente fase del producto.",
+    "mode": "Modo de predicción",
+    "resultPoints": "Puntos por resultado general",
+    "exactScorePoints": "Puntos por marcador exacto",
+    "perfectMatchdayBonusPoints": "Bonus por jornada perfecta",
+    "mixedExplanation": "En modo Mixed los puntos son excluyentes: un marcador exacto entrega los puntos de marcador, no la suma con resultado. Si todos los marcadores de una jornada son exactos, se agrega el bonus configurado.",
+    "modes": {
+      "simple": {
+        "label": "Simple",
+        "description": "Se predice local, empate o visitante."
+      },
+      "score": {
+        "label": "Score",
+        "description": "Solamente puntúa el marcador exacto."
+      },
+      "mixed": {
+        "label": "Mixed",
+        "description": "Puntúa el resultado o el marcador exacto y premia una jornada perfecta."
+      }
+    }
+  },
+  "summary": {
+    "title": "Revisa antes de crear",
+    "body": "Puedes volver a cualquier paso. El servidor validará nuevamente toda la configuración.",
+    "none": "Sin descripción",
+    "participation": "Participación",
+    "distribution": "Distribución",
+    "points": "Puntuación",
+    "fullPool": "100% del monto acumulado para el primer lugar",
+    "simplePoints": "{result} puntos por resultado general",
+    "scorePoints": "{score} puntos por marcador exacto",
+    "simpleExplanation": "Los jugadores eligen local, empate o visitante y reciben los puntos configurados al acertar.",
+    "scoreExplanation": "Los jugadores predicen el marcador y solamente reciben puntos cuando es exacto.",
+    "mixedExplanation": "Resultado general: {result} puntos. Marcador exacto: {score} puntos excluyentes. Jornada perfecta: {bonus} puntos adicionales."
+  },
+  "join": {
+    "title": "Unirme a una quiniela",
+    "body": "Ingresa el código de seis caracteres compartido por un administrador.",
+    "codeLabel": "Código de invitación",
+    "codePlaceholder": "ABC234",
+    "submit": "Unirme",
+    "submitting": "Validando…"
+  },
+  "detail": {
+    "createdTitle": "La quiniela fue creada",
+    "createdBody": "Comparte el código de invitación para sumar jugadores.",
+    "members": "Miembros",
+    "participationFee": "Costo de participación",
+    "createdAt": "Fecha de creación",
+    "invitation": {
+      "title": "Código de invitación",
+      "body": "Solo los administradores pueden consultar este código.",
+      "copy": "Copiar código",
+      "copied": "Código copiado"
+    },
+    "prizesTitle": "Premios",
+    "predictionTitle": "Reglas y puntuación",
+    "memberListTitle": "Miembros y administradores",
+    "unnamedMember": "Miembro",
+    "joinedAt": "Se unió el {date}",
+    "currentPrize": "Premio acumulado actual: {amount}",
+    "predictionExplanation": {
+      "simple": "Solo cuenta acertar el resultado general.",
+      "score": "No se entregan puntos parciales por acertar únicamente el resultado general.",
+      "mixed": "Los puntos de resultado y marcador son excluyentes. El bonus se suma cuando todos los marcadores de la jornada son exactos."
+    }
+  },
+  "errors": {
+    "authentication_required": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
+    "competition_unavailable": "La competición seleccionada ya no está disponible.",
+    "creation_failed": "No pudimos crear la quiniela. Revisa los datos e inténtalo nuevamente.",
+    "invalid_configuration": "Revisa los campos de este paso y corrige los valores inválidos.",
+    "invalid_invitation_code": "El código no es válido o no existe.",
+    "join_failed": "No pudimos completar el ingreso. Inténtalo nuevamente."
+  },
+  "status": {
+    "loading": "Cargando quiniela…",
+    "errorTitle": "No pudimos cargar esta pantalla",
+    "errorBody": "Ocurrió un error inesperado. Puedes intentar nuevamente.",
+    "retry": "Reintentar"
+  }
+}

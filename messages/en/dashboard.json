@@ -2,6 +2,10 @@
   "actions": {
     "signOut": "Sign out"
   },
+  "navigation": {
+    "pools": "My pools",
+    "join": "Join"
+  },
   "home": {
     "metadata": {
       "title": "Home — Quiniela FUTVE",

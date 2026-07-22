@@ -66,7 +66,13 @@ Aplicar las migraciones pendientes al ambiente indicado por `DATABASE_URL`:
 pnpm db:migrate
 ```
 
-Revisa el SQL generado y confirma el ambiente de destino antes de aplicar una migracion. El schema interno `neon_auth` pertenece a Neon Auth y no se administra con Drizzle.
+Insertar o actualizar los datos iniciales app-owned, como Liga FUTVE:
+
+```bash
+pnpm db:seed
+```
+
+Revisa el SQL generado y confirma el ambiente de destino antes de aplicar una migracion o seed. El schema interno `neon_auth` pertenece a Neon Auth y no se administra con Drizzle.
 
 ## Emails de autenticacion
 
@@ -96,6 +102,7 @@ Configura en Neon la URL resultante con el path `/api/webhooks/neon-auth` y elim
 | `pnpm lint` | Ejecuta ESLint sobre el proyecto. |
 | `pnpm db:generate` | Genera migraciones desde el schema Drizzle. |
 | `pnpm db:migrate` | Aplica migraciones pendientes. |
+| `pnpm db:seed` | Inserta o actualiza datos iniciales app-owned. |
 
 ## Estructura principal
 
@@ -131,5 +138,6 @@ Si se modifica el schema, tambien se debe generar y revisar la migracion corresp
 - [Theming](docs/THEMING.md)
 - [Base de datos](docs/database/README.md)
 - [Modelo de usuarios](docs/database/USERS.md)
+- [Modelo de quinielas privadas](docs/database/POOLS.md)
 - [Migraciones](docs/database/MIGRATIONS.md)
 - [Convencion de commits](docs/COMMITS.md)

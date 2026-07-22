@@ -1,108 +1,134 @@
-import { CalendarDays, Construction, Trophy } from "lucide-react";
+import { CalendarDays, Plus, Ticket, Trophy, Users } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
-import { BrandMark } from "@/components/brand-mark";
+import { formatMinorCurrency } from "@/features/pools/format";
+import type { PoolListItem } from "@/features/pools/types";
 import { Link } from "@/i18n/navigation";
 
-import LogoutButton from "./logout-button";
-
 type DashboardHomeProps = Readonly<{
-  homeLabel: string;
-  eyebrow: string;
-  title: string;
-  subtitle: string;
-  statusTitle: string;
-  statusBody: string;
-  primaryStatLabel: string;
-  primaryStatValue: string;
-  secondaryStatLabel: string;
-  secondaryStatValue: string;
+  locale: string;
+  pools: ReadonlyArray<PoolListItem>;
 }>;
 
-export default function DashboardHome({
-  homeLabel,
-  eyebrow,
-  title,
-  subtitle,
-  statusTitle,
-  statusBody,
-  primaryStatLabel,
-  primaryStatValue,
-  secondaryStatLabel,
-  secondaryStatValue,
-}: DashboardHomeProps) {
+export default async function DashboardHome({ locale, pools }: DashboardHomeProps) {
+  const t = await getTranslations("pools");
+
   return (
-    <main className="min-h-dvh bg-background px-4 py-6 text-foreground">
-      <div className="mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-6xl flex-col">
-        <header className="flex items-center justify-between gap-3">
+    <section>
+      <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-sm font-semibold text-brand">{t("list.eyebrow")}</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
+            {t("list.title")}
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+            {t("list.subtitle")}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
           <Link
-            href="/"
-            aria-label={homeLabel}
-            className="inline-flex min-w-0 items-center gap-2 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            href="/pools/join"
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-bold text-foreground shadow-soft hover:border-brand/40 hover:bg-brand/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <BrandMark className="size-9 rounded-lg" />
-            <span className="truncate text-base font-bold tracking-tight">
-              Quiniela <span className="text-brand">FUTVE</span>
-            </span>
+            <Ticket aria-hidden="true" className="size-4 text-brand" />
+            {t("actions.join")}
           </Link>
-
-          <LogoutButton />
-        </header>
-
-        <section className="flex flex-1 items-center py-10">
-          <div className="grid w-full items-center gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-            <div className="max-w-2xl">
-              <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-border bg-brand/5 px-3 py-1.5 text-xs font-medium text-muted-foreground">
-                <Construction aria-hidden="true" className="size-3.5 text-brand" />
-                {eyebrow}
-              </div>
-
-              <h1 className="text-balance text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-                {title}
-              </h1>
-              <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                {subtitle}
-              </p>
-            </div>
-
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-soft sm:p-6">
-              <div className="mb-5 flex items-start gap-3">
-                <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-border bg-brand/10 text-brand shadow-soft">
-                  <Trophy aria-hidden="true" className="size-6" strokeWidth={1.8} />
-                </div>
-                <div>
-                  <h2 className="text-lg font-bold tracking-tight text-foreground">
-                    {statusTitle}
-                  </h2>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {statusBody}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-xl border border-border bg-brand/5 p-4">
-                  <CalendarDays aria-hidden="true" className="mb-3 size-5 text-brand" />
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {primaryStatLabel}
-                  </p>
-                  <p className="mt-1 text-xl font-bold text-foreground">
-                    {primaryStatValue}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-border bg-brand/5 p-4">
-                  <Trophy aria-hidden="true" className="mb-3 size-5 text-brand" />
-                  <p className="text-xs font-medium text-muted-foreground">
-                    {secondaryStatLabel}
-                  </p>
-                  <p className="mt-1 text-xl font-bold text-foreground">
-                    {secondaryStatValue}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+          <Link
+            href="/pools/create"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-soft hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Plus aria-hidden="true" className="size-4" />
+            {t("actions.create")}
+          </Link>
+        </div>
       </div>
-    </main>
+
+      {pools.length === 0 ? (
+        <div className="mt-8 rounded-2xl border border-dashed border-border bg-card px-6 py-14 text-center shadow-soft">
+          <div className="mx-auto flex size-12 items-center justify-center rounded-xl bg-brand/10 text-brand">
+            <Trophy aria-hidden="true" className="size-6" />
+          </div>
+          <h2 className="mt-4 text-lg font-bold">{t("list.empty.title")}</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+            {t("list.empty.body")}
+          </p>
+        </div>
+      ) : (
+        <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {pools.map((pool) => (
+            <article
+              key={pool.id}
+              className="flex flex-col rounded-2xl border border-border bg-card p-5 shadow-soft"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-wide text-brand">
+                    {pool.competitionName}
+                  </p>
+                  <h2 className="mt-1 truncate text-xl font-bold">{pool.name}</h2>
+                </div>
+                <span className="shrink-0 rounded-full bg-brand/10 px-2.5 py-1 text-xs font-semibold text-brand">
+                  {t(`roles.${pool.role}`)}
+                </span>
+              </div>
+
+              {pool.description ? (
+                <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground">
+                  {pool.description}
+                </p>
+              ) : null}
+
+              <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-xl bg-muted p-3">
+                  <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Users aria-hidden="true" className="size-3.5" />
+                    {t("list.members")}
+                  </dt>
+                  <dd className="mt-1 font-bold">{pool.memberCount}</dd>
+                </div>
+                <div className="rounded-xl bg-muted p-3">
+                  <dt className="text-xs text-muted-foreground">{t("list.fee")}</dt>
+                  <dd className="mt-1 font-bold">
+                    {pool.participationFeeMinor === null
+                      ? t("financial.free")
+                      : formatMinorCurrency(
+                          locale,
+                          pool.currency,
+                          pool.participationFeeMinor,
+                        )}
+                  </dd>
+                </div>
+                <div className="rounded-xl bg-muted p-3">
+                  <dt className="text-xs text-muted-foreground">
+                    {t("list.prediction")}
+                  </dt>
+                  <dd className="mt-1 font-bold">
+                    {t(`prediction.modes.${pool.predictionMode}.label`)}
+                  </dd>
+                </div>
+                <div className="rounded-xl bg-muted p-3">
+                  <dt className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <CalendarDays aria-hidden="true" className="size-3.5" />
+                    {t("list.created")}
+                  </dt>
+                  <dd className="mt-1 font-bold">
+                    {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
+                      new Date(pool.createdAt),
+                    )}
+                  </dd>
+                </div>
+              </dl>
+
+              <Link
+                href={`/pools/${pool.id}`}
+                className="mt-5 inline-flex items-center justify-center rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-foreground hover:border-brand/40 hover:bg-brand/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {t("actions.open")}
+              </Link>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

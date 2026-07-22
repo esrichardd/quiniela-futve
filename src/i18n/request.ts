@@ -10,6 +10,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const auth = (await import(`../../messages/${locale}/auth.json`)).default;
   const dashboard = (await import(`../../messages/${locale}/dashboard.json`))
     .default;
+  const pools = (await import(`../../messages/${locale}/pools.json`)).default;
 
   return {
     locale,
@@ -18,6 +19,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       common,
       dashboard,
       home,
+      pools,
     },
   };
 });

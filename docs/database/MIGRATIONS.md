@@ -115,6 +115,7 @@ Reglas:
 - Los seeds insertan datos iniciales necesarios para operar.
 - Los seeds deben ser idempotentes.
 - Los seeds viven separados de migraciones.
+- El seed app-owned actual se ejecuta con `pnpm db:seed` despues de aplicar migraciones.
 
 ## Revision
 

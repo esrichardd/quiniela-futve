@@ -313,6 +313,8 @@ Usar `src/server/services` cuando una operacion coordine varias entidades o regl
 
 Los servicios encapsulan reglas de negocio y coordinan operaciones que no pertenecen a una sola lectura o escritura simple. No deben devolver datos sin filtrar a UI. Si se necesita UI, se expone un DTO via DAL o un action.
 
+Para operaciones atomicas con el cliente `drizzle-orm/neon-http` instalado, se usa `db.batch([...])`, que Neon ejecuta como transaccion no interactiva. No se debe usar `db.transaction(...)` con este driver porque no soporta transacciones interactivas. Si un caso futuro necesita lecturas dependientes dentro de una transaccion, debe evaluarse un cambio de driver como decision transversal.
+
 ## Server Actions
 
 Usar Server Actions para mutaciones iniciadas por la UI. Toda Server Action debe tratarse como una entrada publica al servidor, aunque se invoque desde un formulario o componente interno.
@@ -396,9 +398,11 @@ Roles conceptuales iniciales:
 - `pool_admin`: administra una quiniela especifica.
 - `player`: participa en quinielas.
 
-`user` y `super_admin` son roles globales app-owned. `league_admin`, `pool_admin` y `player` son roles contextuales futuros y no deben guardarse como atributo global del usuario.
+`user` y `super_admin` son roles globales app-owned. `pool_admin` y `player` ya son roles contextuales de quiniela; `league_admin` permanece como rol contextual futuro. Ninguno debe guardarse como atributo global del usuario.
 
 Los permisos se evaluaran siempre con contexto. Por ejemplo, poder editar una quiniela depende de la quiniela concreta, la membresia del usuario, el estado de la quiniela y las reglas definidas. Poder cargar resultados depende de la liga o temporada asignada, no solamente de que el usuario tenga una etiqueta administrativa.
+
+Las quinielas privadas implementan los primeros permisos contextuales en `src/server/auth/permissions.ts`. La membresia persistida es la fuente de verdad para `pool_admin` y `player`; el codigo de invitacion solo se consulta despues de comprobar el rol administrativo.
 
 La definicion detallada de tablas y relaciones persistidas vive en `docs/database/`. La definicion detallada de permisos vive en el documento de autorizacion correspondiente.
 

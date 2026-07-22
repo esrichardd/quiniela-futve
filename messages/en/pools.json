@@ -1,0 +1,206 @@
+{
+  "metadata": {
+    "create": {
+      "title": "Create pool — Quiniela FUTVE",
+      "description": "Configure a new private pool."
+    },
+    "join": {
+      "title": "Join a pool — Quiniela FUTVE",
+      "description": "Enter a code to join a private pool."
+    },
+    "detail": {
+      "title": "Pool details — Quiniela FUTVE",
+      "description": "Private pool settings and members."
+    }
+  },
+  "actions": {
+    "create": "Create pool",
+    "join": "Join with code",
+    "open": "Open pool",
+    "back": "Back",
+    "continue": "Continue",
+    "creating": "Creating…",
+    "confirmCreate": "Confirm and create"
+  },
+  "roles": {
+    "pool_admin": "Administrator",
+    "player": "Player"
+  },
+  "list": {
+    "eyebrow": "Your locker room",
+    "title": "My pools",
+    "subtitle": "Create private groups, share their code, and review the agreed rules.",
+    "members": "Members",
+    "fee": "Participation",
+    "prediction": "Prediction",
+    "created": "Created",
+    "empty": {
+      "title": "You do not have any pools yet",
+      "body": "Create your first private group or join with a code shared by an administrator."
+    }
+  },
+  "create": {
+    "eyebrow": "New private pool",
+    "title": "Configure the group rules",
+    "subtitle": "Nothing will be saved until you review the summary and confirm creation.",
+    "unavailableTitle": "No competitions are available",
+    "unavailableBody": "Try again later or contact the platform administrator.",
+    "progressLabel": "Creation progress",
+    "stepCount": "Step {current} of {total}",
+    "steps": {
+      "general": "General information",
+      "financial": "Participation",
+      "prizes": "Prizes",
+      "prediction": "Scoring",
+      "summary": "Summary"
+    }
+  },
+  "general": {
+    "title": "General information",
+    "body": "Identify the pool and select the competition it will use.",
+    "name": {
+      "label": "Name",
+      "placeholder": "E.g. Office pool"
+    },
+    "description": {
+      "label": "Optional description",
+      "placeholder": "Briefly explain who this pool is for."
+    },
+    "competition": {
+      "label": "League or competition"
+    }
+  },
+  "financial": {
+    "title": "Participation fee",
+    "body": "Fees and amounts are informational; the application does not process payments.",
+    "type": "Participation type",
+    "free": "Free",
+    "freeHelp": "No participation amount will be requested.",
+    "paid": "Paid",
+    "paidHelp": "Each member contributes the configured amount.",
+    "currency": "Currency",
+    "amount": "Amount per participant"
+  },
+  "prizes": {
+    "title": "Prize settings",
+    "body": "Define how the informational prize is calculated and distributed.",
+    "model": "Prize model",
+    "mode": "Calculation method",
+    "percentage": "Percentage",
+    "amount": "Amount",
+    "first": "First place",
+    "second": "Second place",
+    "third": "Third place",
+    "remainderHelp": "Percentages may add up to less than 100%. The remaining percentage is not shown as a prize or distributed automatically.",
+    "models": {
+      "winner_takes_all": {
+        "label": "Pooled amount",
+        "description": "The winner receives the participation fee multiplied by every member."
+      },
+      "first_place": {
+        "label": "First-place prize",
+        "description": "Set a percentage of the pool or a fixed amount for the winner."
+      },
+      "top_three": {
+        "label": "First, second, and third-place prizes",
+        "description": "Distribute percentages of the pool or three fixed amounts."
+      }
+    },
+    "modes": {
+      "percentage": "Percentages",
+      "fixed": "Fixed amounts"
+    },
+    "modeHelp": {
+      "percentage": "Calculated from the amount pooled through participation fees.",
+      "fixed": "Uses values defined in the pool currency."
+    },
+    "positions": {
+      "1": "First place",
+      "2": "Second place",
+      "3": "Third place"
+    }
+  },
+  "prediction": {
+    "title": "Prediction and scoring",
+    "body": "These rules will be stored for scoring in a later product phase.",
+    "mode": "Prediction mode",
+    "resultPoints": "Points for general result",
+    "exactScorePoints": "Points for exact score",
+    "perfectMatchdayBonusPoints": "Perfect matchday bonus",
+    "mixedExplanation": "In Mixed mode, points are exclusive: an exact score awards score points, not result plus score. If every score in a matchday is exact, the configured bonus is added.",
+    "modes": {
+      "simple": {
+        "label": "Simple",
+        "description": "Predict home win, draw, or away win."
+      },
+      "score": {
+        "label": "Score",
+        "description": "Only the exact score earns points."
+      },
+      "mixed": {
+        "label": "Mixed",
+        "description": "Awards the result or exact score and rewards a perfect matchday."
+      }
+    }
+  },
+  "summary": {
+    "title": "Review before creating",
+    "body": "You can return to any step. The server will validate the entire configuration again.",
+    "none": "No description",
+    "participation": "Participation",
+    "distribution": "Distribution",
+    "points": "Scoring",
+    "fullPool": "100% of the pooled amount for first place",
+    "simplePoints": "{result} points for the general result",
+    "scorePoints": "{score} points for the exact score",
+    "simpleExplanation": "Players choose home, draw, or away and receive the configured points when correct.",
+    "scoreExplanation": "Players predict the score and only receive points when it is exact.",
+    "mixedExplanation": "General result: {result} points. Exact score: {score} exclusive points. Perfect matchday: {bonus} additional points."
+  },
+  "join": {
+    "title": "Join a pool",
+    "body": "Enter the six-character code shared by an administrator.",
+    "codeLabel": "Invitation code",
+    "codePlaceholder": "ABC234",
+    "submit": "Join",
+    "submitting": "Validating…"
+  },
+  "detail": {
+    "createdTitle": "The pool was created",
+    "createdBody": "Share the invitation code to add players.",
+    "members": "Members",
+    "participationFee": "Participation fee",
+    "createdAt": "Creation date",
+    "invitation": {
+      "title": "Invitation code",
+      "body": "Only administrators can view this code.",
+      "copy": "Copy code",
+      "copied": "Code copied"
+    },
+    "prizesTitle": "Prizes",
+    "predictionTitle": "Rules and scoring",
+    "memberListTitle": "Members and administrators",
+    "unnamedMember": "Member",
+    "joinedAt": "Joined on {date}",
+    "currentPrize": "Current pooled prize: {amount}",
+    "predictionExplanation": {
+      "simple": "Only a correct general result earns points.",
+      "score": "No partial points are awarded for getting only the general result right.",
+      "mixed": "Result and score points are exclusive. The bonus is added when every score in the matchday is exact."
+    }
+  },
+  "errors": {
+    "authentication_required": "Your session is no longer valid. Sign in again.",
+    "competition_unavailable": "The selected competition is no longer available.",
+    "creation_failed": "We could not create the pool. Review the data and try again.",
+    "invalid_configuration": "Review this step and correct any invalid values.",
+    "invalid_invitation_code": "The code is invalid or does not exist.",
+    "join_failed": "We could not complete the join request. Try again."
+  },
+  "status": {
+    "loading": "Loading pool…",
+    "errorTitle": "We could not load this screen",
+    "errorBody": "An unexpected error occurred. You can try again.",
+    "retry": "Try again"
+  }
+}
