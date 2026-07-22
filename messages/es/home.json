@@ -3,6 +3,11 @@
     "title": "Quiniela FUTVE — Pronostica la Liga FUTVE",
     "description": "Únete a quinielas privadas, predice cada jornada y sube en el ranking. Gratis y en minutos."
   },
+  "socialImage": {
+    "predict": "Pronostica.",
+    "compete": "Compite.",
+    "win": "Gana."
+  },
   "nav": {
     "howItWorks": "Cómo funciona",
     "preview": "Vista previa"

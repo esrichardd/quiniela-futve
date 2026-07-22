@@ -3,6 +3,11 @@
     "title": "Quiniela FUTVE — Predict the Liga FUTVE",
     "description": "Join private pools, predict each matchday and climb the rankings. Free and in minutes."
   },
+  "socialImage": {
+    "predict": "Predict.",
+    "compete": "Compete.",
+    "win": "Win."
+  },
   "nav": {
     "howItWorks": "How it works",
     "preview": "Preview"

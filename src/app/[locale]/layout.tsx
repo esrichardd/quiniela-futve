@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+const siteUrl = new URL("https://www.quinielafutve.com");
 
 type LocaleLayoutProps = Readonly<{
   children: React.ReactNode;
@@ -36,10 +37,25 @@ export async function generateMetadata({
   }
 
   const t = await getTranslations({ locale, namespace: "home" });
+  const title = t("metadata.title");
+  const description = t("metadata.description");
 
   return {
-    title: t("metadata.title"),
-    description: t("metadata.description"),
+    metadataBase: siteUrl,
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      locale: locale === "es" ? "es_ES" : "en_US",
+      siteName: "Quiniela FUTVE",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
   };
 }
 
