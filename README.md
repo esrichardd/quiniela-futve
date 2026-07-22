@@ -1,78 +1,127 @@
 # Quiniela FUTVE
 
-Aplicacion web para crear quinielas, enviar pronosticos y competir alrededor de competiciones de futbol. La base actual incluye interfaz publica bilingue, temas claro/oscuro/sistema y autenticacion real con email y password.
-
-## Estado actual
-
-- Registro con email/password y verificacion obligatoria de correo.
-- Login, logout y proteccion server-side de `/[locale]/home`.
-- Recuperacion y cambio de contrasena mediante links de un solo uso.
-- Perfil, preferencias y auditoria app-owned en PostgreSQL con Drizzle.
-- Correos transaccionales propios enviados con Resend desde un webhook firmado de Neon Auth.
-- Interfaz y correos disponibles en espanol (`es`) e ingles (`en`).
-- OAuth con Google aplazado; los botones permanecen deshabilitados con la etiqueta "Proximamente".
+Aplicacion web construida con Next.js, TypeScript y PostgreSQL.
 
 ## Stack
 
 - Next.js 16 con App Router y React 19.
-- TypeScript estricto, Tailwind CSS 4 y next-intl.
-- Neon PostgreSQL, Drizzle ORM y Drizzle Kit.
-- Neon Auth para identidad, credenciales, verificacion y sesiones.
-- Resend para entrega de emails de autenticacion.
+- TypeScript en modo estricto.
+- Tailwind CSS 4.
+- next-intl para internacionalizacion.
+- next-themes para temas `light`, `dark` y `system`.
+- Neon PostgreSQL.
+- Drizzle ORM y Drizzle Kit.
+- Neon Auth para identidad y sesiones.
+- Resend para correo transaccional.
+- Zod para validacion de datos y variables de entorno.
+- pnpm como package manager.
 
-## Configuracion local
+## Requisitos
 
-Requisitos: Node.js compatible con la version de Next.js instalada, pnpm y un proyecto Neon con Neon Auth habilitado.
+- Node.js compatible con la version de Next.js instalada.
+- pnpm.
+- Un proyecto de Neon con PostgreSQL y Neon Auth habilitados.
+- Una cuenta de Resend para probar el envio de correos de autenticacion.
+
+## Instalacion
 
 ```bash
 pnpm install
 cp .env.example .env.local
+```
+
+Completa `.env.local` con las credenciales del ambiente y luego inicia el servidor:
+
+```bash
 pnpm dev
 ```
 
-La aplicacion queda disponible en [http://localhost:3000](http://localhost:3000). Completa estas variables en `.env.local`:
+La aplicacion queda disponible en [http://localhost:3000](http://localhost:3000).
 
-| Variable | Uso |
-| --- | --- |
-| `DATABASE_URL` | Conexion PostgreSQL usada por Drizzle. |
-| `NEON_AUTH_BASE_URL` | URL base de la instancia de Neon Auth. |
-| `NEON_AUTH_COOKIE_SECRET` | Secreto de al menos 32 caracteres para cookies de sesion. |
-| `RESEND_API_KEY` | API key server-side para enviar correos personalizados. |
-| `AUTH_EMAIL_FROM` | Remitente de Resend; durante pruebas puede usarse `onboarding@resend.dev`. |
+## Variables de entorno
 
-No se deben versionar `.env.local`, API keys, tokens ni URLs de correo generadas por Neon.
+| Variable | Requerida | Descripcion |
+| --- | --- | --- |
+| `DATABASE_URL` | Si | URL de conexion PostgreSQL usada por Drizzle. |
+| `NEON_AUTH_BASE_URL` | Si | URL base de la instancia de Neon Auth. |
+| `NEON_AUTH_COOKIE_SECRET` | Si | Secreto de al menos 32 caracteres usado para proteger las cookies de autenticacion. |
+| `RESEND_API_KEY` | Para emails | API key server-side de Resend. |
+| `AUTH_EMAIL_FROM` | Para emails | Remitente autorizado por Resend. Usa `Quiniela FUTVE <onboarding@resend.dev>` durante pruebas sin dominio. |
+
+El esquema completo se encuentra en [.env.example](.env.example). No se deben versionar `.env.local`, API keys, tokens ni credenciales reales.
 
 ## Base de datos
 
-El schema TypeScript vive en `src/server/db/schema/` y las migraciones versionadas en `src/server/db/migrations/`.
+El schema app-owned vive en `src/server/db/schema/` y las migraciones versionadas en `src/server/db/migrations/`.
+
+Generar una migracion despues de modificar el schema:
 
 ```bash
 pnpm db:generate
+```
+
+Aplicar las migraciones pendientes al ambiente indicado por `DATABASE_URL`:
+
+```bash
 pnpm db:migrate
 ```
 
-Revisa siempre el SQL generado antes de aplicar una migracion. Las tablas internas del schema `neon_auth` pertenecen a Neon Auth y no se administran con Drizzle.
+Revisa el SQL generado y confirma el ambiente de destino antes de aplicar una migracion. El schema interno `neon_auth` pertenece a Neon Auth y no se administra con Drizzle.
 
-## Autenticacion y emails
+## Emails de autenticacion
 
-Neon Auth genera los links de verificacion y recuperacion. El evento bloqueante `send.magic_link` llega a `POST /api/webhooks/neon-auth`, donde la aplicacion:
+Los correos personalizados se procesan mediante el Route Handler:
 
-1. conserva el body original y verifica la firma Ed25519 con el JWKS de Neon;
-2. valida headers, timestamp, payload y tipo de link;
-3. selecciona locale a partir del callback incluido en el link;
-4. renderiza uno de los dos archivos en `templates/emails/`;
-5. envia con Resend usando `event_id` como clave de idempotencia.
+```text
+POST /api/webhooks/neon-auth
+```
 
-En el modo gratuito sin dominio verificado, Resend limita el destinatario al correo autorizado por la cuenta. El codigo no restringe destinatarios: cuando se configure un dominio, podra enviar a cualquier direccion sin cambiar el flujo.
+Neon Auth debe configurar un webhook bloqueante para el evento `send.magic_link` apuntando a esa ruta. Los templates HTML se encuentran en `templates/emails/` y el contenido localizado en `messages/{locale}/auth.json`.
 
-La configuracion completa, las pruebas con ngrok y el checklist de produccion estan en [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
+Para probar el webhook localmente se necesita una URL publica temporal, por ejemplo con ngrok:
 
-## Validacion
+```bash
+ngrok http 3000
+```
+
+Configura en Neon la URL resultante con el path `/api/webhooks/neon-auth` y elimina o deshabilita el webhook temporal cuando termine la prueba. El procedimiento completo esta documentado en [docs/AUTHENTICATION.md](docs/AUTHENTICATION.md).
+
+## Comandos
+
+| Comando | Descripcion |
+| --- | --- |
+| `pnpm dev` | Inicia el servidor de desarrollo. |
+| `pnpm build` | Genera y valida el build de produccion. |
+| `pnpm start` | Ejecuta el build de produccion. |
+| `pnpm lint` | Ejecuta ESLint sobre el proyecto. |
+| `pnpm db:generate` | Genera migraciones desde el schema Drizzle. |
+| `pnpm db:migrate` | Aplica migraciones pendientes. |
+
+## Estructura principal
+
+```text
+messages/             Traducciones por locale
+templates/emails/     Templates HTML de correo
+src/app/              Rutas, layouts, paginas y Route Handlers
+src/components/       Componentes reutilizables sin ownership de dominio
+src/features/         Casos de uso y UI organizada por feature
+src/i18n/             Configuracion de internacionalizacion
+src/lib/              Utilidades transversales
+src/server/auth/      Integracion server-side con Neon Auth
+src/server/dal/       Acceso a datos
+src/server/db/        Cliente, schema y migraciones Drizzle
+src/server/email/     Renderizado y entrega de emails
+src/server/services/  Orquestacion de reglas de aplicacion
+```
+
+## Validacion antes de entregar cambios
 
 ```bash
 pnpm lint
 pnpm build
 ```
+
+Si se modifica el schema, tambien se debe generar y revisar la migracion correspondiente.
 
 ## Documentacion
 
