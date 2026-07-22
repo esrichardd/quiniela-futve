@@ -206,6 +206,9 @@ Reglas:
 - No poner reglas de negocio complejas en `page.tsx`.
 - Las paginas componen features y llaman funciones de lectura seguras del DAL.
 - Usar route groups como `(public)`, `(auth)` y `(dashboard)` para organizar layouts sin afectar URLs.
+- Las rutas autenticadas comparten shell y loading visual en `(dashboard)/layout.tsx` y `(dashboard)/loading.tsx`.
+- El layout de dashboard solo puede resolver locale, traducciones y UI estable. No debe consultar sesion, permisos ni datos privados porque bloquearia el loading del segmento.
+- Cada pagina de dashboard conserva su autorizacion con `requireDashboardUser()` antes de devolver contenido privado. Los Server Actions y servicios deben verificar autenticacion y permisos de forma independiente al layout.
 
 ### `src/components`
 

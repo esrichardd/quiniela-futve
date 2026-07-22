@@ -6,6 +6,9 @@
     "pools": "Mis quinielas",
     "join": "Unirme"
   },
+  "status": {
+    "loading": "Cargando panel..."
+  },
   "home": {
     "metadata": {
       "title": "Home — Quiniela FUTVE",

@@ -9,7 +9,6 @@ import {
   setRequestLocale,
 } from "next-intl/server";
 
-import DashboardShell from "@/features/dashboard/components/dashboard-shell";
 import PoolWizard from "@/features/pools/components/pool-wizard";
 import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
 import { isLocale } from "@/i18n/routing";
@@ -44,7 +43,7 @@ export default async function CreatePoolPage({ params }: CreatePoolPageProps) {
   const messages = await getMessages();
 
   return (
-    <DashboardShell>
+    <>
       {competitions.length > 0 ? (
         <NextIntlClientProvider
           messages={pickNestedMessageNamespaces(messages, "pools", [
@@ -71,6 +70,6 @@ export default async function CreatePoolPage({ params }: CreatePoolPageProps) {
           </p>
         </div>
       )}
-    </DashboardShell>
+    </>
   );
 }

@@ -1,19 +1,25 @@
 import type { ReactNode } from "react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 
 import { BrandMark } from "@/components/brand-mark";
 import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
 
 import LogoutButton from "./logout-button";
 
 type DashboardShellProps = Readonly<{
   children: ReactNode;
+  locale: Locale;
 }>;
 
-export default async function DashboardShell({ children }: DashboardShellProps) {
-  const common = await getTranslations("common");
-  const dashboard = await getTranslations("dashboard");
-  const locale = await getLocale();
+export default async function DashboardShell({
+  children,
+  locale,
+}: DashboardShellProps) {
+  const [common, dashboard] = await Promise.all([
+    getTranslations({ locale, namespace: "common" }),
+    getTranslations({ locale, namespace: "dashboard" }),
+  ]);
 
   return (
     <main className="min-h-dvh bg-background px-4 py-5 text-foreground sm:px-6">

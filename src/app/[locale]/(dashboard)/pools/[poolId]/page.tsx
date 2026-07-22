@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { z } from "zod";
 
-import DashboardShell from "@/features/dashboard/components/dashboard-shell";
 import PoolDetail from "@/features/pools/components/pool-detail";
 import { isLocale } from "@/i18n/routing";
 import { PoolMembershipRequiredError } from "@/server/auth/permissions";
@@ -64,8 +63,6 @@ export default async function PoolDetailPage({
   }
 
   return (
-    <DashboardShell>
-      <PoolDetail pool={pool} locale={locale} created={query.created === "1"} />
-    </DashboardShell>
+    <PoolDetail pool={pool} locale={locale} created={query.created === "1"} />
   );
 }

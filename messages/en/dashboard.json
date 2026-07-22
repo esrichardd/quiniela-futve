@@ -6,6 +6,9 @@
     "pools": "My pools",
     "join": "Join"
   },
+  "status": {
+    "loading": "Loading dashboard..."
+  },
   "home": {
     "metadata": {
       "title": "Home — Quiniela FUTVE",

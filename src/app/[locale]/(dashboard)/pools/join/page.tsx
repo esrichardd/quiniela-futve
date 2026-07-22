@@ -7,7 +7,6 @@ import {
   setRequestLocale,
 } from "next-intl/server";
 
-import DashboardShell from "@/features/dashboard/components/dashboard-shell";
 import JoinPoolForm from "@/features/pools/components/join-pool-form";
 import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
 import { isLocale } from "@/i18n/routing";
@@ -39,15 +38,13 @@ export default async function JoinPoolPage({ params }: JoinPoolPageProps) {
   const messages = await getMessages();
 
   return (
-    <DashboardShell>
-      <NextIntlClientProvider
-        messages={pickNestedMessageNamespaces(messages, "pools", [
-          "join",
-          "errors",
-        ])}
-      >
-        <JoinPoolForm />
-      </NextIntlClientProvider>
-    </DashboardShell>
+    <NextIntlClientProvider
+      messages={pickNestedMessageNamespaces(messages, "pools", [
+        "join",
+        "errors",
+      ])}
+    >
+      <JoinPoolForm />
+    </NextIntlClientProvider>
   );
 }

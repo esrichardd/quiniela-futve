@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import DashboardHome from "@/features/dashboard/components/dashboard-home";
-import DashboardShell from "@/features/dashboard/components/dashboard-shell";
 import { isLocale } from "@/i18n/routing";
 import { requireDashboardUser } from "@/server/auth/dashboard";
 import { InvalidPaginationCursorError } from "@/server/pagination";
@@ -67,9 +66,5 @@ export default async function DashboardHomePage({
     throw error;
   }
 
-  return (
-    <DashboardShell>
-      <DashboardHome locale={locale} page={pools} />
-    </DashboardShell>
-  );
+  return <DashboardHome locale={locale} page={pools} />;
 }

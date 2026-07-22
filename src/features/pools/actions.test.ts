@@ -34,6 +34,7 @@ vi.mock("@/server/services/pools", () => ({
 }));
 
 import { createPoolAction } from "@/features/pools/actions";
+import { AuthenticationRequiredError } from "@/server/auth/session";
 
 describe("createPoolAction", () => {
   beforeEach(() => {
@@ -67,6 +68,35 @@ describe("createPoolAction", () => {
       error: "invalid_configuration",
     });
     expect(actionMocks.createPool).not.toHaveBeenCalled();
+    expect(actionMocks.revalidatePath).not.toHaveBeenCalled();
+    expect(actionMocks.redirect).not.toHaveBeenCalled();
+  });
+
+  it("keeps direct action calls protected by the mutation service", async () => {
+    actionMocks.createPool.mockRejectedValue(new AuthenticationRequiredError());
+    const formData = new FormData();
+    formData.set("locale", "es");
+    formData.set(
+      "configuration",
+      JSON.stringify({
+        creationToken: "00000000-0000-4000-8000-000000000010",
+        competitionId: "00000000-0000-4000-8000-000000000001",
+        name: "Quiniela protegida",
+        financial: {
+          currency: "USD",
+          participationFee: { enabled: true, amount: "10" },
+        },
+        prize: { model: "winner_takes_all" },
+        prediction: { mode: "simple", resultPoints: 1 },
+      }),
+    );
+
+    await expect(
+      createPoolAction(initialPoolActionState, formData),
+    ).resolves.toEqual({
+      status: "error",
+      error: "authentication_required",
+    });
     expect(actionMocks.revalidatePath).not.toHaveBeenCalled();
     expect(actionMocks.redirect).not.toHaveBeenCalled();
   });
