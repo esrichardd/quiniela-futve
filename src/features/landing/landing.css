@@ -387,3 +387,55 @@
 .landing-footer-border {
   border-top: 1px solid var(--c-border);
 }
+
+/*
+ * Touch devices use a visually equivalent glass treatment without live
+ * backdrop blur. This avoids expensive WebKit recompositing during scroll.
+ */
+@media (max-width: 767px), (hover: none) and (pointer: coarse) {
+  .landing-glass-card,
+  .landing-cta-panel {
+    background:
+      radial-gradient(circle at top left, var(--c-mobile-glass-highlight), transparent 70%),
+      var(--c-mobile-glass-surface);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    box-shadow:
+      0 10px 30px var(--c-mobile-glass-shadow),
+      0 0 0 1px var(--c-brand-a06) inset;
+  }
+
+  .landing-card-shadow-full {
+    box-shadow:
+      0 0 28px var(--c-brand-a12),
+      0 14px 32px var(--c-mobile-glass-shadow);
+  }
+
+  .landing-card-shadow-compact {
+    box-shadow:
+      0 0 24px var(--c-brand-a12),
+      0 12px 28px var(--c-mobile-glass-shadow);
+  }
+
+  .landing-cta-panel {
+    box-shadow:
+      0 0 32px var(--c-brand-a12),
+      0 20px 40px var(--c-mobile-glass-shadow);
+  }
+
+  .landing-orb {
+    filter: none;
+    opacity: var(--c-mobile-orb-opacity);
+  }
+
+  .landing-animate-float,
+  .landing-animate-orb-drift,
+  .landing-btn-glow::before {
+    animation: none;
+  }
+
+  .landing-glass-card-hover:hover,
+  .landing-btn-glow:hover {
+    transform: none;
+  }
+}
