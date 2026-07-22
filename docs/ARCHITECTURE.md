@@ -19,8 +19,11 @@ Se reviso la documentacion local instalada en `node_modules/next/dist/docs/`, co
 - `01-app/01-getting-started/15-route-handlers.md`
 - `01-app/01-getting-started/16-proxy.md`
 - `01-app/02-guides/authentication.md`
+- `01-app/02-guides/content-security-policy.md`
 - `01-app/02-guides/data-security.md`
 - `01-app/02-guides/upgrading/version-16.md`
+- `01-app/03-api-reference/05-config/01-next-config-js/headers.md`
+- `01-app/03-api-reference/05-config/01-next-config-js/poweredByHeader.md`
 
 Referencias externas utiles:
 
@@ -391,6 +394,20 @@ Reglas obligatorias:
 - La interfaz ayuda a la experiencia del usuario, pero nunca es la fuente de autorizacion.
 - El servidor es el punto obligatorio de validacion antes de leer o mutar datos.
 - La base de datos debe reforzar integridad con constraints, relaciones, unicidad y estados validos.
+
+### Cabeceras HTTP
+
+Las cabeceras transversales se definen de forma centralizada en `src/lib/security-headers.ts` y se publican mediante `headers()` en `next.config.ts`. No deben duplicarse en layouts, pages, Server Actions ni Route Handlers.
+
+Reglas:
+
+- Deshabilitar `X-Powered-By`.
+- Aplicar una CSP sin comodines que limite recursos, formularios y conexiones al mismo origen, impida framing y bloquee objetos embebidos.
+- Permitir scripts y estilos inline mientras el bootstrap de tema y el runtime actual de Next.js los necesiten. `unsafe-eval` solo puede aparecer en desarrollo.
+- Usar `Referrer-Policy: no-referrer` en recuperacion de contrasena y `strict-origin-when-cross-origin` como valor global.
+- Emitir HSTS solo en despliegues productivos HTTPS. No agregar `includeSubDomains` ni `preload` sin auditar primero todos los subdominios.
+- Mantener una prueba unitaria de la politica y verificar navegacion, hidratacion, tema y formularios cuando cambien sus directivas.
+- No introducir nonces globales sin medir su impacto: en la arquitectura actual convertirian paginas estaticas en dinamicas.
 
 ## Roles y permisos
 
