@@ -13,6 +13,7 @@ import "../globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
+  preload: false,
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });

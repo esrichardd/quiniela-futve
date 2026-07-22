@@ -109,31 +109,13 @@
   border: 1px solid var(--c-border-bright);
 }
 
-.landing-glass-card-hover {
-  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
-}
-
-.landing-glass-card-hover:hover {
-  border-color: var(--c-border-bright);
-  box-shadow:
-    0 8px 40px rgba(0, 0, 0, 0.22),
-    0 0 24px var(--c-brand-a12);
-  transform: translateY(-2px);
-}
-
 .landing-btn-glow {
   position: relative;
   overflow: hidden;
   background: linear-gradient(135deg, var(--c-brand-dim) 0%, var(--c-brand) 60%, var(--c-gold-dim) 100%);
   box-shadow: 0 0 20px var(--c-brand-a35);
-  transition: box-shadow 0.25s, transform 0.15s;
   color: var(--c-text-on-brand);
   isolation: isolate;
-}
-
-.landing-btn-glow:hover {
-  box-shadow: 0 0 38px var(--c-brand-a60);
-  transform: translateY(-1px);
 }
 
 .landing-btn-glow::before {
@@ -228,14 +210,6 @@
   border: 1px solid var(--c-border-bright);
 }
 
-.landing-match-row {
-  transition: background 0.2s;
-}
-
-.landing-match-row:hover {
-  background: var(--c-brand-a06);
-}
-
 .landing-score-muted {
   background: var(--c-brand-a08);
 }
@@ -299,11 +273,6 @@
 
 .landing-nav-link {
   color: var(--c-muted);
-  transition: color 0.2s;
-}
-
-.landing-nav-link:hover {
-  color: var(--c-link-hover);
 }
 
 .landing-icon-badge {
@@ -388,6 +357,59 @@
   border-top: 1px solid var(--c-border);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .landing-glass-card-hover {
+    transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  }
+
+  .landing-glass-card-hover:hover {
+    border-color: var(--c-border-bright);
+    box-shadow:
+      0 8px 40px rgba(0, 0, 0, 0.22),
+      0 0 24px var(--c-brand-a12);
+    transform: translateY(-2px);
+  }
+
+  .landing-btn-glow {
+    transition: box-shadow 0.25s, transform 0.15s;
+  }
+
+  .landing-btn-glow:hover {
+    box-shadow: 0 0 38px var(--c-brand-a60);
+    transform: translateY(-1px);
+  }
+
+  .landing-match-row {
+    transition: background 0.2s;
+  }
+
+  .landing-match-row:hover {
+    background: var(--c-brand-a06);
+  }
+
+  .landing-nav-link,
+  .landing-theme-toggle {
+    transition: color 0.2s, background-color 0.2s;
+  }
+
+  .landing-nav-link:hover {
+    color: var(--c-link-hover);
+  }
+
+  .landing-theme-toggle:hover {
+    color: var(--c-brand);
+    background: var(--c-brand-a08);
+  }
+
+  .landing-step-icon {
+    transition: transform 0.2s;
+  }
+
+  .group:hover .landing-step-icon {
+    transform: scale(1.1);
+  }
+}
+
 /*
  * Touch devices use a visually equivalent glass treatment without live
  * backdrop blur. This avoids expensive WebKit recompositing during scroll.
@@ -432,10 +454,5 @@
   .landing-animate-orb-drift,
   .landing-btn-glow::before {
     animation: none;
-  }
-
-  .landing-glass-card-hover:hover,
-  .landing-btn-glow:hover {
-    transform: none;
   }
 }

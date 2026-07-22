@@ -57,7 +57,7 @@ export function ThemeToggle({ labels }: ThemeToggleProps) {
       onClick={cycle}
       aria-label={`${labels.label}: ${current}`}
       title={`${labels.label}: ${current}`}
-      className="grid size-9 place-items-center rounded-lg border border-border text-[var(--c-muted)] transition-colors hover:bg-[var(--c-brand-a08)] hover:text-[var(--c-brand)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="landing-theme-toggle grid size-9 place-items-center rounded-lg border border-border text-[var(--c-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <Icon />
     </button>

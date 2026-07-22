@@ -58,7 +58,7 @@ export default async function HowItWorks() {
                 </div>
 
                 <div
-                  className="landing-icon-badge landing-icon-badge-glow-sm mb-4 size-11 rounded-xl transition-all group-hover:scale-110 md:mb-5 md:size-12"
+                  className="landing-icon-badge landing-icon-badge-glow-sm landing-step-icon mb-4 size-11 rounded-xl md:mb-5 md:size-12"
                 >
                   <Icon aria-hidden="true" className="size-5 md:size-6" strokeWidth={1.5} />
                 </div>
