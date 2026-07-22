@@ -33,6 +33,15 @@ export type RegistrationProfile = Readonly<{
   lastName: string;
 }>;
 
+type AppUserProvisioningInput = Readonly<{
+  authUser: AuthUserSnapshot;
+  locale?: Locale;
+  provider?: AuthProvider;
+  registrationProfile?: RegistrationProfile;
+}>;
+
+type AppUserProvisioningSource = "session_recovery" | "sign_in";
+
 export function isUserBanned(
   profile: Pick<UserProfile, "banned" | "banExpiresAt">,
 ): boolean {
@@ -47,12 +56,48 @@ export function isUserBanned(
   return profile.banExpiresAt > new Date();
 }
 
-export async function ensureAppUser(input: {
-  authUser: AuthUserSnapshot;
-  locale?: Locale;
-  provider?: AuthProvider;
-  registrationProfile?: RegistrationProfile;
-}): Promise<AppUser> {
+export async function getAppUser(
+  authUser: Pick<AuthUserSnapshot, "emailVerified" | "id">,
+): Promise<AppUser | null> {
+  const [profile, preferences] = await Promise.all([
+    getUserProfile(authUser.id),
+    getUserPreferences(authUser.id),
+  ]);
+
+  if (!profile || !preferences) {
+    return null;
+  }
+
+  return {
+    id: authUser.id,
+    emailVerified: authUser.emailVerified,
+    profile,
+    preferences,
+  };
+}
+
+export async function getOrProvisionAppUser(
+  input: AppUserProvisioningInput & {
+    provisioningSource: AppUserProvisioningSource;
+  },
+): Promise<AppUser> {
+  const appUser = await getAppUser(input.authUser);
+
+  if (appUser) {
+    return appUser;
+  }
+
+  console.warn("App-owned user data is missing; provisioning records.", {
+    authUserId: input.authUser.id,
+    provisioningSource: input.provisioningSource,
+  });
+
+  return ensureAppUser(input);
+}
+
+export async function ensureAppUser(
+  input: AppUserProvisioningInput,
+): Promise<AppUser> {
   const profile = await ensureUserProfile(
     input.authUser,
     input.provider,

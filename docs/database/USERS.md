@@ -100,6 +100,8 @@ Reglas:
 
 - Cada usuario de Neon Auth tiene como maximo un perfil app-owned.
 - El perfil debe crearse o asegurarse despues de registro o primer login exitoso.
+- La navegacion autenticada normal solo lee el perfil y las preferencias; no intenta insertar ni sincronizar datos en cada request.
+- Si una sesion valida no tiene todos sus registros app-owned, el servidor ejecuta un aprovisionamiento idempotente excepcional y registra un warning estructurado con la fuente de recuperacion.
 - `display_name` y `avatar_url` son datos de presentacion y pueden sincronizarse desde Neon Auth o ser editados por la aplicacion si se habilita ese flujo.
 - `first_name`, `last_name`, `birth_date` y `gender` son datos personales opcionales; no pertenecen a Neon Auth ni a `user_preferences`.
 - Estos datos personales no deben exponerse en DTOs publicos salvo que una pantalla o caso de uso lo necesite explicitamente.
@@ -144,6 +146,7 @@ Reglas:
 - `time_zone` se usa para presentacion de fechas y horas.
 - `time_zone` no define el huso horario oficial de un evento deportivo.
 - Las preferencias deben crearse o asegurarse junto al perfil app-owned.
+- Las preferencias existentes se leen sin intentar un `INSERT` durante la navegacion normal.
 
 ## `user_audit_events`
 
@@ -228,6 +231,13 @@ Registro email/password:
 5. Neon Auth emite un webhook bloqueante `send.magic_link` con el link de verificacion.
 6. La aplicacion valida la firma, renderiza el template localizado y envia el correo mediante Resend.
 7. La aplicacion registra auditoria app-owned cuando corresponda, sin guardar links ni tokens.
+
+Inicio de sesion y navegacion autenticada:
+
+1. Despues de autenticar, la aplicacion lee `user_profiles` y `user_preferences`.
+2. Si ambos registros existen, continua sin ejecutar escrituras app-owned.
+3. Si falta alguno, ejecuta el aprovisionamiento idempotente y emite un warning estructurado con la fuente `sign_in` o `session_recovery`.
+4. Las rutas privadas posteriores reutilizan el usuario memoizado dentro del request y mantienen sus validaciones de bloqueo, verificacion y permisos.
 
 Recuperacion de contrasena:
 

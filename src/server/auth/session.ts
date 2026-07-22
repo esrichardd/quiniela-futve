@@ -4,7 +4,7 @@ import { cache } from "react";
 
 import { auth } from "@/server/auth/server";
 import {
-  ensureAppUser,
+  getOrProvisionAppUser,
   isUserBanned,
   type AppUser,
   type AuthProvider,
@@ -57,7 +57,7 @@ const resolveCurrentAppUser = cache(
       return null;
     }
 
-    return ensureAppUser({
+    return getOrProvisionAppUser({
       authUser: {
         id: session.user.id,
         emailVerified: session.user.emailVerified,
@@ -65,6 +65,7 @@ const resolveCurrentAppUser = cache(
         image: session.user.image,
       },
       provider,
+      provisioningSource: "session_recovery",
     });
   },
 );

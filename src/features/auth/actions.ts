@@ -14,6 +14,7 @@ import { defaultLocale, isLocale } from "@/i18n/routing";
 import { auth } from "@/server/auth/server";
 import {
   ensureAppUser,
+  getOrProvisionAppUser,
   isUserBanned,
   recordEmailVerificationRequired,
 } from "@/server/services/users";
@@ -47,7 +48,7 @@ export async function signInAction(
         return errorState(errorCode);
       }
     } else if (data?.user) {
-      const appUser = await ensureAppUser({
+      const appUser = await getOrProvisionAppUser({
         authUser: {
           emailVerified: data.user.emailVerified,
           id: data.user.id,
@@ -56,6 +57,7 @@ export async function signInAction(
         },
         locale,
         provider: "email",
+        provisioningSource: "sign_in",
       });
 
       if (isUserBanned(appUser.profile)) {
