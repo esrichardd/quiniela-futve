@@ -90,7 +90,8 @@ La aplicacion usa el SDK de Resend exclusivamente desde codigo server-only. El w
 
 - Server Actions para mutaciones internas usadas por pantallas React.
 - Route Handlers para webhooks, integraciones externas, endpoints publicos o clientes no React.
-- Zod para validar input en el servidor.
+- Zod para validar input de forma autoritativa en el servidor; los Client Components no deben importar schemas Zod completos para validacion progresiva.
+- Las reglas puras compartidas pueden dar feedback inmediato en cliente, pero nunca sustituyen la validacion estructural, de sesion y permisos del Server Action.
 - `revalidatePath`, `revalidateTag` o invalidacion equivalente cuando una mutacion cambie datos visibles.
 
 ### UI

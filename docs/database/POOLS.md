@@ -92,6 +92,12 @@ La creacion envia en un batch atomico la quiniela, configuraciones, asignaciones
 
 El ingreso normaliza y valida el codigo, inserta la membresia con `ON CONFLICT DO NOTHING` y trata los reintentos como exito idempotente.
 
+## Validacion de creacion
+
+El asistente usa reglas TypeScript puras para validar de forma progresiva el paso visible sin enviar Zod al navegador. Estas reglas cubren longitudes, montos decimales, porcentajes, orden de premios y puntos, y se comparten con los refinamientos del schema para reducir divergencias.
+
+El feedback cliente no es una frontera de seguridad. `createPoolAction` parsea nuevamente el JSON completo con `createPoolSchema`, valida locale, sesion y competencia activa, y solo despues llama al servicio que escribe el batch atomico. Un payload manipulado puede saltarse el wizard, pero no la validacion del servidor.
+
 ## Autorizacion
 
 - Solo miembros pueden obtener el detalle.

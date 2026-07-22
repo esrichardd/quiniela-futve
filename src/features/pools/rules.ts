@@ -2,7 +2,7 @@ import type {
   FinancialConfigurationInput,
   PrizeConfigurationInput,
 } from "@/features/pools/types";
-import { toScaledInteger } from "@/features/pools/schemas";
+import { toScaledInteger } from "@/features/pools/validation-rules";
 
 export type NormalizedFinancialConfiguration = Readonly<{
   currency: FinancialConfigurationInput["currency"];

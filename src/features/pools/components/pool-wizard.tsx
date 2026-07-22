@@ -10,7 +10,6 @@ import {
   poolCurrencies,
 } from "@/features/pools/constants";
 import { createPoolAction } from "@/features/pools/actions";
-import { createPoolSchema } from "@/features/pools/schemas";
 import type {
   CompetitionOption,
   CreatePoolInput,
@@ -19,6 +18,14 @@ import type {
   PrizeModel,
 } from "@/features/pools/types";
 import { initialPoolActionState } from "@/features/pools/types";
+import {
+  isPrizeCompatibleWithFinancialConfiguration,
+  isValidFinancialConfiguration,
+  isValidPoolDescription,
+  isValidPoolName,
+  isValidPredictionRules,
+  isValidPrizeConfiguration,
+} from "@/features/pools/validation-rules";
 
 type PoolWizardProps = Readonly<{
   competitions: ReadonlyArray<CompetitionOption>;
@@ -745,21 +752,25 @@ function buildConfiguration(
 function isStepValid(step: number, configuration: CreatePoolInput): boolean {
   if (step === 0) {
     return (
-      configuration.name.trim().length >= 3 &&
-      configuration.name.trim().length <= 100 &&
-      (configuration.description?.trim().length ?? 0) <= 500 &&
+      isValidPoolName(configuration.name) &&
+      isValidPoolDescription(configuration.description) &&
       Boolean(configuration.competitionId)
     );
   }
   if (step === 1) {
-    return configuration.financial.participationFee.enabled
-      ? /^\d{1,13}(?:\.\d{1,2})?$/.test(
-          configuration.financial.participationFee.amount,
-        ) && Number(configuration.financial.participationFee.amount) > 0
-      : true;
+    return isValidFinancialConfiguration(configuration.financial);
   }
-  if (step === 2 || step === 3) {
-    return createPoolSchema.safeParse(configuration).success;
+  if (step === 2) {
+    return (
+      isValidPrizeConfiguration(configuration.prize) &&
+      isPrizeCompatibleWithFinancialConfiguration(
+        configuration.prize,
+        configuration.financial,
+      )
+    );
+  }
+  if (step === 3) {
+    return isValidPredictionRules(configuration.prediction);
   }
   return true;
 }
