@@ -102,6 +102,8 @@ Reglas:
 - El perfil debe crearse o asegurarse despues de registro o primer login exitoso.
 - La navegacion autenticada normal solo lee el perfil y las preferencias; no intenta insertar ni sincronizar datos en cada request.
 - Si una sesion valida no tiene todos sus registros app-owned, el servidor ejecuta un aprovisionamiento idempotente excepcional y registra un warning estructurado con la fuente de recuperacion.
+- La lectura normal usa un unico `LEFT JOIN` entre perfil y preferencias. La proyeccion de autenticacion incluye solamente `user_id`, `banned`, `ban_expires_at`, `locale`, `theme` y `time_zone`.
+- La ausencia de preferencias se conserva como estado incompleto para activar el aprovisionamiento; no se reemplaza silenciosamente con valores enviados por el cliente.
 - `display_name` y `avatar_url` son datos de presentacion y pueden sincronizarse desde Neon Auth o ser editados por la aplicacion si se habilita ese flujo.
 - `first_name`, `last_name`, `birth_date` y `gender` son datos personales opcionales; no pertenecen a Neon Auth ni a `user_preferences`.
 - Estos datos personales no deben exponerse en DTOs publicos salvo que una pantalla o caso de uso lo necesite explicitamente.
@@ -234,7 +236,7 @@ Registro email/password:
 
 Inicio de sesion y navegacion autenticada:
 
-1. Despues de autenticar, la aplicacion lee `user_profiles` y `user_preferences`.
+1. Despues de autenticar, la aplicacion lee `user_profiles` y `user_preferences` en una consulta con `LEFT JOIN` y proyeccion minima.
 2. Si ambos registros existen, continua sin ejecutar escrituras app-owned.
 3. Si falta alguno, ejecuta el aprovisionamiento idempotente y emite un warning estructurado con la fuente `sign_in` o `session_recovery`.
 4. Las rutas privadas posteriores reutilizan el usuario memoizado dentro del request y mantienen sus validaciones de bloqueo, verificacion y permisos.

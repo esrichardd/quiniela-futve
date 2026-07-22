@@ -5,9 +5,12 @@ import {
   createUserAuditEvent,
   createUserPreferencesIfMissing,
   createUserProfileIfMissing,
+  getAppUserRecord,
   getUserPreferences,
   getUserProfile,
   updateUserProfileDetails,
+  type AppUserPreferences,
+  type AppUserProfile,
   type UserPreferences,
   type UserProfile,
 } from "@/server/dal/users";
@@ -24,8 +27,8 @@ export type AuthUserSnapshot = Readonly<{
 export type AppUser = Readonly<{
   id: string;
   emailVerified: boolean;
-  profile: UserProfile;
-  preferences: UserPreferences;
+  profile: AppUserProfile;
+  preferences: AppUserPreferences;
 }>;
 
 export type RegistrationProfile = Readonly<{
@@ -59,21 +62,13 @@ export function isUserBanned(
 export async function getAppUser(
   authUser: Pick<AuthUserSnapshot, "emailVerified" | "id">,
 ): Promise<AppUser | null> {
-  const [profile, preferences] = await Promise.all([
-    getUserProfile(authUser.id),
-    getUserPreferences(authUser.id),
-  ]);
+  const record = await getAppUserRecord(authUser.id);
 
-  if (!profile || !preferences) {
+  if (!record?.preferences) {
     return null;
   }
 
-  return {
-    id: authUser.id,
-    emailVerified: authUser.emailVerified,
-    profile,
-    preferences,
-  };
+  return createAppUser(authUser, record.profile, record.preferences);
 }
 
 export async function getOrProvisionAppUser(
@@ -108,12 +103,7 @@ export async function ensureAppUser(
     input.locale,
   );
 
-  return {
-    id: input.authUser.id,
-    emailVerified: input.authUser.emailVerified,
-    profile,
-    preferences,
-  };
+  return createAppUser(input.authUser, profile, preferences);
 }
 
 async function ensureUserProfile(
@@ -230,6 +220,26 @@ export async function recordEmailVerificationRequired(
     targetUserId: userId,
     action: "user.email_verification_required",
   });
+}
+
+function createAppUser(
+  authUser: Pick<AuthUserSnapshot, "emailVerified" | "id">,
+  profile: AppUserProfile,
+  preferences: AppUserPreferences,
+): AppUser {
+  return {
+    id: authUser.id,
+    emailVerified: authUser.emailVerified,
+    profile: {
+      banned: profile.banned,
+      banExpiresAt: profile.banExpiresAt,
+    },
+    preferences: {
+      locale: preferences.locale,
+      theme: preferences.theme,
+      timeZone: preferences.timeZone,
+    },
+  };
 }
 
 function normalizeNullableText(value: string | null | undefined): string | null {

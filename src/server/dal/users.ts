@@ -17,6 +17,17 @@ export type NewUserProfile = InferInsertModel<typeof userProfiles>;
 export type UserPreferences = InferSelectModel<typeof userPreferences>;
 export type NewUserPreferences = InferInsertModel<typeof userPreferences>;
 export type UserAuditEvent = InferSelectModel<typeof userAuditEvents>;
+export type AppUserProfile = Readonly<
+  Pick<UserProfile, "banned" | "banExpiresAt">
+>;
+export type AppUserPreferences = Readonly<
+  Pick<UserPreferences, "locale" | "theme" | "timeZone">
+>;
+export type AppUserRecord = Readonly<{
+  id: string;
+  profile: AppUserProfile;
+  preferences: AppUserPreferences | null;
+}>;
 
 export type UserAuditAction =
   | "user.created"
@@ -30,6 +41,53 @@ export type UserAuditAction =
   | "user.banned"
   | "user.unbanned"
   | "user.session_revoked";
+
+export async function getAppUserRecord(
+  userId: string,
+): Promise<AppUserRecord | null> {
+  const [record] = await db
+    .select({
+      id: userProfiles.userId,
+      banned: userProfiles.banned,
+      banExpiresAt: userProfiles.banExpiresAt,
+      preferencesUserId: userPreferences.userId,
+      locale: userPreferences.locale,
+      theme: userPreferences.theme,
+      timeZone: userPreferences.timeZone,
+    })
+    .from(userProfiles)
+    .leftJoin(
+      userPreferences,
+      eq(userPreferences.userId, userProfiles.userId),
+    )
+    .where(eq(userProfiles.userId, userId))
+    .limit(1);
+
+  if (!record) {
+    return null;
+  }
+
+  const preferences =
+    record.preferencesUserId !== null &&
+    record.locale !== null &&
+    record.theme !== null &&
+    record.timeZone !== null
+      ? {
+          locale: record.locale,
+          theme: record.theme,
+          timeZone: record.timeZone,
+        }
+      : null;
+
+  return {
+    id: record.id,
+    profile: {
+      banned: record.banned,
+      banExpiresAt: record.banExpiresAt,
+    },
+    preferences,
+  };
+}
 
 export async function getUserProfile(
   userId: string,
