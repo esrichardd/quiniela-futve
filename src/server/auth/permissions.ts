@@ -16,6 +16,17 @@ export class PoolAdminRequiredError extends Error {
   }
 }
 
+export class PlatformAdminRequiredError extends Error {
+  constructor() {
+    super("Platform administrator permission is required.");
+    this.name = "PlatformAdminRequiredError";
+  }
+}
+
 export function assertPoolAdmin(role: PoolRole): void {
   if (role !== "pool_admin") throw new PoolAdminRequiredError();
+}
+
+export function assertPlatformAdmin(globalRole: string): void {
+  if (globalRole !== "super_admin") throw new PlatformAdminRequiredError();
 }

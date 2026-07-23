@@ -17,6 +17,7 @@ type PoolDetailPageProps = Readonly<{
   searchParams: Promise<{
     created?: string | Array<string>;
     membersCursor?: string | Array<string>;
+    section?: string | Array<string>;
   }>;
 }>;
 
@@ -45,7 +46,11 @@ export default async function PoolDetailPage({
 
   const query = await searchParams;
 
-  if (Array.isArray(query.membersCursor)) {
+  if (
+    Array.isArray(query.membersCursor) ||
+    Array.isArray(query.section) ||
+    (query.section !== undefined && query.section !== "members")
+  ) {
     notFound();
   }
 
@@ -63,6 +68,11 @@ export default async function PoolDetailPage({
   }
 
   return (
-    <PoolDetail pool={pool} locale={locale} created={query.created === "1"} />
+    <PoolDetail
+      pool={pool}
+      locale={locale}
+      created={query.created === "1"}
+      activeSection={query.section === "members" ? "members" : "summary"}
+    />
   );
 }

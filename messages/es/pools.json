@@ -11,6 +11,10 @@
     "detail": {
       "title": "Detalle de quiniela — Quiniela FUTVE",
       "description": "Configuración y miembros de la quiniela privada."
+    },
+    "matchdays": {
+      "title": "Jornadas — Quiniela FUTVE",
+      "description": "Consulta las jornadas y partidos oficiales de la quiniela."
     }
   },
   "actions": {
@@ -48,7 +52,7 @@
     "eyebrow": "Nueva quiniela privada",
     "title": "Configura las reglas del grupo",
     "subtitle": "Nada se guardará hasta que revises el resumen y confirmes la creación.",
-    "unavailableTitle": "No hay competiciones disponibles",
+    "unavailableTitle": "No hay temporadas activas disponibles",
     "unavailableBody": "Inténtalo nuevamente más tarde o contacta al administrador de la plataforma.",
     "progressLabel": "Progreso de creación",
     "stepCount": "Paso {current} de {total}",
@@ -62,7 +66,7 @@
   },
   "general": {
     "title": "Información general",
-    "body": "Identifica la quiniela y selecciona la competición que utilizará.",
+    "body": "Identifica la quiniela y selecciona la temporada oficial que utilizará.",
     "name": {
       "label": "Nombre",
       "placeholder": "Ej. Quiniela de la oficina"
@@ -73,6 +77,9 @@
     },
     "competition": {
       "label": "Liga o competición"
+    },
+    "season": {
+      "label": "Temporada"
     }
   },
   "financial": {
@@ -176,6 +183,12 @@
     "members": "Miembros",
     "participationFee": "Costo de participación",
     "createdAt": "Fecha de creación",
+    "navigation": {
+      "label": "Secciones de la quiniela",
+      "summary": "Resumen",
+      "matchdays": "Jornadas",
+      "members": "Miembros"
+    },
     "invitation": {
       "title": "Código de invitación",
       "body": "Solo los administradores pueden consultar este código.",
@@ -200,9 +213,17 @@
       "mixed": "Los puntos de resultado y marcador son excluyentes. El bonus se suma cuando todos los marcadores de la jornada son exactos."
     }
   },
+  "matchdays": {
+    "emptyTitle": "Todavía no hay jornadas publicadas",
+    "emptyBody": "Cuando la administración publique el calendario aparecerá aquí.",
+    "selectorLabel": "Seleccionar jornada",
+    "defaultName": "Jornada {number}",
+    "versus": "vs.",
+    "noMatches": "Esta jornada no tiene partidos publicados."
+  },
   "errors": {
     "authentication_required": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
-    "competition_unavailable": "La competición seleccionada ya no está disponible.",
+    "competition_unavailable": "La temporada seleccionada ya no está disponible.",
     "creation_failed": "No pudimos crear la quiniela. Revisa los datos e inténtalo nuevamente.",
     "invalid_configuration": "Revisa los campos de este paso y corrige los valores inválidos.",
     "invalid_invitation_code": "El código no es válido o no existe.",
@@ -210,6 +231,7 @@
   },
   "status": {
     "loading": "Cargando quiniela…",
+    "matchdaysLoading": "Cargando jornadas…",
     "listLoading": "Cargando tus quinielas…",
     "listErrorTitle": "No pudimos cargar tus quinielas",
     "listErrorBody": "Ocurrió un error al cargar esta página. Puedes intentarlo nuevamente.",

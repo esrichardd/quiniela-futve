@@ -13,7 +13,7 @@ import PoolWizard from "@/features/pools/components/pool-wizard";
 import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
 import { isLocale } from "@/i18n/routing";
 import { requireDashboardUser } from "@/server/auth/dashboard";
-import { getAvailableCompetitionOptions } from "@/server/services/pools";
+import { getAvailableSeasonOptions } from "@/server/services/pools";
 
 export const dynamic = "force-dynamic";
 
@@ -38,13 +38,13 @@ export default async function CreatePoolPage({ params }: CreatePoolPageProps) {
   if (!isLocale(locale)) notFound();
   setRequestLocale(locale);
   await requireDashboardUser(locale);
-  const competitions = await getAvailableCompetitionOptions();
+  const seasons = await getAvailableSeasonOptions();
   const t = await getTranslations("pools");
   const messages = await getMessages();
 
   return (
     <>
-      {competitions.length > 0 ? (
+      {seasons.length > 0 ? (
         <NextIntlClientProvider
           messages={pickNestedMessageNamespaces(messages, "pools", [
             "actions",
@@ -58,7 +58,7 @@ export default async function CreatePoolPage({ params }: CreatePoolPageProps) {
           ])}
         >
           <PoolWizard
-            competitions={competitions}
+            seasons={seasons}
             creationToken={randomUUID()}
           />
         </NextIntlClientProvider>

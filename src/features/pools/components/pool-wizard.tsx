@@ -11,12 +11,12 @@ import {
 } from "@/features/pools/constants";
 import { createPoolAction } from "@/features/pools/actions";
 import type {
-  CompetitionOption,
   CreatePoolInput,
   PoolCurrency,
   PredictionMode,
   PrizeModel,
 } from "@/features/pools/types";
+import type { SeasonOption } from "@/features/competition-catalog/types";
 import { initialPoolActionState } from "@/features/pools/types";
 import {
   isPrizeCompatibleWithFinancialConfiguration,
@@ -28,14 +28,14 @@ import {
 } from "@/features/pools/validation-rules";
 
 type PoolWizardProps = Readonly<{
-  competitions: ReadonlyArray<CompetitionOption>;
+  seasons: ReadonlyArray<SeasonOption>;
   creationToken: string;
 }>;
 
 type DraftState = Readonly<{
   name: string;
   description: string;
-  competitionId: string;
+  competitionSeasonId: string;
   currency: PoolCurrency;
   hasParticipationFee: boolean;
   participationFee: string;
@@ -54,7 +54,7 @@ const inputClass =
   "mt-1.5 w-full rounded-xl border border-border bg-input px-3.5 py-3 text-base text-foreground outline-none transition placeholder:text-muted-foreground focus:border-brand focus:ring-2 focus:ring-ring/30 disabled:cursor-not-allowed disabled:opacity-60";
 
 export default function PoolWizard({
-  competitions,
+  seasons,
   creationToken,
 }: PoolWizardProps) {
   const t = useTranslations("pools");
@@ -68,7 +68,7 @@ export default function PoolWizard({
   const [draft, setDraft] = useState<DraftState>({
     name: "",
     description: "",
-    competitionId: competitions[0]?.id ?? "",
+    competitionSeasonId: seasons[0]?.id ?? "",
     currency: DEFAULT_POOL_CURRENCY,
     hasParticipationFee: false,
     participationFee: "",
@@ -169,15 +169,15 @@ export default function PoolWizard({
             <Field label={t("general.competition.label")} htmlFor="pool-competition">
               <select
                 id="pool-competition"
-                value={draft.competitionId}
+                value={draft.competitionSeasonId}
                 onChange={(event) =>
-                  updateDraft("competitionId", event.target.value)
+                  updateDraft("competitionSeasonId", event.target.value)
                 }
                 className={inputClass}
               >
-                {competitions.map((competition) => (
-                  <option key={competition.id} value={competition.id}>
-                    {competition.name}
+                {seasons.map((season) => (
+                  <option key={season.id} value={season.id}>
+                    {season.competitionName} · {season.name}
                   </option>
                 ))}
               </select>
@@ -256,7 +256,11 @@ export default function PoolWizard({
           <Summary
             configuration={configuration}
             competitionName={
-              competitions.find((item) => item.id === draft.competitionId)?.name ?? ""
+              seasons.find((item) => item.id === draft.competitionSeasonId)
+                ?.competitionName ?? ""
+            }
+            seasonName={
+              seasons.find((item) => item.id === draft.competitionSeasonId)?.name ?? ""
             }
           />
         ) : null}
@@ -489,9 +493,11 @@ function PredictionStep({
 function Summary({
   configuration,
   competitionName,
+  seasonName,
 }: Readonly<{
   configuration: CreatePoolInput;
   competitionName: string;
+  seasonName: string;
 }>) {
   const t = useTranslations("pools");
   const locale = useLocale();
@@ -526,6 +532,7 @@ function Summary({
     [t("general.name.label"), configuration.name],
     [t("general.description.label"), configuration.description || t("summary.none")],
     [t("general.competition.label"), competitionName],
+    [t("general.season.label"), seasonName],
     [
       t("summary.participation"),
       configuration.financial.participationFee.enabled
@@ -740,7 +747,7 @@ function buildConfiguration(
 
   return {
     creationToken,
-    competitionId: draft.competitionId,
+    competitionSeasonId: draft.competitionSeasonId,
     name: draft.name,
     description: draft.description,
     financial,
@@ -754,7 +761,7 @@ function isStepValid(step: number, configuration: CreatePoolInput): boolean {
     return (
       isValidPoolName(configuration.name) &&
       isValidPoolDescription(configuration.description) &&
-      Boolean(configuration.competitionId)
+      Boolean(configuration.competitionSeasonId)
     );
   }
   if (step === 1) {

@@ -100,6 +100,7 @@ Modelos definidos:
 
 - `docs/database/USERS.md`: perfil de usuario app-owned, preferencias y auditoria.
 - `docs/database/POOLS.md`: competiciones, quinielas privadas, membresias, invitaciones y reglas.
+- `docs/database/COMPETITION_CATALOG.md`: temporadas, equipos, jornadas, partidos, resultados y auditoria oficial.
 
 Proceso de cambios:
 
@@ -107,4 +108,4 @@ Proceso de cambios:
 
 ## Fuera de alcance
 
-Este documento no define tablas de partidos, pronosticos enviados ni rankings. Esos modelos se documentan en archivos propios cuando se incorporen al producto.
+Este documento no define pronosticos enviados ni rankings. Esos modelos se documentan en archivos propios cuando se incorporen al producto.

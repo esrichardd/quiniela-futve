@@ -11,6 +11,10 @@
     "detail": {
       "title": "Pool details — Quiniela FUTVE",
       "description": "Private pool settings and members."
+    },
+    "matchdays": {
+      "title": "Matchdays — Quiniela FUTVE",
+      "description": "Review the pool's official matchdays and matches."
     }
   },
   "actions": {
@@ -48,7 +52,7 @@
     "eyebrow": "New private pool",
     "title": "Configure the group rules",
     "subtitle": "Nothing will be saved until you review the summary and confirm creation.",
-    "unavailableTitle": "No competitions are available",
+    "unavailableTitle": "No active seasons are available",
     "unavailableBody": "Try again later or contact the platform administrator.",
     "progressLabel": "Creation progress",
     "stepCount": "Step {current} of {total}",
@@ -62,7 +66,7 @@
   },
   "general": {
     "title": "General information",
-    "body": "Identify the pool and select the competition it will use.",
+    "body": "Identify the pool and select the official season it will use.",
     "name": {
       "label": "Name",
       "placeholder": "E.g. Office pool"
@@ -73,6 +77,9 @@
     },
     "competition": {
       "label": "League or competition"
+    },
+    "season": {
+      "label": "Season"
     }
   },
   "financial": {
@@ -176,6 +183,12 @@
     "members": "Members",
     "participationFee": "Participation fee",
     "createdAt": "Creation date",
+    "navigation": {
+      "label": "Pool sections",
+      "summary": "Summary",
+      "matchdays": "Matchdays",
+      "members": "Members"
+    },
     "invitation": {
       "title": "Invitation code",
       "body": "Only administrators can view this code.",
@@ -200,9 +213,17 @@
       "mixed": "Result and score points are exclusive. The bonus is added when every score in the matchday is exact."
     }
   },
+  "matchdays": {
+    "emptyTitle": "There are no published matchdays yet",
+    "emptyBody": "The schedule will appear here after it is published.",
+    "selectorLabel": "Select matchday",
+    "defaultName": "Matchday {number}",
+    "versus": "vs.",
+    "noMatches": "This matchday has no published matches."
+  },
   "errors": {
     "authentication_required": "Your session is no longer valid. Sign in again.",
-    "competition_unavailable": "The selected competition is no longer available.",
+    "competition_unavailable": "The selected season is no longer available.",
     "creation_failed": "We could not create the pool. Review the data and try again.",
     "invalid_configuration": "Review this step and correct any invalid values.",
     "invalid_invitation_code": "The code is invalid or does not exist.",
@@ -210,6 +231,7 @@
   },
   "status": {
     "loading": "Loading pool…",
+    "matchdaysLoading": "Loading matchdays…",
     "listLoading": "Loading your pools…",
     "listErrorTitle": "We could not load your pools",
     "listErrorBody": "An error occurred while loading this page. You can try again.",

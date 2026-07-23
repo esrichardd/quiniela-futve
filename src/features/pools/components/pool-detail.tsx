@@ -13,22 +13,25 @@ import type {
 import { Link } from "@/i18n/navigation";
 
 import InvitationCode from "./invitation-code";
+import PoolNavigation from "./pool-navigation";
 
 type PoolDetailProps = Readonly<{
   pool: PoolDetailDto;
   locale: string;
   created: boolean;
+  activeSection: "summary" | "members";
 }>;
 
 export default async function PoolDetail({
   pool,
   locale,
   created,
+  activeSection,
 }: PoolDetailProps) {
   const t = await getTranslations("pools");
 
   return (
-    <section>
+    <section id="summary">
       {created ? (
         <div className="mb-6 flex items-start gap-3 rounded-xl border border-success/30 bg-success/10 p-4 text-sm text-foreground">
           <CheckCircle2 aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-success" />
@@ -42,7 +45,7 @@ export default async function PoolDetail({
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-brand">
-            {pool.competitionName}
+            {pool.competitionName} · {pool.seasonName}
           </p>
           <h1 className="mt-1 text-3xl font-bold tracking-tight sm:text-4xl">
             {pool.name}
@@ -57,6 +60,8 @@ export default async function PoolDetail({
           {t(`roles.${pool.currentUserRole}`)}
         </span>
       </div>
+
+      <PoolNavigation poolId={pool.id} active={activeSection} />
 
       <div className="mt-7 grid gap-4 sm:grid-cols-3">
         <Stat
@@ -109,7 +114,7 @@ export default async function PoolDetail({
         </section>
       </div>
 
-      <section className="mt-6 rounded-2xl border border-border bg-card p-5 shadow-soft">
+      <section id="members" className="mt-6 scroll-mt-6 rounded-2xl border border-border bg-card p-5 shadow-soft">
         <div className="flex items-center gap-2">
           <Users aria-hidden="true" className="size-5 text-brand" />
           <h2 className="text-lg font-bold">{t("detail.memberListTitle")}</h2>
@@ -154,7 +159,7 @@ export default async function PoolDetail({
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           {!pool.membersPageIsFirst ? (
             <Link
-              href={`/pools/${pool.id}`}
+              href={`/pools/${pool.id}?section=members#members`}
               className="inline-flex items-center justify-center rounded-xl border border-border px-4 py-2.5 text-sm font-bold text-foreground hover:border-brand/40 hover:bg-brand/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {t("detail.memberPagination.first")}
@@ -162,7 +167,7 @@ export default async function PoolDetail({
           ) : null}
           {pool.membersNextCursor ? (
             <Link
-              href={`/pools/${pool.id}?membersCursor=${encodeURIComponent(pool.membersNextCursor)}`}
+              href={`/pools/${pool.id}?section=members&membersCursor=${encodeURIComponent(pool.membersNextCursor)}#members`}
               className="inline-flex items-center justify-center rounded-xl bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground shadow-soft hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {t("detail.memberPagination.next")}

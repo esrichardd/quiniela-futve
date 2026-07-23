@@ -56,7 +56,7 @@ export type PredictionRulesInput =
 
 export type CreatePoolInput = Readonly<{
   creationToken: string;
-  competitionId: string;
+  competitionSeasonId: string;
   name: string;
   description?: string;
   financial: FinancialConfigurationInput;
@@ -89,6 +89,7 @@ export type PoolListItem = Readonly<{
   name: string;
   description: string | null;
   competitionName: string;
+  seasonName: string;
   role: PoolRole;
   memberCount: number;
   currency: PoolCurrency;
@@ -160,6 +161,7 @@ export type PoolDetail = Readonly<{
   name: string;
   description: string | null;
   competitionName: string;
+  seasonName: string;
   currentUserRole: PoolRole;
   invitationCode: string | null;
   memberCount: number;

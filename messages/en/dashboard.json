@@ -4,7 +4,8 @@
   },
   "navigation": {
     "pools": "My pools",
-    "join": "Join"
+    "join": "Join",
+    "admin": "Administration"
   },
   "status": {
     "loading": "Loading dashboard..."

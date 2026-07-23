@@ -92,7 +92,7 @@ const predictionSchema = z
 export const createPoolSchema = z
   .object({
     creationToken: z.string().uuid(),
-    competitionId: z.string().uuid(),
+    competitionSeasonId: z.string().uuid(),
     name: z.string().trim().refine(isValidPoolName),
     description: z.string().trim().refine(isValidPoolDescription).optional(),
     financial: z.object({

@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "admin": {
+      "title": "Competition administration — Quiniela FUTVE",
+      "description": "Manage official seasons, teams, matchdays, and matches."
+    },
+    "season": {
+      "title": "Manage season — Quiniela FUTVE",
+      "description": "Configure participants and the official season schedule."
+    }
+  },
+  "admin": {
+    "eyebrow": "Platform administration",
+    "title": "Competitions and seasons",
+    "subtitle": "Manage the official catalog shared by every pool.",
+    "permissionNotice": "Only global platform administrators can modify this data."
+  },
+  "actions": {
+    "back": "Back to competitions",
+    "saving": "Saving…"
+  },
+  "competition": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "season": {
+    "empty": "This competition does not have any seasons yet.",
+    "createTitle": "Create season",
+    "create": "Create season",
+    "creating": "Creating…",
+    "name": "Display name",
+    "code": "Stable code",
+    "startsOn": "Optional start date",
+    "endsOn": "Optional end date",
+    "activate": "Activate season",
+    "finish": "Finish season",
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "finished": "Finished"
+    }
+  },
+  "teams": {
+    "title": "Participating teams",
+    "empty": "No teams have been associated yet.",
+    "createTitle": "Register a new team",
+    "addTitle": "Add an existing team",
+    "create": "Register and add",
+    "add": "Add team",
+    "name": "Name",
+    "shortName": "Optional short name",
+    "code": "Stable code",
+    "existing": "Team",
+    "noneAvailable": "Every registered team already participates in this season."
+  },
+  "matchdays": {
+    "title": "Matchdays and matches",
+    "empty": "There are no matchdays yet.",
+    "create": "Create matchday",
+    "number": "Number",
+    "name": "Optional name",
+    "defaultName": "Matchday {number}",
+    "publish": "Publish matchday",
+    "finish": "Finish matchday",
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "finished": "Finished"
+    }
+  },
+  "matches": {
+    "create": "Create match",
+    "save": "Save changes",
+    "empty": "This matchday does not have any matches yet.",
+    "homeTeam": "Home team",
+    "awayTeam": "Away team",
+    "startsAtDevice": "Start time (device time zone)",
+    "statusLabel": "Status",
+    "homeScore": "Home goals",
+    "awayScore": "Away goals",
+    "status": {
+      "scheduled": "Scheduled",
+      "postponed": "Postponed",
+      "in_progress": "In progress",
+      "finished": "Finished",
+      "cancelled": "Cancelled"
+    }
+  },
+  "confirm": {
+    "seasonStatus": "Confirm the season status change?",
+    "matchdayStatus": "Confirm the matchday status change?",
+    "resultCorrection": "Confirm this official result correction?"
+  },
+  "errors": {
+    "authentication_required": "Your session is no longer valid.",
+    "forbidden": "You do not have permission to manage the official catalog.",
+    "invalid_input": "Review the fields and try again.",
+    "not_found": "The requested record no longer exists.",
+    "conflict": "The data changed or a record with those values already exists.",
+    "invalid_transition": "This status change is not allowed or its requirements are incomplete.",
+    "operation_failed": "We could not complete the operation. Try again."
+  },
+  "success": {
+    "season_status_updated": "Season status updated.",
+    "team_created": "Team registered and added.",
+    "team_added": "Team added to the season.",
+    "matchday_created": "Matchday created.",
+    "matchday_updated": "Matchday status updated.",
+    "match_created": "Match created.",
+    "match_updated": "Match updated."
+  },
+  "status": {
+    "loading": "Loading administration…",
+    "errorTitle": "We could not load administration",
+    "errorBody": "An unexpected error occurred. You can try again.",
+    "retry": "Try again"
+  }
+}

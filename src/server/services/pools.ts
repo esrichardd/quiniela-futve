@@ -16,7 +16,6 @@ import {
   normalizePrizeConfiguration,
 } from "@/features/pools/rules";
 import type {
-  CompetitionOption,
   CreatePoolInput,
   PoolDetail,
   PoolListItem,
@@ -24,13 +23,14 @@ import type {
   PoolPredictionDetails,
   PoolPrizeDetails,
 } from "@/features/pools/types";
+import type { SeasonOption } from "@/features/competition-catalog/types";
 import {
   assertPoolAdmin,
   PoolMembershipRequiredError,
 } from "@/server/auth/permissions";
 import { requireVerifiedAppUser } from "@/server/auth/session";
-import { getCachedActiveCompetitions } from "@/server/cache/competition-catalog";
-import { isCompetitionActive } from "@/server/dal/competitions";
+import { getCachedActiveSeasonOptions } from "@/server/cache/season-catalog";
+import { isCompetitionSeasonActive } from "@/server/dal/competition-catalog";
 import {
   createPlayerMembershipIfMissing,
   createPoolRecord,
@@ -70,11 +70,11 @@ export class InvalidInvitationCodeError extends Error {
   }
 }
 
-export async function getAvailableCompetitionOptions(): Promise<
-  ReadonlyArray<CompetitionOption>
+export async function getAvailableSeasonOptions(): Promise<
+  ReadonlyArray<SeasonOption>
 > {
   await requireVerifiedAppUser();
-  return getCachedActiveCompetitions();
+  return getCachedActiveSeasonOptions();
 }
 
 export async function createPool(input: CreatePoolInput): Promise<string> {
@@ -88,7 +88,7 @@ export async function createPool(input: CreatePoolInput): Promise<string> {
     return existingPoolId;
   }
 
-  if (!(await isCompetitionActive(input.competitionId))) {
+  if (!(await isCompetitionSeasonActive(input.competitionSeasonId))) {
     throw new CompetitionUnavailableError();
   }
 
@@ -103,7 +103,7 @@ export async function createPool(input: CreatePoolInput): Promise<string> {
       await createPoolRecord({
         poolId,
         membershipId,
-        competitionId: input.competitionId,
+        competitionSeasonId: input.competitionSeasonId,
         creatorUserId: appUser.id,
         creationToken: input.creationToken,
         invitationCode: generateInvitationCode(),
@@ -219,6 +219,7 @@ export async function getCurrentUserPoolDetail(
     name: core.name,
     description: core.description,
     competitionName: core.competitionName,
+    seasonName: core.seasonName,
     currentUserRole: currentRole,
     invitationCode,
     memberCount: core.memberCount,
@@ -250,6 +251,7 @@ function mapPoolListItem(record: PoolListRecord): PoolListItem {
     name: record.name,
     description: record.description,
     competitionName: record.competitionName,
+    seasonName: record.seasonName,
     role: parsePoolRole(record.role),
     memberCount: record.memberCount,
     currency: parsePoolCurrency(record.currency),

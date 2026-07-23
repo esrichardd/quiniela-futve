@@ -117,6 +117,14 @@ Reglas:
 - Los seeds viven separados de migraciones.
 - El seed app-owned actual se ejecuta con `pnpm db:seed` despues de aplicar migraciones.
 
+## Migracion `0003_harsh_sumo`
+
+La migracion del catalogo oficial crea temporadas, equipos, participaciones, jornadas, partidos y auditoria. Tambien reemplaza `pools.competition_id` por `pools.competition_season_id` obligatorio.
+
+Las quinielas previas eran datos de prueba sin temporada identificable. Por decision de producto, la migracion ejecuta `TRUNCATE TABLE pools CASCADE` antes del reemplazo de la FK; esto elimina tambien configuraciones, membresias e invitaciones dependientes. No se debe aplicar en un ambiente que contenga quinielas que deban conservarse.
+
+Las unique constraints compuestas de `matchdays` se crean antes de las foreign keys compuestas de `matches`. Este orden fue revisado manualmente porque el orden inicial generado por Drizzle intentaba crear la FK antes de su clave candidata.
+
 ## Revision
 
 Antes de aceptar una migracion:

@@ -48,7 +48,7 @@ export default async function DashboardHomePage({
 
   setRequestLocale(locale);
 
-  await requireDashboardUser(locale);
+  const appUser = await requireDashboardUser(locale);
 
   const query = await searchParams;
 
@@ -66,5 +66,11 @@ export default async function DashboardHomePage({
     throw error;
   }
 
-  return <DashboardHome locale={locale} page={pools} />;
+  return (
+    <DashboardHome
+      locale={locale}
+      page={pools}
+      isPlatformAdmin={appUser.profile.globalRole === "super_admin"}
+    />
+  );
 }

@@ -233,6 +233,7 @@ function createAppUser(
     profile: {
       banned: profile.banned,
       banExpiresAt: profile.banExpiresAt,
+      globalRole: profile.globalRole,
     },
     preferences: {
       locale: preferences.locale,

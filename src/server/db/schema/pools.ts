@@ -14,16 +14,16 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-import { competitions } from "./competitions";
+import { competitionSeasons } from "./competition-catalog";
 import { userProfiles } from "./users";
 
 export const pools = pgTable(
   "pools",
   {
     id: uuid("id").primaryKey(),
-    competitionId: uuid("competition_id")
+    competitionSeasonId: uuid("competition_season_id")
       .notNull()
-      .references(() => competitions.id, { onDelete: "restrict" }),
+      .references(() => competitionSeasons.id, { onDelete: "restrict" }),
     createdByUserId: text("created_by_user_id")
       .notNull()
       .references(() => userProfiles.userId, { onDelete: "restrict" }),
@@ -44,7 +44,7 @@ export const pools = pgTable(
       .defaultNow(),
   },
   (table) => [
-    index("pools_competition_id_idx").on(table.competitionId),
+    index("pools_competition_season_id_idx").on(table.competitionSeasonId),
     index("pools_created_by_user_id_idx").on(table.createdByUserId),
     uniqueIndex("pools_creator_creation_token_unique").on(
       table.createdByUserId,

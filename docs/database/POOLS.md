@@ -10,7 +10,7 @@ Este modelo implementa quinielas privadas configurables. Persiste la competicion
 
 Catalogo app-owned de ligas y competiciones con UUID estable, codigo unico, nombre propio, estado activo y timestamps. El registro inicial es Liga FUTVE, insertado de forma idempotente mediante `pnpm db:seed`. El modelo no limita el catalogo a esa competicion.
 
-La lista activa usada por el asistente de creacion se cachea globalmente durante una hora bajo el tag `competition-catalog`. La entrada solo contiene `id`, `code` y `name`; no incorpora sesion, permisos ni datos personales. Toda futura mutacion administrativa debe llamar `invalidateCompetitionCatalog()` despues de confirmar la escritura. La validacion al crear una quiniela consulta directamente la tabla y nunca confia en el valor cacheado.
+La lista activa usada por el asistente de creacion se cachea globalmente durante una hora bajo el tag `competition-catalog`. Incluye solo temporadas activas de competiciones activas y no incorpora sesion, permisos ni datos personales. Toda mutacion administrativa invalida el tag despues de confirmar la escritura. La validacion al crear una quiniela consulta directamente las tablas y nunca confia en el valor cacheado.
 
 El TTL es una red de seguridad para cambios externos, como `pnpm db:seed`, que no pueden invalidar el Data Cache de un deployment por si mismos. Si se incorporan actualizaciones frecuentes fuera de Next.js, deben notificar una ruta protegida que invalide el tag en vez de depender solamente del TTL.
 
@@ -18,7 +18,7 @@ El TTL es una red de seguridad para cambios externos, como `pnpm db:seed`, que n
 
 Entidad principal de una quiniela privada.
 
-- `competition_id` referencia una competicion y restringe su borrado.
+- `competition_season_id` referencia una temporada oficial y restringe su borrado. La competicion se deriva desde esa temporada.
 - `created_by_user_id` referencia el perfil app-owned del creador.
 - `creation_token` es la clave de idempotencia de la confirmacion.
 - `name` y `description` contienen la informacion definida por el administrador.
@@ -129,7 +129,7 @@ El feedback cliente no es una frontera de seguridad. `createPoolAction` parsea n
 ## Indices
 
 - Codigo y estado activo de competicion.
-- Competicion y creador de quiniela.
+- Temporada oficial y creador de quiniela.
 - Token idempotente por creador.
 - Membresias por quiniela y por usuario.
 - Membresias por `(pool_id, created_at, id)` para paginar miembros.
@@ -139,7 +139,7 @@ El feedback cliente no es una frontera de seguridad. `createPoolAction` parsea n
 
 ## Borrado
 
-- Una competicion referenciada no se elimina.
+- Una temporada referenciada no se elimina.
 - El borrado controlado de una quiniela elimina sus configuraciones, asignaciones, membresias y codigo.
 - Un perfil con quinielas creadas o membresias no se elimina por cascade.
 - No existe UI de borrado de quinielas o miembros en este MVP.

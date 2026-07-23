@@ -1,4 +1,4 @@
-import { CalendarDays, Plus, Ticket, Trophy, Users } from "lucide-react";
+import { CalendarDays, Plus, ShieldCheck, Ticket, Trophy, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { formatMinorCurrency } from "@/features/pools/format";
@@ -8,10 +8,14 @@ import { Link } from "@/i18n/navigation";
 type DashboardHomeProps = Readonly<{
   locale: string;
   page: PoolListPage;
+  isPlatformAdmin: boolean;
 }>;
 
-export default async function DashboardHome({ locale, page }: DashboardHomeProps) {
-  const t = await getTranslations("pools");
+export default async function DashboardHome({ locale, page, isPlatformAdmin }: DashboardHomeProps) {
+  const [t, dashboard] = await Promise.all([
+    getTranslations("pools"),
+    getTranslations("dashboard"),
+  ]);
   const pools = page.items;
 
   return (
@@ -27,6 +31,15 @@ export default async function DashboardHome({ locale, page }: DashboardHomeProps
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {isPlatformAdmin ? (
+            <Link
+              href="/admin/competitions"
+              className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-bold text-foreground shadow-soft hover:border-brand/40 hover:bg-brand/5"
+            >
+              <ShieldCheck aria-hidden="true" className="size-4 text-brand" />
+              {dashboard("navigation.admin")}
+            </Link>
+          ) : null}
           <Link
             href="/pools/join"
             className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-bold text-foreground shadow-soft hover:border-brand/40 hover:bg-brand/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -65,7 +78,7 @@ export default async function DashboardHome({ locale, page }: DashboardHomeProps
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="text-xs font-bold uppercase tracking-wide text-brand">
-                    {pool.competitionName}
+                    {pool.competitionName} · {pool.seasonName}
                   </p>
                   <h2 className="mt-1 truncate text-xl font-bold">{pool.name}</h2>
                 </div>

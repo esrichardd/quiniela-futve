@@ -11,6 +11,9 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const dashboard = (await import(`../../messages/${locale}/dashboard.json`))
     .default;
   const pools = (await import(`../../messages/${locale}/pools.json`)).default;
+  const competitionCatalog = (
+    await import(`../../messages/${locale}/competition-catalog.json`)
+  ).default;
 
   return {
     locale,
@@ -20,6 +23,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
       dashboard,
       home,
       pools,
+      competitionCatalog,
     },
   };
 });

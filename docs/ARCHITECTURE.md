@@ -421,11 +421,13 @@ Roles conceptuales iniciales:
 - `pool_admin`: administra una quiniela especifica.
 - `player`: participa en quinielas.
 
-`user` y `super_admin` son roles globales app-owned. `pool_admin` y `player` ya son roles contextuales de quiniela; `league_admin` permanece como rol contextual futuro. Ninguno debe guardarse como atributo global del usuario.
+`user` y `super_admin` son roles globales app-owned. `super_admin` administra el catalogo oficial compartido mediante rutas separadas y checks centralizados en servidor. `pool_admin` y `player` son roles contextuales de quiniela; `league_admin` permanece como rol contextual futuro y no se guarda como atributo global.
 
 Los permisos se evaluaran siempre con contexto. Por ejemplo, poder editar una quiniela depende de la quiniela concreta, la membresia del usuario, el estado de la quiniela y las reglas definidas. Poder cargar resultados depende de la liga o temporada asignada, no solamente de que el usuario tenga una etiqueta administrativa.
 
 Las quinielas privadas implementan los primeros permisos contextuales en `src/server/auth/permissions.ts`. La membresia persistida es la fuente de verdad para `pool_admin` y `player`; el codigo de invitacion solo se consulta despues de comprobar el rol administrativo.
+
+El catalogo oficial implementa temporadas, equipos, jornadas y partidos compartidos. Sus mutaciones requieren `super_admin` tanto en Server Actions como en servicios, se auditan en una tabla append-only y no reutilizan `pool_admin`. Las quinielas referencian una temporada y derivan desde ella la competicion y el calendario.
 
 La definicion detallada de tablas y relaciones persistidas vive en `docs/database/`. La definicion detallada de permisos vive en el documento de autorizacion correspondiente.
 

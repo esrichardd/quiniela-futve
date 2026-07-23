@@ -14,6 +14,7 @@ import { db } from "@/server/db/client";
 import type { PaginationCursor } from "@/server/pagination";
 import {
   competitions,
+  competitionSeasons,
   poolFinancialSettings,
   poolInvitationCodes,
   poolMemberships,
@@ -47,7 +48,7 @@ type PredictionInsert =
 export type CreatePoolRecordInput = Readonly<{
   poolId: string;
   membershipId: string;
-  competitionId: string;
+  competitionSeasonId: string;
   creatorUserId: string;
   creationToken: string;
   invitationCode: string;
@@ -64,6 +65,7 @@ export type PoolListRecord = Readonly<{
   name: string;
   description: string | null;
   competitionName: string;
+  seasonName: string;
   role: string;
   memberCount: number;
   currency: string;
@@ -78,6 +80,7 @@ export type PoolCoreRecord = Readonly<{
   name: string;
   description: string | null;
   competitionName: string;
+  seasonName: string;
   currentUserRole: string;
   memberCount: number;
   currency: string;
@@ -109,7 +112,7 @@ export async function createPoolRecord(
 ): Promise<void> {
   const poolQuery = db.insert(pools).values({
     id: input.poolId,
-    competitionId: input.competitionId,
+    competitionSeasonId: input.competitionSeasonId,
     createdByUserId: input.creatorUserId,
     creationToken: input.creationToken,
     name: input.name,
@@ -204,6 +207,7 @@ export async function listPoolRecordsForUser(
       name: pools.name,
       description: pools.description,
       competitionName: competitions.name,
+      seasonName: competitionSeasons.name,
       role: poolMemberships.role,
       memberCount: sql<number>`(
         select count(*)::integer
@@ -221,7 +225,11 @@ export async function listPoolRecordsForUser(
     })
     .from(poolMemberships)
     .innerJoin(pools, eq(poolMemberships.poolId, pools.id))
-    .innerJoin(competitions, eq(pools.competitionId, competitions.id))
+    .innerJoin(
+      competitionSeasons,
+      eq(pools.competitionSeasonId, competitionSeasons.id),
+    )
+    .innerJoin(competitions, eq(competitionSeasons.competitionId, competitions.id))
     .innerJoin(
       poolFinancialSettings,
       eq(poolFinancialSettings.poolId, pools.id),
@@ -255,6 +263,7 @@ export async function getPoolCoreRecordForUser(
       name: pools.name,
       description: pools.description,
       competitionName: competitions.name,
+      seasonName: competitionSeasons.name,
       currentUserRole: poolMemberships.role,
       memberCount: sql<number>`(
         select count(*)::integer
@@ -274,7 +283,11 @@ export async function getPoolCoreRecordForUser(
     })
     .from(poolMemberships)
     .innerJoin(pools, eq(poolMemberships.poolId, pools.id))
-    .innerJoin(competitions, eq(pools.competitionId, competitions.id))
+    .innerJoin(
+      competitionSeasons,
+      eq(pools.competitionSeasonId, competitionSeasons.id),
+    )
+    .innerJoin(competitions, eq(competitionSeasons.competitionId, competitions.id))
     .innerJoin(
       poolFinancialSettings,
       eq(poolFinancialSettings.poolId, pools.id),

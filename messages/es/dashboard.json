@@ -4,7 +4,8 @@
   },
   "navigation": {
     "pools": "Mis quinielas",
-    "join": "Unirme"
+    "join": "Unirme",
+    "admin": "Administración"
   },
   "status": {
     "loading": "Cargando panel..."

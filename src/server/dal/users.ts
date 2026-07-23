@@ -18,7 +18,7 @@ export type UserPreferences = InferSelectModel<typeof userPreferences>;
 export type NewUserPreferences = InferInsertModel<typeof userPreferences>;
 export type UserAuditEvent = InferSelectModel<typeof userAuditEvents>;
 export type AppUserProfile = Readonly<
-  Pick<UserProfile, "banned" | "banExpiresAt">
+  Pick<UserProfile, "banned" | "banExpiresAt" | "globalRole">
 >;
 export type AppUserPreferences = Readonly<
   Pick<UserPreferences, "locale" | "theme" | "timeZone">
@@ -50,6 +50,7 @@ export async function getAppUserRecord(
       id: userProfiles.userId,
       banned: userProfiles.banned,
       banExpiresAt: userProfiles.banExpiresAt,
+      globalRole: userProfiles.globalRole,
       preferencesUserId: userPreferences.userId,
       locale: userPreferences.locale,
       theme: userPreferences.theme,
@@ -84,6 +85,7 @@ export async function getAppUserRecord(
     profile: {
       banned: record.banned,
       banExpiresAt: record.banExpiresAt,
+      globalRole: record.globalRole,
     },
     preferences,
   };

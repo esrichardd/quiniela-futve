@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "admin": {
+      "title": "Administración de competiciones — Quiniela FUTVE",
+      "description": "Administra temporadas, equipos, jornadas y partidos oficiales."
+    },
+    "season": {
+      "title": "Administrar temporada — Quiniela FUTVE",
+      "description": "Configura los participantes y el calendario oficial de una temporada."
+    }
+  },
+  "admin": {
+    "eyebrow": "Administración de plataforma",
+    "title": "Competiciones y temporadas",
+    "subtitle": "Gestiona el catálogo oficial compartido por todas las quinielas.",
+    "permissionNotice": "Solo los administradores globales de la plataforma pueden modificar estos datos."
+  },
+  "actions": {
+    "back": "Volver a competiciones",
+    "saving": "Guardando…"
+  },
+  "competition": {
+    "active": "Activa",
+    "inactive": "Inactiva"
+  },
+  "season": {
+    "empty": "Esta competición todavía no tiene temporadas.",
+    "createTitle": "Crear temporada",
+    "create": "Crear temporada",
+    "creating": "Creando…",
+    "name": "Nombre visible",
+    "code": "Código estable",
+    "startsOn": "Fecha de inicio opcional",
+    "endsOn": "Fecha de finalización opcional",
+    "activate": "Activar temporada",
+    "finish": "Finalizar temporada",
+    "status": {
+      "draft": "Borrador",
+      "active": "Activa",
+      "finished": "Finalizada"
+    }
+  },
+  "teams": {
+    "title": "Equipos participantes",
+    "empty": "Todavía no hay equipos asociados.",
+    "createTitle": "Registrar un equipo nuevo",
+    "addTitle": "Agregar un equipo existente",
+    "create": "Registrar y agregar",
+    "add": "Agregar equipo",
+    "name": "Nombre",
+    "shortName": "Nombre corto opcional",
+    "code": "Código estable",
+    "existing": "Equipo",
+    "noneAvailable": "Todos los equipos registrados ya participan en esta temporada."
+  },
+  "matchdays": {
+    "title": "Jornadas y partidos",
+    "empty": "Todavía no hay jornadas.",
+    "create": "Crear jornada",
+    "number": "Número",
+    "name": "Nombre opcional",
+    "defaultName": "Jornada {number}",
+    "publish": "Publicar jornada",
+    "finish": "Finalizar jornada",
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicada",
+      "finished": "Finalizada"
+    }
+  },
+  "matches": {
+    "create": "Crear partido",
+    "save": "Guardar cambios",
+    "empty": "Esta jornada todavía no tiene partidos.",
+    "homeTeam": "Equipo local",
+    "awayTeam": "Equipo visitante",
+    "startsAtDevice": "Inicio (zona horaria del dispositivo)",
+    "statusLabel": "Estado",
+    "homeScore": "Goles local",
+    "awayScore": "Goles visitante",
+    "status": {
+      "scheduled": "Programado",
+      "postponed": "Aplazado",
+      "in_progress": "En juego",
+      "finished": "Finalizado",
+      "cancelled": "Cancelado"
+    }
+  },
+  "confirm": {
+    "seasonStatus": "¿Confirmas el cambio de estado de la temporada?",
+    "matchdayStatus": "¿Confirmas el cambio de estado de la jornada?",
+    "resultCorrection": "¿Confirmas la corrección de este resultado oficial?"
+  },
+  "errors": {
+    "authentication_required": "Tu sesión ya no es válida.",
+    "forbidden": "No tienes permiso para administrar el catálogo oficial.",
+    "invalid_input": "Revisa los campos e inténtalo nuevamente.",
+    "not_found": "El registro solicitado ya no existe.",
+    "conflict": "Los datos cambiaron o ya existe un registro con esos valores.",
+    "invalid_transition": "El cambio de estado no está permitido o faltan requisitos.",
+    "operation_failed": "No pudimos completar la operación. Inténtalo nuevamente."
+  },
+  "success": {
+    "season_status_updated": "Estado de temporada actualizado.",
+    "team_created": "Equipo registrado y agregado.",
+    "team_added": "Equipo agregado a la temporada.",
+    "matchday_created": "Jornada creada.",
+    "matchday_updated": "Estado de jornada actualizado.",
+    "match_created": "Partido creado.",
+    "match_updated": "Partido actualizado."
+  },
+  "status": {
+    "loading": "Cargando administración…",
+    "errorTitle": "No pudimos cargar la administración",
+    "errorBody": "Ocurrió un error inesperado. Puedes intentarlo nuevamente.",
+    "retry": "Reintentar"
+  }
+}

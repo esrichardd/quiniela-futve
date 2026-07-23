@@ -15,7 +15,7 @@ import {
 
 const validConfiguration: CreatePoolInput = {
   creationToken: "00000000-0000-4000-8000-000000000010",
-  competitionId: "00000000-0000-4000-8000-000000000001",
+  competitionSeasonId: "00000000-0000-4000-8000-000000000001",
   name: "Quiniela de prueba",
   description: "Configuración válida",
   financial: {
@@ -165,7 +165,7 @@ describe("authoritative create pool schema", () => {
     expect(
       createPoolSchema.safeParse({
         ...validConfiguration,
-        competitionId: "not-a-uuid",
+        competitionSeasonId: "not-a-uuid",
       }).success,
     ).toBe(false);
     expect(

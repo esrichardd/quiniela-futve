@@ -50,7 +50,7 @@ describe("createPoolAction", () => {
       "configuration",
       JSON.stringify({
         creationToken: "00000000-0000-4000-8000-000000000010",
-        competitionId: "not-a-uuid",
+        competitionSeasonId: "not-a-uuid",
         name: "Payload manipulado",
         financial: {
           currency: "USD",
@@ -80,7 +80,7 @@ describe("createPoolAction", () => {
       "configuration",
       JSON.stringify({
         creationToken: "00000000-0000-4000-8000-000000000010",
-        competitionId: "00000000-0000-4000-8000-000000000001",
+        competitionSeasonId: "00000000-0000-4000-8000-000000000001",
         name: "Quiniela protegida",
         financial: {
           currency: "USD",
