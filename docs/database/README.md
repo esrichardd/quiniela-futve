@@ -101,6 +101,7 @@ Modelos definidos:
 - `docs/database/USERS.md`: perfil de usuario app-owned, preferencias y auditoria.
 - `docs/database/POOLS.md`: competiciones, quinielas privadas, membresias, invitaciones y reglas.
 - `docs/database/COMPETITION_CATALOG.md`: temporadas, equipos, jornadas, partidos, resultados y auditoria oficial.
+- `docs/database/PREDICTIONS.md`: pronosticos enviados por miembro y partido, su representacion segun modalidad y su regla de cierre.
 
 Proceso de cambios:
 
@@ -108,4 +109,4 @@ Proceso de cambios:
 
 ## Fuera de alcance
 
-Este documento no define pronosticos enviados ni rankings. Esos modelos se documentan en archivos propios cuando se incorporen al producto.
+Este documento no define calculo de puntos ni rankings. Los pronosticos enviados por los miembros ya estan modelados en `docs/database/PREDICTIONS.md`; el calculo de puntos y el ranking se documentaran en un archivo propio cuando se incorporen al producto.

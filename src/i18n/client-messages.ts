@@ -29,3 +29,12 @@ export function pickNestedMessageNamespaces(
     ),
   };
 }
+
+export function pickMessageNamespaces(
+  messages: AbstractIntlMessages,
+  namespaces: ReadonlyArray<string>,
+): AbstractIntlMessages {
+  return Object.fromEntries(
+    namespaces.map((namespace) => [namespace, getMessageGroup(messages, namespace)]),
+  );
+}

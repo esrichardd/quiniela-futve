@@ -1,7 +1,8 @@
 import { CalendarDays } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
-import type { PoolMatchdaysView } from "@/features/competition-catalog/types";
+import MatchdayPredictionsForm from "@/features/predictions/components/matchday-predictions-form";
+import type { PoolPredictionsView } from "@/features/predictions/types";
 import { Link } from "@/i18n/navigation";
 
 import PoolNavigation from "./pool-navigation";
@@ -11,7 +12,7 @@ export default async function PoolMatchdays({
   locale,
   timeZone,
 }: Readonly<{
-  view: PoolMatchdaysView;
+  view: PoolPredictionsView;
   locale: string;
   timeZone: string;
 }>) {
@@ -70,27 +71,19 @@ export default async function PoolMatchdays({
                 </span>
               </div>
               {selected.matches.length > 0 ? (
-                <ul className="mt-5 divide-y divide-border">
-                  {selected.matches.map((match) => (
-                    <li key={match.id} className="grid gap-3 py-4 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
-                      <p className="font-semibold sm:text-right">{match.homeTeamName}</p>
-                      <div className="text-center">
-                        <p className="text-lg font-bold">
-                          {match.status === "finished"
-                            ? `${match.homeScore} — ${match.awayScore}`
-                            : t("matchdays.versus")}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatter.format(new Date(match.startsAt))}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {catalog(`matches.status.${match.status}`)}
-                        </p>
-                      </div>
-                      <p className="font-semibold">{match.awayTeamName}</p>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mt-5">
+                  <MatchdayPredictionsForm
+                    key={selected.id}
+                    poolId={view.poolId}
+                    locale={locale}
+                    mode={view.predictionMode}
+                    matches={selected.matches.map((match) => ({
+                      ...match,
+                      dateLabel: formatter.format(new Date(match.startsAt)),
+                      statusLabel: catalog(`matches.status.${match.matchStatus}`),
+                    }))}
+                  />
+                </div>
               ) : (
                 <p className="mt-5 text-sm text-muted-foreground">{t("matchdays.noMatches")}</p>
               )}

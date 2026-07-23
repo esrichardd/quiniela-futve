@@ -58,7 +58,7 @@ La administracion usa el rol global app-owned `super_admin`. `pool_admin` solo a
 
 `pools.competition_season_id` es obligatorio. La lectura parte de `pool_memberships`, muestra jornadas `published` y `finished` y ordena partidos por `starts_at` e ID.
 
-El cierre futuro de pronosticos se evaluara contra `matches.starts_at` por partido en servidor. Un partido iniciado no cierra los partidos posteriores de la jornada.
+El cierre de pronosticos se evalua contra `matches.starts_at` por partido en servidor, definido en `docs/database/PREDICTIONS.md`. Un partido iniciado no cierra los partidos posteriores de la jornada.
 
 ## Borrado
 

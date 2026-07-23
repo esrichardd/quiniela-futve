@@ -7,7 +7,7 @@ import PoolMatchdays from "@/features/pools/components/pool-matchdays";
 import { isLocale } from "@/i18n/routing";
 import { PoolMembershipRequiredError } from "@/server/auth/permissions";
 import { requireDashboardUser } from "@/server/auth/dashboard";
-import { getCurrentUserPoolMatchdays } from "@/server/services/competition-catalog";
+import { getCurrentUserPoolPredictions } from "@/server/services/predictions";
 
 export const dynamic = "force-dynamic";
 
@@ -33,7 +33,7 @@ export default async function PoolMatchdaysPage({ params, searchParams }: PagePr
   if (query.matchday && !z.string().uuid().safeParse(query.matchday).success) notFound();
   let view;
   try {
-    view = await getCurrentUserPoolMatchdays(poolId, query.matchday);
+    view = await getCurrentUserPoolPredictions(poolId, query.matchday);
   } catch (error) {
     if (error instanceof PoolMembershipRequiredError) notFound();
     throw error;

@@ -1,0 +1,44 @@
+{
+  "results": {
+    "home": "Local",
+    "draw": "Empate",
+    "away": "Visitante"
+  },
+  "form": {
+    "resultLegend": "Tu pronóstico",
+    "homeScoreLabel": "Goles local",
+    "awayScoreLabel": "Goles visitante",
+    "saveAll": "Guardar jornada",
+    "savingAll": "Guardando jornada…"
+  },
+  "status": {
+    "saved": "Pronóstico guardado",
+    "noPrediction": "No enviaste un pronóstico",
+    "yourPrediction": "Tu pronóstico",
+    "summaryAllSaved": "Se guardaron todos tus pronósticos de esta jornada.",
+    "summaryPartial": "Se guardaron {saved} de {total} pronósticos. Revisa los que quedaron marcados con error.",
+    "noEditableMatches": "Ningún partido de esta jornada admite pronósticos por ahora."
+  },
+  "lockReasons": {
+    "match_started": "El partido ya comenzó.",
+    "match_in_progress": "El partido está en juego.",
+    "match_finished": "El partido finalizó.",
+    "match_cancelled": "El partido fue cancelado.",
+    "matchday_not_published": "Esta jornada todavía no está publicada.",
+    "matchday_finished": "Esta jornada ya finalizó."
+  },
+  "errors": {
+    "authentication_required": "Tu sesión ya no es válida. Vuelve a iniciar sesión.",
+    "prediction_invalid": "Revisa los valores ingresados e inténtalo nuevamente.",
+    "prediction_mode_mismatch": "Este pronóstico no coincide con el modo configurado en la quiniela.",
+    "prediction_locked": "Ya no puedes modificar este pronóstico.",
+    "match_unavailable": "Este partido ya no está disponible.",
+    "pool_unavailable": "No pudimos verificar tu acceso a esta quiniela.",
+    "save_failed": "No pudimos guardar tu pronóstico. Inténtalo nuevamente."
+  },
+  "a11y": {
+    "resultGroupLabel": "Selecciona tu pronóstico para {homeTeam} contra {awayTeam}",
+    "homeScoreInputLabel": "Goles pronosticados para {team}",
+    "awayScoreInputLabel": "Goles pronosticados para {team}"
+  }
+}

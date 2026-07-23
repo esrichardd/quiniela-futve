@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
+import {
+  pickMessageNamespaces,
+  pickNestedMessageNamespaces,
+} from "@/i18n/client-messages";
 
 const messages = {
   auth: {
@@ -22,6 +25,11 @@ const messages = {
     },
     status: {
       retry: "Reintentar",
+    },
+  },
+  predictions: {
+    form: {
+      save: "Guardar",
     },
   },
 };
@@ -49,5 +57,20 @@ describe("client message selection", () => {
         ["status"],
       ),
     ).toThrow('Message namespace "status" is not an object.');
+  });
+});
+
+describe("pickMessageNamespaces", () => {
+  it("selects full top-level namespaces", () => {
+    expect(pickMessageNamespaces(messages, ["predictions", "dashboard"])).toEqual({
+      predictions: messages.predictions,
+      dashboard: messages.dashboard,
+    });
+  });
+
+  it("rejects missing or scalar namespaces", () => {
+    expect(() => pickMessageNamespaces(messages, ["missing"])).toThrow(
+      'Message namespace "missing" is not an object.',
+    );
   });
 });

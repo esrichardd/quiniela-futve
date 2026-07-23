@@ -202,6 +202,10 @@ export const matches = pgTable(
       ],
       name: "matches_away_season_team_fk",
     }).onDelete("restrict"),
+    uniqueIndex("matches_id_season_unique").on(
+      table.id,
+      table.competitionSeasonId,
+    ),
     index("matches_matchday_starts_id_idx").on(
       table.matchdayId,
       table.startsAt,

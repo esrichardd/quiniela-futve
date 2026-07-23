@@ -50,6 +50,10 @@ export const pools = pgTable(
       table.createdByUserId,
       table.creationToken,
     ),
+    uniqueIndex("pools_id_competition_season_unique").on(
+      table.id,
+      table.competitionSeasonId,
+    ),
   ],
 );
 
@@ -260,6 +264,10 @@ export const poolMemberships = pgTable(
     uniqueIndex("pool_memberships_pool_user_unique").on(
       table.poolId,
       table.userId,
+    ),
+    uniqueIndex("pool_memberships_id_pool_unique").on(
+      table.id,
+      table.poolId,
     ),
     index("pool_memberships_pool_created_id_idx").on(
       table.poolId,

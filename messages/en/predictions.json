@@ -1,0 +1,44 @@
+{
+  "results": {
+    "home": "Home",
+    "draw": "Draw",
+    "away": "Away"
+  },
+  "form": {
+    "resultLegend": "Your prediction",
+    "homeScoreLabel": "Home goals",
+    "awayScoreLabel": "Away goals",
+    "saveAll": "Save matchday",
+    "savingAll": "Saving matchday…"
+  },
+  "status": {
+    "saved": "Prediction saved",
+    "noPrediction": "You didn't submit a prediction",
+    "yourPrediction": "Your prediction",
+    "summaryAllSaved": "All your predictions for this matchday were saved.",
+    "summaryPartial": "Saved {saved} of {total} predictions. Check the ones marked with an error.",
+    "noEditableMatches": "No match in this matchday accepts predictions right now."
+  },
+  "lockReasons": {
+    "match_started": "The match has already started.",
+    "match_in_progress": "The match is in progress.",
+    "match_finished": "The match has finished.",
+    "match_cancelled": "The match was cancelled.",
+    "matchday_not_published": "This matchday is not published yet.",
+    "matchday_finished": "This matchday has already finished."
+  },
+  "errors": {
+    "authentication_required": "Your session is no longer valid. Please sign in again.",
+    "prediction_invalid": "Check the values you entered and try again.",
+    "prediction_mode_mismatch": "This prediction does not match the pool's configured mode.",
+    "prediction_locked": "You can no longer change this prediction.",
+    "match_unavailable": "This match is no longer available.",
+    "pool_unavailable": "We couldn't verify your access to this pool.",
+    "save_failed": "We couldn't save your prediction. Please try again."
+  },
+  "a11y": {
+    "resultGroupLabel": "Select your prediction for {homeTeam} versus {awayTeam}",
+    "homeScoreInputLabel": "Predicted goals for {team}",
+    "awayScoreInputLabel": "Predicted goals for {team}"
+  }
+}
