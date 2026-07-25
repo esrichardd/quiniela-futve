@@ -40,5 +40,10 @@
     "resultGroupLabel": "Select your prediction for {homeTeam} versus {awayTeam}",
     "homeScoreInputLabel": "Predicted goals for {team}",
     "awayScoreInputLabel": "Predicted goals for {team}"
+  },
+  "scoring": {
+    "pointsEarned": "You earned {points} points",
+    "exactScoreBadge": "Exact score",
+    "perfectMatchdayBonus": "Perfect matchday bonus: +{points} points"
   }
 }

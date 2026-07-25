@@ -24,6 +24,10 @@ import { assertPlatformAdmin, PoolMembershipRequiredError } from "@/server/auth/
 import { requireVerifiedAppUser } from "@/server/auth/session";
 import { invalidateCompetitionCatalog } from "@/server/cache/competition-catalog";
 import {
+  recomputeMatchdayBonuses,
+  recomputeMatchPredictionPoints,
+} from "@/server/services/scoring";
+import {
   addTeamToSeasonRecord,
   createMatchdayRecord,
   createMatchRecord,
@@ -267,6 +271,9 @@ export async function transitionMatchday(input: {
   }))) {
     throw new CatalogConflictError();
   }
+  if (input.status === "finished") {
+    await recomputeMatchdayBonuses(input.matchdayId);
+  }
 }
 
 export async function createMatch(input: {
@@ -333,6 +340,23 @@ export async function updateMatch(input: {
     action,
   }))) {
     throw new CatalogConflictError();
+  }
+  if (input.status === "finished") {
+    if (input.homeScore === null || input.awayScore === null) {
+      throw new Error("A finished match must have a recorded score.");
+    }
+    await recomputeMatchPredictionPoints(input.matchId, {
+      homeScore: input.homeScore,
+      awayScore: input.awayScore,
+    });
+
+    // A correction on a match whose matchday already finished can change
+    // who has a perfect matchday, so keep the bonus in sync automatically
+    // instead of relying on an admin re-triggering the matchday finish.
+    const matchday = await getMatchdayRecord(input.seasonId, match.matchdayId);
+    if (matchday && parseMatchdayStatus(matchday.status) === "finished") {
+      await recomputeMatchdayBonuses(match.matchdayId);
+    }
   }
 }
 

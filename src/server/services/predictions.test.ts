@@ -284,6 +284,9 @@ describe("getCurrentUserPoolPredictions", () => {
         predictedResult: null,
         predictedHomeScore: null,
         predictedAwayScore: null,
+        pointsEarned: null,
+        wasExactScore: null,
+        perfectMatchdayBonusPoints: null,
       },
     ]);
 
@@ -295,9 +298,11 @@ describe("getCurrentUserPoolPredictions", () => {
     expect(match.lockReason).toBeNull();
     expect(match.currentPrediction).toBeNull();
     expect(match.homeTeamShortName).toBe("LOC");
+    expect(match.pointsEarned).toBeNull();
+    expect(match.wasExactScore).toBeNull();
   });
 
-  it("marks a finished match as read-only and exposes the saved prediction", async () => {
+  it("marks a finished match as read-only, exposes the saved prediction and the points earned", async () => {
     dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
       {
         poolId,
@@ -320,6 +325,9 @@ describe("getCurrentUserPoolPredictions", () => {
         predictedResult: null,
         predictedHomeScore: 2,
         predictedAwayScore: 2,
+        pointsEarned: 3,
+        wasExactScore: true,
+        perfectMatchdayBonusPoints: null,
       },
     ]);
 
@@ -333,5 +341,81 @@ describe("getCurrentUserPoolPredictions", () => {
       homeScore: 2,
       awayScore: 2,
     });
+    expect(match.pointsEarned).toBe(3);
+    expect(match.wasExactScore).toBe(true);
+  });
+
+  it("exposes the perfect matchday bonus only for a finished matchday, and never another member's", async () => {
+    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
+      {
+        poolId,
+        poolName: "Quiniela",
+        competitionName: "Liga",
+        seasonName: "2026",
+        predictionMode: "mixed",
+        poolMembershipId: "membership-1",
+        matchdayId: "matchday-1",
+        matchdayNumber: 1,
+        matchdayName: null,
+        matchdayStatus: "finished",
+        matchId,
+        homeTeamName: "Local FC",
+        homeTeamShortName: null,
+        awayTeamName: "Away FC",
+        awayTeamShortName: null,
+        startsAt: new Date("2020-01-01T00:00:00.000Z"),
+        matchStatus: "finished",
+        predictedResult: null,
+        predictedHomeScore: 2,
+        predictedAwayScore: 2,
+        pointsEarned: 5,
+        wasExactScore: true,
+        perfectMatchdayBonusPoints: 10,
+      },
+    ]);
+
+    const view = await getCurrentUserPoolPredictions(poolId);
+
+    // The DAL query is scoped to poolMemberships.userId = the current user,
+    // so any bonus value returned already belongs to their own membership.
+    expect(dalMocks.listPoolMatchPredictionRowsForUser).toHaveBeenCalledWith(
+      poolId,
+      appUser.id,
+    );
+    expect(view.matchdays[0].perfectMatchdayBonusPoints).toBe(10);
+  });
+
+  it("hides the perfect matchday bonus while the matchday is still published", async () => {
+    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
+      {
+        poolId,
+        poolName: "Quiniela",
+        competitionName: "Liga",
+        seasonName: "2026",
+        predictionMode: "mixed",
+        poolMembershipId: "membership-1",
+        matchdayId: "matchday-1",
+        matchdayNumber: 1,
+        matchdayName: null,
+        matchdayStatus: "published",
+        matchId,
+        homeTeamName: "Local FC",
+        homeTeamShortName: null,
+        awayTeamName: "Away FC",
+        awayTeamShortName: null,
+        startsAt: new Date(Date.now() + 3_600_000),
+        matchStatus: "scheduled",
+        predictedResult: null,
+        predictedHomeScore: 2,
+        predictedAwayScore: 2,
+        pointsEarned: null,
+        wasExactScore: null,
+        perfectMatchdayBonusPoints: null,
+      },
+    ]);
+
+    const view = await getCurrentUserPoolPredictions(poolId);
+
+    expect(view.matchdays[0].perfectMatchdayBonusPoints).toBeNull();
   });
 });

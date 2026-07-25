@@ -26,11 +26,13 @@ export default function MatchdayPredictionsForm({
   locale,
   mode,
   matches,
+  perfectMatchdayBonusPoints,
 }: Readonly<{
   poolId: string;
   locale: string;
   mode: PredictionMode;
   matches: ReadonlyArray<PredictionMatchViewModel>;
+  perfectMatchdayBonusPoints: number | null;
 }>) {
   const t = useTranslations("predictions");
   const [state, formAction, pending] = useActionState(
@@ -88,6 +90,12 @@ export default function MatchdayPredictionsForm({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="predictions" ref={predictionsFieldRef} />
 
+      {perfectMatchdayBonusPoints !== null ? (
+        <p className="mb-4 rounded-xl border border-success/30 bg-success/10 px-3 py-2.5 text-sm font-semibold text-success">
+          {t("scoring.perfectMatchdayBonus", { points: perfectMatchdayBonusPoints })}
+        </p>
+      ) : null}
+
       <ul className="divide-y divide-border">
         {matches.map((match) => (
           <li key={match.matchId} className="py-4">
@@ -131,6 +139,18 @@ export default function MatchdayPredictionsForm({
                 {match.lockReason ? (
                   <p className="mt-1 text-xs text-muted-foreground">
                     {t(`lockReasons.${match.lockReason}`)}
+                  </p>
+                ) : null}
+                {match.pointsEarned !== null ? (
+                  <p className="mt-2 flex flex-wrap items-center gap-2 text-xs font-semibold">
+                    <span className={match.pointsEarned > 0 ? "text-success" : "text-muted-foreground"}>
+                      {t("scoring.pointsEarned", { points: match.pointsEarned })}
+                    </span>
+                    {match.wasExactScore ? (
+                      <span className="rounded-full bg-success/10 px-2 py-0.5 text-success">
+                        {t("scoring.exactScoreBadge")}
+                      </span>
+                    ) : null}
                   </p>
                 ) : null}
               </div>

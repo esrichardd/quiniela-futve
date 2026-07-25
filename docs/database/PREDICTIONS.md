@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este modelo persiste el pronóstico de una membresía para un partido oficial dentro de una quiniela. Extiende la lectura protegida de jornadas para que cada miembro vea y edite únicamente su propio pronóstico, respetando el modo de puntuación configurado en `pool_prediction_rules`. Este documento no define cálculo de puntos ni ranking; esos modelos se documentarán en un feature posterior.
+Este modelo persiste el pronóstico de una membresía para un partido oficial dentro de una quiniela. Extiende la lectura protegida de jornadas para que cada miembro vea y edite únicamente su propio pronóstico, respetando el modo de puntuación configurado en `pool_prediction_rules`. Este documento no define cálculo de puntos ni ranking; el cálculo de puntos y el bonus de jornada perfecta se modelan en `docs/database/SCORING.md`, y el ranking queda pendiente para un feature posterior.
 
 ## Tabla
 
@@ -116,11 +116,9 @@ La UI guarda todos los pronósticos editables de una jornada con un solo botón.
 - Escritura: `getPredictionWriteMembershipContext` resuelve membresía + modo; `getPredictionWriteMatchContext` resuelve partido + jornada filtrando por la temporada de la quiniela.
 - Índices `pool_match_predictions_pool_id_idx` y `pool_match_predictions_match_id_idx` soportan las cascadas de borrado y las futuras consultas de puntuación por partido o por quiniela.
 
-## Decisiones que quedan para scoring y ranking
+## Decisiones que quedan para ranking
 
-- Cálculo de puntos por resultado o marcador exacto.
-- Bonus de jornada perfecta.
-- Ranking y premios calculados.
-- Cualquier tabla o columna que agregue puntos obtenidos por pronóstico.
+- Ranking y tabla de posiciones.
+- Premios calculados en base a puntos.
 
-Ninguna de estas decisiones se modela todavía en `pool_match_predictions`.
+El cálculo de puntos por resultado o marcador exacto y el bonus de jornada perfecta ya están modelados en `docs/database/SCORING.md`, en tablas propias (`pool_match_prediction_scores`, `pool_matchday_perfect_bonuses`) separadas de `pool_match_predictions`: el pronóstico enviado por el usuario nunca se modifica para guardar puntos.

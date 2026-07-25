@@ -71,6 +71,8 @@ export async function getCurrentUserPoolPredictions(
         name: row.matchdayName,
         status: matchdayStatus,
         matches: match ? [match] : [],
+        perfectMatchdayBonusPoints:
+          matchdayStatus === "finished" ? row.perfectMatchdayBonusPoints : null,
       });
     }
   }
@@ -207,6 +209,8 @@ function mapPredictionMatch(
     currentPrediction: mapCurrentPrediction(row),
     canEdit,
     lockReason,
+    pointsEarned: matchStatus === "finished" ? row.pointsEarned : null,
+    wasExactScore: matchStatus === "finished" ? row.wasExactScore : null,
   };
 }
 

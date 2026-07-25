@@ -32,6 +32,12 @@ export type PredictionMatch = Readonly<{
   currentPrediction: MatchPrediction | null;
   canEdit: boolean;
   lockReason: PredictionLockReason | null;
+  /** Points earned by the current user's prediction. Only set once the
+   * match is `finished` and a score has been calculated. */
+  pointsEarned: number | null;
+  /** Whether the current user's prediction matched the exact score. Only
+   * set together with `pointsEarned`. */
+  wasExactScore: boolean | null;
 }>;
 
 export type PredictionMatchday = Readonly<{
@@ -40,6 +46,10 @@ export type PredictionMatchday = Readonly<{
   name: string | null;
   status: Extract<MatchdayStatus, "published" | "finished">;
   matches: ReadonlyArray<PredictionMatch>;
+  /** Perfect matchday bonus earned by the current user's membership for
+   * this matchday. Only set once the matchday is `finished` and the bonus
+   * was awarded. */
+  perfectMatchdayBonusPoints: number | null;
 }>;
 
 export type PoolPredictionsView = Readonly<{

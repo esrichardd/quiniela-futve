@@ -333,6 +333,7 @@ export async function getMatchRecord(
 ): Promise<
   | Readonly<{
       id: string;
+      matchdayId: string;
       status: string;
       startsAt: Date;
       homeScore: number | null;
@@ -343,6 +344,7 @@ export async function getMatchRecord(
   const [record] = await db
     .select({
       id: matches.id,
+      matchdayId: matches.matchdayId,
       status: matches.status,
       startsAt: matches.startsAt,
       homeScore: matches.homeScore,

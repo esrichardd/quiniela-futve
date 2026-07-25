@@ -40,5 +40,10 @@
     "resultGroupLabel": "Selecciona tu pronóstico para {homeTeam} contra {awayTeam}",
     "homeScoreInputLabel": "Goles pronosticados para {team}",
     "awayScoreInputLabel": "Goles pronosticados para {team}"
+  },
+  "scoring": {
+    "pointsEarned": "Ganaste {points} puntos",
+    "exactScoreBadge": "Marcador exacto",
+    "perfectMatchdayBonus": "Bonus de jornada perfecta: +{points} puntos"
   }
 }

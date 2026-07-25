@@ -77,6 +77,7 @@ export default async function PoolMatchdays({
                     poolId={view.poolId}
                     locale={locale}
                     mode={view.predictionMode}
+                    perfectMatchdayBonusPoints={selected.perfectMatchdayBonusPoints}
                     matches={selected.matches.map((match) => ({
                       ...match,
                       dateLabel: formatter.format(new Date(match.startsAt)),

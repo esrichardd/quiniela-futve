@@ -14,7 +14,9 @@ import {
   competitionSeasons,
   matchdays,
   matches,
+  poolMatchdayPerfectBonuses,
   poolMatchPredictions,
+  poolMatchPredictionScores,
   poolMemberships,
   poolPredictionRules,
   pools,
@@ -42,6 +44,9 @@ export type PoolMatchPredictionRow = Readonly<{
   predictedResult: string | null;
   predictedHomeScore: number | null;
   predictedAwayScore: number | null;
+  pointsEarned: number | null;
+  wasExactScore: boolean | null;
+  perfectMatchdayBonusPoints: number | null;
 }>;
 
 export type PredictionWriteMembershipContext = Readonly<{
@@ -96,6 +101,9 @@ export async function listPoolMatchPredictionRowsForUser(
       predictedResult: poolMatchPredictions.predictedResult,
       predictedHomeScore: poolMatchPredictions.predictedHomeScore,
       predictedAwayScore: poolMatchPredictions.predictedAwayScore,
+      pointsEarned: poolMatchPredictionScores.pointsEarned,
+      wasExactScore: poolMatchPredictionScores.wasExactScore,
+      perfectMatchdayBonusPoints: poolMatchdayPerfectBonuses.pointsAwarded,
     })
     .from(poolMemberships)
     .innerJoin(pools, eq(poolMemberships.poolId, pools.id))
@@ -120,6 +128,17 @@ export async function listPoolMatchPredictionRowsForUser(
       and(
         eq(poolMatchPredictions.matchId, matches.id),
         eq(poolMatchPredictions.poolMembershipId, poolMemberships.id),
+      ),
+    )
+    .leftJoin(
+      poolMatchPredictionScores,
+      eq(poolMatchPredictionScores.poolMatchPredictionId, poolMatchPredictions.id),
+    )
+    .leftJoin(
+      poolMatchdayPerfectBonuses,
+      and(
+        eq(poolMatchdayPerfectBonuses.matchdayId, matchdays.id),
+        eq(poolMatchdayPerfectBonuses.poolMembershipId, poolMemberships.id),
       ),
     )
     .where(

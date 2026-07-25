@@ -102,6 +102,7 @@ Modelos definidos:
 - `docs/database/POOLS.md`: competiciones, quinielas privadas, membresias, invitaciones y reglas.
 - `docs/database/COMPETITION_CATALOG.md`: temporadas, equipos, jornadas, partidos, resultados y auditoria oficial.
 - `docs/database/PREDICTIONS.md`: pronosticos enviados por miembro y partido, su representacion segun modalidad y su regla de cierre.
+- `docs/database/SCORING.md`: calculo y persistencia de puntos por pronostico y del bonus de jornada perfecta.
 
 Proceso de cambios:
 
@@ -109,4 +110,4 @@ Proceso de cambios:
 
 ## Fuera de alcance
 
-Este documento no define calculo de puntos ni rankings. Los pronosticos enviados por los miembros ya estan modelados en `docs/database/PREDICTIONS.md`; el calculo de puntos y el ranking se documentaran en un archivo propio cuando se incorporen al producto.
+Este documento no define ranking. Los pronosticos enviados por los miembros estan modelados en `docs/database/PREDICTIONS.md` y el calculo de puntos y el bonus de jornada perfecta en `docs/database/SCORING.md`; el ranking y los premios calculados en base a puntos se documentaran en un archivo propio cuando se incorporen al producto.
