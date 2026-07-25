@@ -107,6 +107,11 @@ export type PoolMemberRecord = Readonly<{
   cursorCreatedAt: string;
 }>;
 
+export type PoolMembershipCore = Readonly<{
+  poolName: string;
+  poolMembershipId: string;
+}>;
+
 export async function createPoolRecord(
   input: CreatePoolRecordInput,
 ): Promise<void> {
@@ -303,6 +308,33 @@ export async function getPoolCoreRecordForUser(
     .limit(1);
 
   return pool ?? null;
+}
+
+/**
+ * Resolves the pool name and the current user's own membership id, and
+ * doubles as the authorization check for read-only, pool-wide screens
+ * (ranking, prediction transparency): a `null` result means the user is
+ * not a member of this pool (or the pool does not exist), which the
+ * calling service maps to `PoolMembershipRequiredError` — the same
+ * behavior as an inexistent pool.
+ */
+export async function getPoolMembershipCore(
+  poolId: string,
+  userId: string,
+): Promise<PoolMembershipCore | null> {
+  const [record] = await db
+    .select({
+      poolMembershipId: poolMemberships.id,
+      poolName: pools.name,
+    })
+    .from(poolMemberships)
+    .innerJoin(pools, eq(poolMemberships.poolId, pools.id))
+    .where(
+      and(eq(poolMemberships.poolId, poolId), eq(poolMemberships.userId, userId)),
+    )
+    .limit(1);
+
+  return record ?? null;
 }
 
 export async function getInvitationCodeForPool(

@@ -103,6 +103,8 @@ Modelos definidos:
 - `docs/database/COMPETITION_CATALOG.md`: temporadas, equipos, jornadas, partidos, resultados y auditoria oficial.
 - `docs/database/PREDICTIONS.md`: pronosticos enviados por miembro y partido, su representacion segun modalidad y su regla de cierre.
 - `docs/database/SCORING.md`: calculo y persistencia de puntos por pronostico y del bonus de jornada perfecta.
+- `docs/database/RANKING.md`: tabla de posiciones por quiniela, calculada al vuelo sobre el puntaje ya persistido, con su regla de desempate y autorizacion.
+- `docs/database/PREDICTION_TRANSPARENCY.md`: revelado de pronosticos a todos los miembros de la quiniela una vez cerrada la ventana de carga de cada partido.
 
 Proceso de cambios:
 
@@ -110,4 +112,4 @@ Proceso de cambios:
 
 ## Fuera de alcance
 
-Este documento no define ranking. Los pronosticos enviados por los miembros estan modelados en `docs/database/PREDICTIONS.md` y el calculo de puntos y el bonus de jornada perfecta en `docs/database/SCORING.md`; el ranking y los premios calculados en base a puntos se documentaran en un archivo propio cuando se incorporen al producto.
+Los pronosticos enviados por los miembros estan modelados en `docs/database/PREDICTIONS.md`, el calculo de puntos y el bonus de jornada perfecta en `docs/database/SCORING.md`, y la tabla de posiciones en `docs/database/RANKING.md`. Los premios calculados en base al ranking quedan fuera de alcance y se documentaran en un archivo propio cuando se incorporen al producto.

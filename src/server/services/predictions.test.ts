@@ -35,10 +35,14 @@ const matchId = "00000000-0000-4000-8000-000000000002";
 const otherMatchId = "00000000-0000-4000-8000-000000000003";
 const appUser = { id: "user-1" };
 
+// Comfortably beyond PREDICTION_LOCK_BUFFER_MINUTES (60) before kickoff,
+// so these contexts represent a match whose prediction window is open.
+const OPEN_STARTS_AT_OFFSET_MS = 2 * 60 * 60 * 1000;
+
 const futureContext = {
   matchdayStatus: "published",
   matchStatus: "scheduled",
-  startsAt: new Date(Date.now() + 60_000),
+  startsAt: new Date(Date.now() + OPEN_STARTS_AT_OFFSET_MS),
 };
 
 describe("savePredictions", () => {
@@ -261,7 +265,7 @@ describe("getCurrentUserPoolPredictions", () => {
   });
 
   it("marks a future scheduled match as editable with no prediction yet", async () => {
-    const startsAt = new Date(Date.now() + 3_600_000);
+    const startsAt = new Date(Date.now() + OPEN_STARTS_AT_OFFSET_MS);
     dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
       {
         poolId,
@@ -403,7 +407,7 @@ describe("getCurrentUserPoolPredictions", () => {
         homeTeamShortName: null,
         awayTeamName: "Away FC",
         awayTeamShortName: null,
-        startsAt: new Date(Date.now() + 3_600_000),
+        startsAt: new Date(Date.now() + OPEN_STARTS_AT_OFFSET_MS),
         matchStatus: "scheduled",
         predictedResult: null,
         predictedHomeScore: 2,

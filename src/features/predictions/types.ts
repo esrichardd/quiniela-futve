@@ -14,7 +14,7 @@ export type MatchPrediction =
   | Readonly<{ kind: "score"; homeScore: number; awayScore: number }>;
 
 export type PredictionLockReason =
-  | "match_started"
+  | "prediction_window_closed"
   | "match_in_progress"
   | "match_finished"
   | "match_cancelled"

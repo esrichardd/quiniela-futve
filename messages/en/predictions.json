@@ -20,7 +20,7 @@
     "noEditableMatches": "No match in this matchday accepts predictions right now."
   },
   "lockReasons": {
-    "match_started": "The match has already started.",
+    "prediction_window_closed": "Predictions for this match have already closed.",
     "match_in_progress": "The match is in progress.",
     "match_finished": "The match has finished.",
     "match_cancelled": "The match was cancelled.",

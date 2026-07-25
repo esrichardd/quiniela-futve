@@ -187,7 +187,8 @@
       "label": "Secciones de la quiniela",
       "summary": "Resumen",
       "matchdays": "Jornadas",
-      "members": "Miembros"
+      "transparency": "Resultados",
+      "ranking": "Posiciones"
     },
     "invitation": {
       "title": "Código de invitación",
@@ -232,6 +233,8 @@
   "status": {
     "loading": "Cargando quiniela…",
     "matchdaysLoading": "Cargando jornadas…",
+    "rankingLoading": "Cargando tabla de posiciones…",
+    "transparencyLoading": "Cargando transparencia…",
     "listLoading": "Cargando tus quinielas…",
     "listErrorTitle": "No pudimos cargar tus quinielas",
     "listErrorBody": "Ocurrió un error al cargar esta página. Puedes intentarlo nuevamente.",

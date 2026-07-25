@@ -17,6 +17,10 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const predictions = (
     await import(`../../messages/${locale}/predictions.json`)
   ).default;
+  const ranking = (await import(`../../messages/${locale}/ranking.json`)).default;
+  const transparency = (
+    await import(`../../messages/${locale}/transparency.json`)
+  ).default;
 
   return {
     locale,
@@ -28,6 +32,8 @@ export default getRequestConfig(async ({ requestLocale }) => {
       pools,
       competitionCatalog,
       predictions,
+      ranking,
+      transparency,
     },
   };
 });

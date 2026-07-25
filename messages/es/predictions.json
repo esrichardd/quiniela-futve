@@ -20,7 +20,7 @@
     "noEditableMatches": "Ningún partido de esta jornada admite pronósticos por ahora."
   },
   "lockReasons": {
-    "match_started": "El partido ya comenzó.",
+    "prediction_window_closed": "Los pronósticos para este partido ya cerraron.",
     "match_in_progress": "El partido está en juego.",
     "match_finished": "El partido finalizó.",
     "match_cancelled": "El partido fue cancelado.",

@@ -19,14 +19,12 @@ type PoolDetailProps = Readonly<{
   pool: PoolDetailDto;
   locale: string;
   created: boolean;
-  activeSection: "summary" | "members";
 }>;
 
 export default async function PoolDetail({
   pool,
   locale,
   created,
-  activeSection,
 }: PoolDetailProps) {
   const t = await getTranslations("pools");
 
@@ -61,7 +59,7 @@ export default async function PoolDetail({
         </span>
       </div>
 
-      <PoolNavigation poolId={pool.id} active={activeSection} />
+      <PoolNavigation poolId={pool.id} active="summary" />
 
       <div className="mt-7 grid gap-4 sm:grid-cols-3">
         <Stat

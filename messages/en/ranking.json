@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "title": "Standings — Quiniela FUTVE",
+    "description": "Review the pool's standings for every member."
+  },
+  "title": "Standings",
+  "table": {
+    "rank": "Rank",
+    "member": "Member",
+    "points": "Points"
+  },
+  "you": "You",
+  "empty": {
+    "title": "There are no calculated points yet",
+    "body": "The standings will appear here once the first matchday with results closes."
+  }
+}

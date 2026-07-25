@@ -187,7 +187,8 @@
       "label": "Pool sections",
       "summary": "Summary",
       "matchdays": "Matchdays",
-      "members": "Members"
+      "transparency": "Results",
+      "ranking": "Standings"
     },
     "invitation": {
       "title": "Invitation code",
@@ -232,6 +233,8 @@
   "status": {
     "loading": "Loading pool…",
     "matchdaysLoading": "Loading matchdays…",
+    "rankingLoading": "Loading standings…",
+    "transparencyLoading": "Loading transparency…",
     "listLoading": "Loading your pools…",
     "listErrorTitle": "We could not load your pools",
     "listErrorBody": "An error occurred while loading this page. You can try again.",

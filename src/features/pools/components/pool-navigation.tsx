@@ -7,13 +7,14 @@ export default async function PoolNavigation({
   active,
 }: Readonly<{
   poolId: string;
-  active: "summary" | "matchdays" | "members";
+  active: "summary" | "matchdays" | "transparency" | "ranking";
 }>) {
   const t = await getTranslations("pools");
   const items = [
     { key: "summary" as const, href: `/pools/${poolId}` },
     { key: "matchdays" as const, href: `/pools/${poolId}/matchdays` },
-    { key: "members" as const, href: `/pools/${poolId}?section=members#members` },
+    { key: "transparency" as const, href: `/pools/${poolId}/transparency` },
+    { key: "ranking" as const, href: `/pools/${poolId}/ranking` },
   ];
   return (
     <nav aria-label={t("detail.navigation.label")} className="mt-6 flex gap-2 overflow-x-auto border-b border-border">

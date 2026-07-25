@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "title": "Results — Quiniela FUTVE",
+    "description": "Review every pool member's predictions once the loading window has closed."
+  },
+  "selectorLabel": "Select matchday",
+  "table": {
+    "points": "Points",
+    "participant": "Participant",
+    "pick": "Pick"
+  },
+  "locked": "Revealed once predictions close, at {time}.",
+  "perfectMatchdayBanner": "Perfect matchday: {names}",
+  "emptyTitle": "There is nothing to reveal yet",
+  "emptyBody": "Once a match's prediction window closes, you'll see what every member picked here."
+}

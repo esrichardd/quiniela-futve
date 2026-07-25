@@ -72,7 +72,6 @@ export default async function PoolDetailPage({
       pool={pool}
       locale={locale}
       created={query.created === "1"}
-      activeSection={query.section === "members" ? "members" : "summary"}
     />
   );
 }

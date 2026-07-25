@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este modelo persiste el pronóstico de una membresía para un partido oficial dentro de una quiniela. Extiende la lectura protegida de jornadas para que cada miembro vea y edite únicamente su propio pronóstico, respetando el modo de puntuación configurado en `pool_prediction_rules`. Este documento no define cálculo de puntos ni ranking; el cálculo de puntos y el bonus de jornada perfecta se modelan en `docs/database/SCORING.md`, y el ranking queda pendiente para un feature posterior.
+Este modelo persiste el pronóstico de una membresía para un partido oficial dentro de una quiniela. Extiende la lectura protegida de jornadas para que cada miembro vea y edite únicamente su propio pronóstico, respetando el modo de puntuación configurado en `pool_prediction_rules`. Este documento no define cálculo de puntos ni ranking; el cálculo de puntos y el bonus de jornada perfecta se modelan en `docs/database/SCORING.md`, y la tabla de posiciones en `docs/database/RANKING.md`.
 
 ## Tabla
 
@@ -83,15 +83,19 @@ Nunca se acepta del cliente `user_id`, `pool_membership_id`, `competition_season
 
 La lectura (`getCurrentUserPoolPredictions`) solo devuelve el pronóstico de la membresía del usuario autenticado. El DTO (`PoolPredictionsView` / `PredictionMatch`) es mínimo: no incluye IDs de otras membresías ni pronósticos de otros participantes. Al ser una lectura dependiente de la sesión, no entra en ningún caché global compartido (la página usa `force-dynamic`).
 
+Esta privacidad estricta tiene una única excepción documentada, igual que el ranking: una vez que la ventana de pronósticos de un partido cierra, ese pronóstico deja de ser personal y se revela a todos los miembros de la quiniela para efectos de transparencia. Ver `docs/database/PREDICTION_TRANSPARENCY.md`.
+
 ## Regla de cierre
 
 Un pronóstico puede crearse o actualizarse solamente cuando:
 
 - La jornada está `published`.
 - El partido está `scheduled` o `postponed`.
-- `now` es estrictamente anterior a `matches.starts_at`.
+- `now` es estrictamente anterior al instante de cierre del partido.
 
-Se bloquea cuando `now >= starts_at`, el partido está `in_progress`, `finished` o `cancelled`, o la jornada está `draft` o `finished`. La comparación se hace exclusivamente en servidor con el horario oficial almacenado (`isPredictionEditable` en `src/features/predictions/rules.ts`); el cliente nunca es la frontera de seguridad, aunque puede mostrar una cuenta regresiva informativa.
+El instante de cierre no es el horario oficial del partido (`matches.starts_at`), sino `starts_at` menos un margen fijo de `PREDICTION_LOCK_BUFFER_MINUTES` (60 minutos), calculado por `getPredictionClosesAt` en `src/features/predictions/rules.ts`. Es una decisión de producto para reducir el valor de un pronóstico enviado a último momento (por ejemplo, con la alineación ya conocida), no una frontera de seguridad adicional: la regla siempre se evaluó exclusivamente en servidor con el reloj del servidor (`isPredictionEditable`), así que el reloj del dispositivo del cliente nunca pudo evadirla, ni antes ni después de introducir este margen.
+
+Se bloquea cuando `now >= getPredictionClosesAt(starts_at)`, el partido está `in_progress`, `finished` o `cancelled`, o la jornada está `draft` o `finished`. El motivo expuesto a la UI en ese primer caso es `prediction_window_closed` (en `src/features/predictions/types.ts`), deliberadamente sin mencionar "el partido ya comenzó": el cierre ocurre antes del kickoff. El cliente puede mostrar una cuenta regresiva informativa hasta ese instante, pero nunca es la frontera de seguridad.
 
 Cada partido se bloquea de forma individual usando su propio `starts_at`; un partido que ya comenzó no bloquea los partidos posteriores de la misma jornada.
 
@@ -116,9 +120,8 @@ La UI guarda todos los pronósticos editables de una jornada con un solo botón.
 - Escritura: `getPredictionWriteMembershipContext` resuelve membresía + modo; `getPredictionWriteMatchContext` resuelve partido + jornada filtrando por la temporada de la quiniela.
 - Índices `pool_match_predictions_pool_id_idx` y `pool_match_predictions_match_id_idx` soportan las cascadas de borrado y las futuras consultas de puntuación por partido o por quiniela.
 
-## Decisiones que quedan para ranking
+## Decisiones que quedan pendientes
 
-- Ranking y tabla de posiciones.
 - Premios calculados en base a puntos.
 
-El cálculo de puntos por resultado o marcador exacto y el bonus de jornada perfecta ya están modelados en `docs/database/SCORING.md`, en tablas propias (`pool_match_prediction_scores`, `pool_matchday_perfect_bonuses`) separadas de `pool_match_predictions`: el pronóstico enviado por el usuario nunca se modifica para guardar puntos.
+El cálculo de puntos por resultado o marcador exacto y el bonus de jornada perfecta ya están modelados en `docs/database/SCORING.md`, en tablas propias (`pool_match_prediction_scores`, `pool_matchday_perfect_bonuses`) separadas de `pool_match_predictions`: el pronóstico enviado por el usuario nunca se modifica para guardar puntos. La tabla de posiciones que agrega esos puntos por membresía ya está modelada en `docs/database/RANKING.md`.

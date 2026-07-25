@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "title": "Tabla de posiciones — Quiniela FUTVE",
+    "description": "Consulta la tabla de posiciones de todos los miembros de la quiniela."
+  },
+  "title": "Tabla de posiciones",
+  "table": {
+    "rank": "Posición",
+    "member": "Miembro",
+    "points": "Puntos"
+  },
+  "you": "Tú",
+  "empty": {
+    "title": "Todavía no hay puntos calculados",
+    "body": "Cuando se cierre la primera jornada con resultados, aquí aparecerá la tabla de posiciones."
+  }
+}

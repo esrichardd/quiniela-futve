@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este modelo calcula y persiste cuántos puntos gana cada pronóstico (`pool_match_predictions`) cuando su partido oficial se marca `finished`, y si corresponde, el bonus de jornada perfecta por membresía cuando su jornada se marca `finished`. Extiende `docs/database/PREDICTIONS.md` sin modificar la representación del pronóstico enviado por el usuario. Este documento no define ranking, tabla de posiciones ni premios calculados; esas decisiones quedan fuera de alcance.
+Este modelo calcula y persiste cuántos puntos gana cada pronóstico (`pool_match_predictions`) cuando su partido oficial se marca `finished`, y si corresponde, el bonus de jornada perfecta por membresía cuando su jornada se marca `finished`. Extiende `docs/database/PREDICTIONS.md` sin modificar la representación del pronóstico enviado por el usuario. Este documento no define ranking ni tabla de posiciones; esa agregación se documenta en `docs/database/RANKING.md`. Los premios calculados en base a puntos quedan fuera de alcance.
 
 ## Tablas
 
@@ -82,7 +82,8 @@ La pantalla de jornadas (`matchday-predictions-form.tsx`) muestra los puntos gan
 
 ## Fuera de alcance
 
-- Ranking o tabla de posiciones.
 - Premios calculados en base a puntos.
 - Notificaciones de puntos o bonus ganados.
 - Cualquier Server Action orientada al usuario para disparar el cálculo: todo el cómputo ocurre en servidor a partir de los eventos administrativos ya existentes.
+
+El ranking o tabla de posiciones, que agrega estos puntos por membresía, está modelado en `docs/database/RANKING.md`.

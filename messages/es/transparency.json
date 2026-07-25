@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "title": "Resultados — Quiniela FUTVE",
+    "description": "Consulta los pronósticos de todos los miembros de la quiniela una vez cerrada la carga."
+  },
+  "selectorLabel": "Seleccionar jornada",
+  "table": {
+    "points": "Puntos",
+    "participant": "Participante",
+    "pick": "Pronóstico"
+  },
+  "locked": "Se revela cuando cierre la carga de pronósticos, a las {time}.",
+  "perfectMatchdayBanner": "Jornada perfecta: {names}",
+  "emptyTitle": "Todavía no hay nada que revelar",
+  "emptyBody": "Cuando cierre la carga de pronósticos de un partido, aquí verás qué puso cada miembro."
+}
