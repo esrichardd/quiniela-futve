@@ -13,6 +13,7 @@ import {
 
 export type MatchScoringRow = Readonly<{
   poolMatchPredictionId: string;
+  poolId: string;
   poolMembershipId: string;
   predictionMode: string;
   resultPoints: number | null;
@@ -59,6 +60,7 @@ export async function listScoringRowsForMatch(
   return db
     .select({
       poolMatchPredictionId: poolMatchPredictions.id,
+      poolId: poolMatchPredictions.poolId,
       poolMembershipId: poolMatchPredictions.poolMembershipId,
       predictionMode: poolPredictionRules.mode,
       resultPoints: poolPredictionRules.resultPoints,
@@ -121,6 +123,23 @@ export async function listComputableMatchIdsForMatchday(
     .from(matches)
     .where(and(eq(matches.matchdayId, matchdayId), eq(matches.status, "finished")));
   return rows.map((row) => row.id);
+}
+
+/**
+ * Distinct pool ids that currently have a perfect matchday bonus row for a
+ * matchday. Read before `replaceMatchdayBonuses` when a correction removes
+ * every computable match (e.g. a match is un-finished): the replace call
+ * deletes those rows, so the affected pools' ranking cache would otherwise
+ * be impossible to invalidate afterwards.
+ */
+export async function listPoolIdsWithBonusesForMatchday(
+  matchdayId: string,
+): Promise<ReadonlyArray<string>> {
+  const rows = await db
+    .selectDistinct({ poolId: poolMatchdayPerfectBonuses.poolId })
+    .from(poolMatchdayPerfectBonuses)
+    .where(eq(poolMatchdayPerfectBonuses.matchdayId, matchdayId));
+  return rows.map((row) => row.poolId);
 }
 
 /**

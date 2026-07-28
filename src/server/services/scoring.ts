@@ -7,10 +7,12 @@ import {
   isPerfectMatchday,
 } from "@/features/scoring/rules";
 import type { OfficialMatchResult } from "@/features/scoring/rules";
+import { invalidatePoolRanking } from "@/server/cache/ranking";
 import { parsePredictionMode } from "@/server/dal/predictions";
 import {
   listComputableMatchIdsForMatchday,
   listMatchdayBonusCandidateRows,
+  listPoolIdsWithBonusesForMatchday,
   listScoringRowsForMatch,
   replaceMatchdayBonuses,
   upsertMatchPredictionScores,
@@ -64,6 +66,14 @@ export async function recomputeMatchPredictionPoints(
   });
 
   await upsertMatchPredictionScores(inputs);
+
+  // A match's points affect every pool that has predictions on it (the same
+  // competition season match can be predicted across several pools), so
+  // every one of them needs its cached ranking invalidated.
+  const poolIds = new Set(rows.map((row) => row.poolId));
+  for (const poolId of poolIds) {
+    invalidatePoolRanking(poolId);
+  }
 }
 
 type BonusGroup = {
@@ -85,7 +95,15 @@ type BonusGroup = {
 export async function recomputeMatchdayBonuses(matchdayId: string): Promise<void> {
   const computableMatchIds = await listComputableMatchIdsForMatchday(matchdayId);
   if (computableMatchIds.length === 0) {
+    // No computable match left (e.g. every match got un-finished): read
+    // which pools currently hold a bonus for this matchday *before* the
+    // replace deletes those rows, otherwise there would be no way left to
+    // know which ranking caches need invalidating.
+    const poolIdsWithBonuses = await listPoolIdsWithBonusesForMatchday(matchdayId);
     await replaceMatchdayBonuses(matchdayId, []);
+    for (const poolId of poolIdsWithBonuses) {
+      invalidatePoolRanking(poolId);
+    }
     return;
   }
 
@@ -127,4 +145,12 @@ export async function recomputeMatchdayBonuses(matchdayId: string): Promise<void
   }
 
   await replaceMatchdayBonuses(matchdayId, bonusInputs);
+
+  // Revalidate every pool with a candidate row for this matchday, not just
+  // the ones that ended up awarded: a correction can also take a bonus
+  // away, and the replace above already applied that change.
+  const poolIds = new Set(rows.map((row) => row.poolId));
+  for (const poolId of poolIds) {
+    invalidatePoolRanking(poolId);
+  }
 }

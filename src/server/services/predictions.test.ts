@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const dalMocks = vi.hoisted(() => ({
-  listPoolMatchPredictionRowsForUser: vi.fn(),
+  listPoolPredictionHeaderRowsForUser: vi.fn(),
+  listPoolMatchPredictionRowsForMatchday: vi.fn(),
   getPredictionWriteMembershipContext: vi.fn(),
-  getPredictionWriteMatchContext: vi.fn(),
+  listPredictionWriteMatchContexts: vi.fn(),
   upsertPoolMatchPredictionRecords: vi.fn(),
 }));
 
@@ -47,9 +48,8 @@ const futureContext = {
 
 describe("savePredictions", () => {
   beforeEach(() => {
-    dalMocks.listPoolMatchPredictionRowsForUser.mockReset();
     dalMocks.getPredictionWriteMembershipContext.mockReset();
-    dalMocks.getPredictionWriteMatchContext.mockReset();
+    dalMocks.listPredictionWriteMatchContexts.mockReset();
     dalMocks.upsertPoolMatchPredictionRecords.mockReset();
     sessionMocks.requireVerifiedAppUser.mockReset();
     sessionMocks.requireVerifiedAppUser.mockResolvedValue(appUser);
@@ -70,7 +70,7 @@ describe("savePredictions", () => {
     await expect(
       savePredictions(poolId, [{ matchId, payload: { kind: "result", result: "home" } }]),
     ).rejects.toBeInstanceOf(PoolMembershipRequiredError);
-    expect(dalMocks.getPredictionWriteMatchContext).not.toHaveBeenCalled();
+    expect(dalMocks.listPredictionWriteMatchContexts).not.toHaveBeenCalled();
   });
 
   it("always resolves the membership using the session's user id", async () => {
@@ -91,9 +91,11 @@ describe("savePredictions", () => {
       competitionSeasonId: "season-1",
       predictionMode: "simple",
     });
-    dalMocks.getPredictionWriteMatchContext.mockImplementation((id: string) =>
-      Promise.resolve(id === matchId ? null : futureContext),
-    );
+    // matchId is absent from the batch context rows, simulating a match
+    // that does not belong to this competition season.
+    dalMocks.listPredictionWriteMatchContexts.mockResolvedValue([
+      { matchId: otherMatchId, ...futureContext },
+    ]);
     dalMocks.upsertPoolMatchPredictionRecords.mockResolvedValue(undefined);
 
     const outcomes = await savePredictions(poolId, [
@@ -114,13 +116,10 @@ describe("savePredictions", () => {
       competitionSeasonId: "season-1",
       predictionMode: "simple",
     });
-    dalMocks.getPredictionWriteMatchContext.mockImplementation((id: string) =>
-      Promise.resolve(
-        id === matchId
-          ? { matchdayStatus: "published", matchStatus: "finished", startsAt: new Date(0) }
-          : futureContext,
-      ),
-    );
+    dalMocks.listPredictionWriteMatchContexts.mockResolvedValue([
+      { matchId, matchdayStatus: "published", matchStatus: "finished", startsAt: new Date(0) },
+      { matchId: otherMatchId, ...futureContext },
+    ]);
     dalMocks.upsertPoolMatchPredictionRecords.mockResolvedValue(undefined);
 
     const outcomes = await savePredictions(poolId, [
@@ -138,7 +137,9 @@ describe("savePredictions", () => {
       competitionSeasonId: "season-1",
       predictionMode: "simple",
     });
-    dalMocks.getPredictionWriteMatchContext.mockResolvedValue(futureContext);
+    dalMocks.listPredictionWriteMatchContexts.mockResolvedValue([
+      { matchId, ...futureContext },
+    ]);
 
     const outcomes = await savePredictions(poolId, [
       { matchId, payload: { kind: "score", homeScore: 1, awayScore: 0 } },
@@ -157,7 +158,10 @@ describe("savePredictions", () => {
       competitionSeasonId: "season-1",
       predictionMode: "score",
     });
-    dalMocks.getPredictionWriteMatchContext.mockResolvedValue(futureContext);
+    dalMocks.listPredictionWriteMatchContexts.mockResolvedValue([
+      { matchId, ...futureContext },
+      { matchId: otherMatchId, ...futureContext },
+    ]);
     dalMocks.upsertPoolMatchPredictionRecords.mockResolvedValue(undefined);
 
     const outcomes = await savePredictions(poolId, [
@@ -184,7 +188,10 @@ describe("savePredictions", () => {
       competitionSeasonId: "season-1",
       predictionMode: "simple",
     });
-    dalMocks.getPredictionWriteMatchContext.mockResolvedValue(futureContext);
+    dalMocks.listPredictionWriteMatchContexts.mockResolvedValue([
+      { matchId, ...futureContext },
+      { matchId: otherMatchId, ...futureContext },
+    ]);
     dalMocks.upsertPoolMatchPredictionRecords.mockRejectedValue(new Error("db down"));
 
     const outcomes = await savePredictions(poolId, [
@@ -202,7 +209,9 @@ describe("savePredictions", () => {
       competitionSeasonId: "season-1",
       predictionMode: "simple",
     });
-    dalMocks.getPredictionWriteMatchContext.mockResolvedValue(futureContext);
+    dalMocks.listPredictionWriteMatchContexts.mockResolvedValue([
+      { matchId, ...futureContext },
+    ]);
     dalMocks.upsertPoolMatchPredictionRecords.mockResolvedValue(undefined);
 
     const items = [{ matchId, payload: { kind: "result" as const, result: "home" as const } }];
@@ -213,25 +222,56 @@ describe("savePredictions", () => {
     expect(second[matchId]).toEqual({ status: "saved" });
     expect(dalMocks.upsertPoolMatchPredictionRecords).toHaveBeenCalledTimes(2);
   });
+
+  it("fetches the match contexts for a batch in a single call, even with an unavailable match", async () => {
+    dalMocks.getPredictionWriteMembershipContext.mockResolvedValue({
+      poolMembershipId: "membership-1",
+      competitionSeasonId: "season-1",
+      predictionMode: "simple",
+    });
+    const thirdMatchId = "00000000-0000-4000-8000-000000000004";
+    dalMocks.listPredictionWriteMatchContexts.mockResolvedValue([
+      { matchId: otherMatchId, ...futureContext },
+      { matchId: thirdMatchId, ...futureContext },
+    ]);
+    dalMocks.upsertPoolMatchPredictionRecords.mockResolvedValue(undefined);
+
+    const outcomes = await savePredictions(poolId, [
+      { matchId, payload: { kind: "result", result: "home" } },
+      { matchId: otherMatchId, payload: { kind: "result", result: "away" } },
+      { matchId: thirdMatchId, payload: { kind: "result", result: "draw" } },
+    ]);
+
+    expect(outcomes[matchId]).toEqual({ status: "error", error: "match_unavailable" });
+    expect(outcomes[otherMatchId]).toEqual({ status: "saved" });
+    expect(outcomes[thirdMatchId]).toEqual({ status: "saved" });
+    expect(dalMocks.listPredictionWriteMatchContexts).toHaveBeenCalledTimes(1);
+    expect(dalMocks.listPredictionWriteMatchContexts).toHaveBeenCalledWith(
+      [matchId, otherMatchId, thirdMatchId],
+      "season-1",
+    );
+  });
 });
 
 describe("getCurrentUserPoolPredictions", () => {
   beforeEach(() => {
-    dalMocks.listPoolMatchPredictionRowsForUser.mockReset();
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockReset();
+    dalMocks.listPoolMatchPredictionRowsForMatchday.mockReset();
     sessionMocks.requireVerifiedAppUser.mockReset();
     sessionMocks.requireVerifiedAppUser.mockResolvedValue(appUser);
   });
 
   it("throws PoolMembershipRequiredError when the user has no membership", async () => {
-    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([]);
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockResolvedValue([]);
 
     await expect(getCurrentUserPoolPredictions(poolId)).rejects.toBeInstanceOf(
       PoolMembershipRequiredError,
     );
+    expect(dalMocks.listPoolMatchPredictionRowsForMatchday).not.toHaveBeenCalled();
   });
 
-  it("scopes the read to the authenticated user, never another member", async () => {
-    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
+  it("scopes the read to the authenticated user, never another member, and never queries matches when the pool has no visible matchday", async () => {
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockResolvedValue([
       {
         poolId,
         poolName: "Quiniela",
@@ -243,30 +283,24 @@ describe("getCurrentUserPoolPredictions", () => {
         matchdayNumber: null,
         matchdayName: null,
         matchdayStatus: null,
-        matchId: null,
-        homeTeamName: null,
-        homeTeamShortName: null,
-        awayTeamName: null,
-        awayTeamShortName: null,
-        startsAt: null,
-        matchStatus: null,
-        predictedResult: null,
-        predictedHomeScore: null,
-        predictedAwayScore: null,
+        perfectMatchdayBonusPoints: null,
       },
     ]);
 
-    await getCurrentUserPoolPredictions(poolId);
+    const view = await getCurrentUserPoolPredictions(poolId);
 
-    expect(dalMocks.listPoolMatchPredictionRowsForUser).toHaveBeenCalledWith(
+    expect(dalMocks.listPoolPredictionHeaderRowsForUser).toHaveBeenCalledWith(
       poolId,
       appUser.id,
     );
+    expect(view.matchdays).toEqual([]);
+    expect(view.selectedMatchdayId).toBeNull();
+    expect(dalMocks.listPoolMatchPredictionRowsForMatchday).not.toHaveBeenCalled();
   });
 
   it("marks a future scheduled match as editable with no prediction yet", async () => {
     const startsAt = new Date(Date.now() + OPEN_STARTS_AT_OFFSET_MS);
-    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockResolvedValue([
       {
         poolId,
         poolName: "Quiniela",
@@ -278,6 +312,11 @@ describe("getCurrentUserPoolPredictions", () => {
         matchdayNumber: 1,
         matchdayName: null,
         matchdayStatus: "published",
+        perfectMatchdayBonusPoints: null,
+      },
+    ]);
+    dalMocks.listPoolMatchPredictionRowsForMatchday.mockResolvedValue([
+      {
         matchId,
         homeTeamName: "Local FC",
         homeTeamShortName: "LOC",
@@ -285,17 +324,21 @@ describe("getCurrentUserPoolPredictions", () => {
         awayTeamShortName: "AWA",
         startsAt,
         matchStatus: "scheduled",
+        matchdayStatus: "published",
         predictedResult: null,
         predictedHomeScore: null,
         predictedAwayScore: null,
         pointsEarned: null,
         wasExactScore: null,
-        perfectMatchdayBonusPoints: null,
       },
     ]);
 
     const view = await getCurrentUserPoolPredictions(poolId);
 
+    expect(dalMocks.listPoolMatchPredictionRowsForMatchday).toHaveBeenCalledWith(
+      "membership-1",
+      "matchday-1",
+    );
     expect(view.matchdays).toHaveLength(1);
     const match = view.matchdays[0].matches[0];
     expect(match.canEdit).toBe(true);
@@ -307,7 +350,7 @@ describe("getCurrentUserPoolPredictions", () => {
   });
 
   it("marks a finished match as read-only, exposes the saved prediction and the points earned", async () => {
-    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockResolvedValue([
       {
         poolId,
         poolName: "Quiniela",
@@ -319,6 +362,11 @@ describe("getCurrentUserPoolPredictions", () => {
         matchdayNumber: 1,
         matchdayName: null,
         matchdayStatus: "finished",
+        perfectMatchdayBonusPoints: null,
+      },
+    ]);
+    dalMocks.listPoolMatchPredictionRowsForMatchday.mockResolvedValue([
+      {
         matchId,
         homeTeamName: "Local FC",
         homeTeamShortName: null,
@@ -326,12 +374,12 @@ describe("getCurrentUserPoolPredictions", () => {
         awayTeamShortName: null,
         startsAt: new Date("2020-01-01T00:00:00.000Z"),
         matchStatus: "finished",
+        matchdayStatus: "finished",
         predictedResult: null,
         predictedHomeScore: 2,
         predictedAwayScore: 2,
         pointsEarned: 3,
         wasExactScore: true,
-        perfectMatchdayBonusPoints: null,
       },
     ]);
 
@@ -350,7 +398,7 @@ describe("getCurrentUserPoolPredictions", () => {
   });
 
   it("exposes the perfect matchday bonus only for a finished matchday, and never another member's", async () => {
-    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockResolvedValue([
       {
         poolId,
         poolName: "Quiniela",
@@ -362,6 +410,11 @@ describe("getCurrentUserPoolPredictions", () => {
         matchdayNumber: 1,
         matchdayName: null,
         matchdayStatus: "finished",
+        perfectMatchdayBonusPoints: 10,
+      },
+    ]);
+    dalMocks.listPoolMatchPredictionRowsForMatchday.mockResolvedValue([
+      {
         matchId,
         homeTeamName: "Local FC",
         homeTeamShortName: null,
@@ -369,20 +422,21 @@ describe("getCurrentUserPoolPredictions", () => {
         awayTeamShortName: null,
         startsAt: new Date("2020-01-01T00:00:00.000Z"),
         matchStatus: "finished",
+        matchdayStatus: "finished",
         predictedResult: null,
         predictedHomeScore: 2,
         predictedAwayScore: 2,
         pointsEarned: 5,
         wasExactScore: true,
-        perfectMatchdayBonusPoints: 10,
       },
     ]);
 
     const view = await getCurrentUserPoolPredictions(poolId);
 
-    // The DAL query is scoped to poolMemberships.userId = the current user,
-    // so any bonus value returned already belongs to their own membership.
-    expect(dalMocks.listPoolMatchPredictionRowsForUser).toHaveBeenCalledWith(
+    // The header query is scoped to poolMemberships.userId = the current
+    // user, so any bonus value returned already belongs to their own
+    // membership.
+    expect(dalMocks.listPoolPredictionHeaderRowsForUser).toHaveBeenCalledWith(
       poolId,
       appUser.id,
     );
@@ -390,7 +444,7 @@ describe("getCurrentUserPoolPredictions", () => {
   });
 
   it("hides the perfect matchday bonus while the matchday is still published", async () => {
-    dalMocks.listPoolMatchPredictionRowsForUser.mockResolvedValue([
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockResolvedValue([
       {
         poolId,
         poolName: "Quiniela",
@@ -402,6 +456,11 @@ describe("getCurrentUserPoolPredictions", () => {
         matchdayNumber: 1,
         matchdayName: null,
         matchdayStatus: "published",
+        perfectMatchdayBonusPoints: null,
+      },
+    ]);
+    dalMocks.listPoolMatchPredictionRowsForMatchday.mockResolvedValue([
+      {
         matchId,
         homeTeamName: "Local FC",
         homeTeamShortName: null,
@@ -409,17 +468,58 @@ describe("getCurrentUserPoolPredictions", () => {
         awayTeamShortName: null,
         startsAt: new Date(Date.now() + OPEN_STARTS_AT_OFFSET_MS),
         matchStatus: "scheduled",
+        matchdayStatus: "published",
         predictedResult: null,
         predictedHomeScore: 2,
         predictedAwayScore: 2,
         pointsEarned: null,
         wasExactScore: null,
-        perfectMatchdayBonusPoints: null,
       },
     ]);
 
     const view = await getCurrentUserPoolPredictions(poolId);
 
     expect(view.matchdays[0].perfectMatchdayBonusPoints).toBeNull();
+  });
+
+  it("falls back to the first visible matchday when the requested one does not exist", async () => {
+    dalMocks.listPoolPredictionHeaderRowsForUser.mockResolvedValue([
+      {
+        poolId,
+        poolName: "Quiniela",
+        competitionName: "Liga",
+        seasonName: "2026",
+        predictionMode: "simple",
+        poolMembershipId: "membership-1",
+        matchdayId: "matchday-1",
+        matchdayNumber: 1,
+        matchdayName: null,
+        matchdayStatus: "published",
+        perfectMatchdayBonusPoints: null,
+      },
+      {
+        poolId,
+        poolName: "Quiniela",
+        competitionName: "Liga",
+        seasonName: "2026",
+        predictionMode: "simple",
+        poolMembershipId: "membership-1",
+        matchdayId: "matchday-2",
+        matchdayNumber: 2,
+        matchdayName: null,
+        matchdayStatus: "published",
+        perfectMatchdayBonusPoints: null,
+      },
+    ]);
+    dalMocks.listPoolMatchPredictionRowsForMatchday.mockResolvedValue([]);
+
+    const view = await getCurrentUserPoolPredictions(poolId, "matchday-unknown");
+
+    expect(view.selectedMatchdayId).toBe("matchday-1");
+    expect(dalMocks.listPoolMatchPredictionRowsForMatchday).toHaveBeenCalledWith(
+      "membership-1",
+      "matchday-1",
+    );
+    expect(dalMocks.listPoolMatchPredictionRowsForMatchday).toHaveBeenCalledTimes(1);
   });
 });

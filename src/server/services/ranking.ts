@@ -4,8 +4,8 @@ import { assignCompetitionRanks } from "@/features/ranking/rules";
 import type { PoolRankingView, RankingEntry } from "@/features/ranking/types";
 import { PoolMembershipRequiredError } from "@/server/auth/permissions";
 import { requireVerifiedAppUser } from "@/server/auth/session";
+import { getCachedRankingRows } from "@/server/cache/ranking";
 import { getPoolMembershipCore, parsePoolRole } from "@/server/dal/pools";
-import { listRankingRowsForPool } from "@/server/dal/ranking";
 
 /**
  * Returns the full standings table of a pool: every member's display name,
@@ -23,7 +23,7 @@ export async function getPoolRanking(poolId: string): Promise<PoolRankingView> {
   const membershipContext = await getPoolMembershipCore(poolId, appUser.id);
   if (!membershipContext) throw new PoolMembershipRequiredError();
 
-  const rows = await listRankingRowsForPool(poolId);
+  const rows = await getCachedRankingRows(poolId);
 
   const ranked = assignCompetitionRanks(
     rows.map((row) => ({

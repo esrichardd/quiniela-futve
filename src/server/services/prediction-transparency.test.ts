@@ -1,9 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { PredictionTransparencyRow } from "@/server/dal/prediction-transparency";
+import type {
+  PoolTransparencyMatchdayRow,
+  PredictionTransparencyMatchdayMatchRow,
+} from "@/server/dal/prediction-transparency";
 
 const dalMocks = vi.hoisted(() => ({
-  listPredictionTransparencyRowsForPool: vi.fn(),
+  listVisibleMatchdaysForPool: vi.fn(),
+  listPredictionTransparencyRowsForMatchday: vi.fn(),
 }));
 
 const poolsDalMocks = vi.hoisted(() => ({
@@ -42,19 +46,28 @@ const NOT_REVEALED_STARTS_AT = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 
 const REVEALED_NOT_PLAYED_STARTS_AT = new Date(now.getTime() + 30 * 60 * 1000); // +30m: closed 30m ago
 const FINISHED_STARTS_AT = new Date(now.getTime() - 3 * 60 * 60 * 1000); // -3h: long closed
 
-function baseRow(overrides: Partial<PredictionTransparencyRow>): PredictionTransparencyRow {
+function baseMatchdayRow(
+  overrides: Partial<PoolTransparencyMatchdayRow>,
+): PoolTransparencyMatchdayRow {
   return {
     poolId,
     poolName: "Quiniela de prueba",
     competitionName: "Liga de Prueba",
     seasonName: "Temporada de Prueba 2026",
-    predictionMode: "mixed",
-    poolMembershipId: "membership-1",
-    displayName: "Ana",
     matchdayId,
     matchdayNumber: 1,
     matchdayName: null,
     matchdayStatus: "published",
+    ...overrides,
+  };
+}
+
+function baseMatchRow(
+  overrides: Partial<PredictionTransparencyMatchdayMatchRow>,
+): PredictionTransparencyMatchdayMatchRow {
+  return {
+    poolMembershipId: "membership-1",
+    displayName: "Ana",
     matchId,
     homeTeamName: "Local FC",
     homeTeamShortName: "LOC",
@@ -62,6 +75,7 @@ function baseRow(overrides: Partial<PredictionTransparencyRow>): PredictionTrans
     awayTeamShortName: "AWA",
     startsAt: REVEALED_NOT_PLAYED_STARTS_AT,
     matchStatus: "scheduled",
+    matchdayStatus: "published",
     homeScore: null,
     awayScore: null,
     predictedResult: null,
@@ -76,7 +90,8 @@ function baseRow(overrides: Partial<PredictionTransparencyRow>): PredictionTrans
 
 describe("getPoolPredictionTransparency", () => {
   beforeEach(() => {
-    dalMocks.listPredictionTransparencyRowsForPool.mockReset();
+    dalMocks.listVisibleMatchdaysForPool.mockReset();
+    dalMocks.listPredictionTransparencyRowsForMatchday.mockReset();
     poolsDalMocks.getPoolMembershipCore.mockReset();
     sessionMocks.requireVerifiedAppUser.mockReset();
     sessionMocks.requireVerifiedAppUser.mockResolvedValue(appUser);
@@ -95,7 +110,7 @@ describe("getPoolPredictionTransparency", () => {
     await expect(getPoolPredictionTransparency(poolId)).rejects.toBeInstanceOf(
       PoolMembershipRequiredError,
     );
-    expect(dalMocks.listPredictionTransparencyRowsForPool).not.toHaveBeenCalled();
+    expect(dalMocks.listVisibleMatchdaysForPool).not.toHaveBeenCalled();
   });
 
   it("always resolves membership using the session's user id", async () => {
@@ -112,31 +127,24 @@ describe("getPoolPredictionTransparency", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-1",
     });
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([]);
+    dalMocks.listVisibleMatchdaysForPool.mockResolvedValue([]);
 
     await expect(getPoolPredictionTransparency(poolId)).rejects.toBeInstanceOf(
       PoolMembershipRequiredError,
     );
   });
 
-  it("returns an empty, well-formed view when the pool has no visible matchdays yet", async () => {
+  it("returns an empty, well-formed view when the pool has no visible matchdays yet, without querying match rows", async () => {
     poolsDalMocks.getPoolMembershipCore.mockResolvedValue({
       poolName: "Quiniela de prueba",
       poolMembershipId: "membership-1",
     });
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({
+    dalMocks.listVisibleMatchdaysForPool.mockResolvedValue([
+      baseMatchdayRow({
         matchdayId: null,
         matchdayNumber: null,
         matchdayName: null,
         matchdayStatus: null,
-        matchId: null,
-        homeTeamName: null,
-        homeTeamShortName: null,
-        awayTeamName: null,
-        awayTeamShortName: null,
-        startsAt: null,
-        matchStatus: null,
       }),
     ]);
 
@@ -146,6 +154,7 @@ describe("getPoolPredictionTransparency", () => {
     expect(view.competitionName).toBe("Liga de Prueba");
     expect(view.matchdays).toEqual([]);
     expect(view.selectedMatchdayId).toBeNull();
+    expect(dalMocks.listPredictionTransparencyRowsForMatchday).not.toHaveBeenCalled();
   });
 
   it("hides every member's pick for a match whose prediction window is still open", async () => {
@@ -153,14 +162,15 @@ describe("getPoolPredictionTransparency", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-1",
     });
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({
+    dalMocks.listVisibleMatchdaysForPool.mockResolvedValue([baseMatchdayRow({})]);
+    dalMocks.listPredictionTransparencyRowsForMatchday.mockResolvedValue([
+      baseMatchRow({
         poolMembershipId: "membership-1",
         displayName: "Ana",
         startsAt: NOT_REVEALED_STARTS_AT,
         predictedResult: "home",
       }),
-      baseRow({
+      baseMatchRow({
         poolMembershipId: "membership-2",
         displayName: "Beto",
         startsAt: NOT_REVEALED_STARTS_AT,
@@ -172,6 +182,10 @@ describe("getPoolPredictionTransparency", () => {
     const view = await getPoolPredictionTransparency(poolId, undefined, now);
     const match = view.matchdays[0].matches[0];
 
+    expect(dalMocks.listPredictionTransparencyRowsForMatchday).toHaveBeenCalledWith(
+      poolId,
+      matchdayId,
+    );
     expect(match.isRevealed).toBe(false);
     expect(match.members).toEqual([]);
   });
@@ -181,15 +195,16 @@ describe("getPoolPredictionTransparency", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-1",
     });
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({
+    dalMocks.listVisibleMatchdaysForPool.mockResolvedValue([baseMatchdayRow({})]);
+    dalMocks.listPredictionTransparencyRowsForMatchday.mockResolvedValue([
+      baseMatchRow({
         poolMembershipId: "membership-1",
         displayName: "Ana",
         startsAt: REVEALED_NOT_PLAYED_STARTS_AT,
         matchStatus: "scheduled",
         predictedResult: "home",
       }),
-      baseRow({
+      baseMatchRow({
         poolMembershipId: "membership-2",
         displayName: "Beto",
         startsAt: REVEALED_NOT_PLAYED_STARTS_AT,
@@ -218,8 +233,11 @@ describe("getPoolPredictionTransparency", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-1",
     });
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({
+    dalMocks.listVisibleMatchdaysForPool.mockResolvedValue([
+      baseMatchdayRow({ matchdayStatus: "finished" }),
+    ]);
+    dalMocks.listPredictionTransparencyRowsForMatchday.mockResolvedValue([
+      baseMatchRow({
         poolMembershipId: "membership-1",
         displayName: "Ana",
         matchdayStatus: "finished",
@@ -233,7 +251,7 @@ describe("getPoolPredictionTransparency", () => {
         wasExactScore: true,
         perfectMatchdayBonusPoints: 5,
       }),
-      baseRow({
+      baseMatchRow({
         poolMembershipId: "membership-2",
         displayName: "Beto",
         matchdayStatus: "finished",
@@ -272,8 +290,11 @@ describe("getPoolPredictionTransparency", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-1",
     });
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({
+    dalMocks.listVisibleMatchdaysForPool.mockResolvedValue([
+      baseMatchdayRow({ matchdayStatus: "published" }),
+    ]);
+    dalMocks.listPredictionTransparencyRowsForMatchday.mockResolvedValue([
+      baseMatchRow({
         poolMembershipId: "membership-1",
         matchdayStatus: "published",
         startsAt: FINISHED_STARTS_AT,
@@ -297,24 +318,26 @@ describe("getPoolPredictionTransparency", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-1",
     });
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({ matchdayId: "matchday-1", matchdayNumber: 1, matchId: "match-1" }),
-      baseRow({ matchdayId: "matchday-2", matchdayNumber: 2, matchId: "match-2" }),
+    dalMocks.listVisibleMatchdaysForPool.mockResolvedValue([
+      baseMatchdayRow({ matchdayId: "matchday-1", matchdayNumber: 1 }),
+      baseMatchdayRow({ matchdayId: "matchday-2", matchdayNumber: 2 }),
     ]);
+    dalMocks.listPredictionTransparencyRowsForMatchday.mockResolvedValue([]);
 
     const defaultView = await getPoolPredictionTransparency(poolId, undefined, now);
     expect(defaultView.selectedMatchdayId).toBe("matchday-1");
+    expect(dalMocks.listPredictionTransparencyRowsForMatchday).toHaveBeenCalledWith(
+      poolId,
+      "matchday-1",
+    );
 
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({ matchdayId: "matchday-1", matchdayNumber: 1, matchId: "match-1" }),
-      baseRow({ matchdayId: "matchday-2", matchdayNumber: 2, matchId: "match-2" }),
-    ]);
     const selectedView = await getPoolPredictionTransparency(poolId, "matchday-2", now);
     expect(selectedView.selectedMatchdayId).toBe("matchday-2");
+    expect(dalMocks.listPredictionTransparencyRowsForMatchday).toHaveBeenCalledWith(
+      poolId,
+      "matchday-2",
+    );
 
-    dalMocks.listPredictionTransparencyRowsForPool.mockResolvedValue([
-      baseRow({ matchdayId: "matchday-1", matchdayNumber: 1, matchId: "match-1" }),
-    ]);
     const invalidSelectionView = await getPoolPredictionTransparency(
       poolId,
       "does-not-exist",

@@ -12,8 +12,9 @@ import { PoolMembershipRequiredError } from "@/server/auth/permissions";
 import { requireVerifiedAppUser } from "@/server/auth/session";
 import { getPoolMembershipCore } from "@/server/dal/pools";
 import {
-  listPredictionTransparencyRowsForPool,
-  type PredictionTransparencyRow,
+  listPredictionTransparencyRowsForMatchday,
+  listVisibleMatchdaysForPool,
+  type PredictionTransparencyMatchdayMatchRow,
 } from "@/server/dal/prediction-transparency";
 import { parseMatchStatus } from "@/server/dal/predictions";
 
@@ -26,6 +27,10 @@ import { parseMatchStatus } from "@/server/dal/predictions";
  * pool. It still stays private to non-members: a user who is not a member
  * of the pool gets the same `PoolMembershipRequiredError` as for an
  * inexistent pool, never a filtered or partial view.
+ *
+ * Only the selected matchday's matches are fetched (`PERF-N03`): every
+ * other visible matchday keeps an empty `matches` array, matching
+ * `pool-transparency.tsx` which only ever renders the selected one.
  *
  * A match that has not been revealed yet always gets an empty `members`
  * array — the redaction happens here, in the service, regardless of what
@@ -41,57 +46,38 @@ export async function getPoolPredictionTransparency(
   const membershipContext = await getPoolMembershipCore(poolId, appUser.id);
   if (!membershipContext) throw new PoolMembershipRequiredError();
 
-  const rows = await listPredictionTransparencyRowsForPool(poolId);
-  const core = rows[0];
+  const matchdayRows = await listVisibleMatchdaysForPool(poolId);
+  const core = matchdayRows[0];
   if (!core) throw new PoolMembershipRequiredError();
 
-  const matchdaysById = new Map<string, MatchdayAccumulator>();
-
-  for (const row of rows) {
-    if (!row.matchdayId || row.matchdayNumber === null) continue;
-    const matchdayStatus = row.matchdayStatus;
-    if (matchdayStatus !== "published" && matchdayStatus !== "finished") continue;
-
-    let matchday = matchdaysById.get(row.matchdayId);
-    if (!matchday) {
-      matchday = {
-        id: row.matchdayId,
-        number: row.matchdayNumber,
-        name: row.matchdayName,
-        status: matchdayStatus,
-        matchesById: new Map(),
-        perfectMatchdayMembershipIds: new Set(),
-      };
-      matchdaysById.set(row.matchdayId, matchday);
-    }
-
+  const visibleMatchdays: Array<TransparencyMatchday> = [];
+  for (const row of matchdayRows) {
+    const { matchdayId, matchdayNumber, matchdayStatus } = row;
     if (
-      row.matchdayStatus === "finished" &&
-      row.perfectMatchdayBonusPoints !== null
+      !matchdayId ||
+      matchdayNumber === null ||
+      (matchdayStatus !== "published" && matchdayStatus !== "finished")
     ) {
-      matchday.perfectMatchdayMembershipIds.add(row.poolMembershipId);
+      continue;
     }
-
-    const match = mapTransparencyRowIntoMatch(row, matchday, now);
-    if (match) matchday.matchesById.set(match.matchId, match);
+    visibleMatchdays.push({
+      id: matchdayId,
+      number: matchdayNumber,
+      name: row.matchdayName,
+      status: matchdayStatus,
+      matches: [],
+      perfectMatchdayMembershipIds: [],
+    });
   }
 
-  const matchdays: ReadonlyArray<TransparencyMatchday> = [...matchdaysById.values()].map(
-    (matchday) => ({
-      id: matchday.id,
-      number: matchday.number,
-      name: matchday.name,
-      status: matchday.status,
-      matches: [...matchday.matchesById.values()],
-      perfectMatchdayMembershipIds: [...matchday.perfectMatchdayMembershipIds],
-    }),
-  );
-
-  const visibleMatchdays = matchdays;
   const selected =
     selectedMatchdayId && visibleMatchdays.some((matchday) => matchday.id === selectedMatchdayId)
       ? selectedMatchdayId
       : (visibleMatchdays[0]?.id ?? null);
+
+  const matchdays: ReadonlyArray<TransparencyMatchday> = selected
+    ? await withSelectedMatchdayMatches(visibleMatchdays, poolId, selected, now)
+    : visibleMatchdays;
 
   return {
     poolId: core.poolId,
@@ -99,36 +85,46 @@ export async function getPoolPredictionTransparency(
     competitionName: core.competitionName,
     seasonName: core.seasonName,
     selectedMatchdayId: selected,
-    matchdays: visibleMatchdays,
+    matchdays,
   };
 }
 
-type MatchdayAccumulator = {
-  id: string;
-  number: number;
-  name: string | null;
-  status: "published" | "finished";
-  matchesById: Map<string, TransparencyMatch>;
-  perfectMatchdayMembershipIds: Set<string>;
-};
-
-function mapTransparencyRowIntoMatch(
-  row: PredictionTransparencyRow,
-  matchday: MatchdayAccumulator,
+async function withSelectedMatchdayMatches(
+  matchdays: ReadonlyArray<TransparencyMatchday>,
+  poolId: string,
+  selectedMatchdayId: string,
   now: Date,
-): TransparencyMatch | null {
-  if (
-    !row.matchId ||
-    !row.homeTeamName ||
-    !row.awayTeamName ||
-    !row.startsAt ||
-    !row.matchStatus
-  ) {
-    return null;
+): Promise<ReadonlyArray<TransparencyMatchday>> {
+  const rows = await listPredictionTransparencyRowsForMatchday(poolId, selectedMatchdayId);
+
+  const matchesById = new Map<string, TransparencyMatch>();
+  const perfectMatchdayMembershipIds = new Set<string>();
+
+  for (const row of rows) {
+    if (row.matchdayStatus === "finished" && row.perfectMatchdayBonusPoints !== null) {
+      perfectMatchdayMembershipIds.add(row.poolMembershipId);
+    }
+    matchesById.set(row.matchId, mapTransparencyRowIntoMatch(row, matchesById, now));
   }
 
+  return matchdays.map((matchday) =>
+    matchday.id === selectedMatchdayId
+      ? {
+          ...matchday,
+          matches: [...matchesById.values()],
+          perfectMatchdayMembershipIds: [...perfectMatchdayMembershipIds],
+        }
+      : matchday,
+  );
+}
+
+function mapTransparencyRowIntoMatch(
+  row: PredictionTransparencyMatchdayMatchRow,
+  matchesById: ReadonlyMap<string, TransparencyMatch>,
+  now: Date,
+): TransparencyMatch {
   const revealed = isPredictionRevealed(row.startsAt, now);
-  const existing = matchday.matchesById.get(row.matchId);
+  const existing = matchesById.get(row.matchId);
 
   const member: MemberMatchPrediction | null = revealed
     ? {
@@ -159,7 +155,9 @@ function mapTransparencyRowIntoMatch(
   };
 }
 
-function mapRevealedPrediction(row: PredictionTransparencyRow): MatchPrediction | null {
+function mapRevealedPrediction(
+  row: PredictionTransparencyMatchdayMatchRow,
+): MatchPrediction | null {
   if (row.predictedResult) {
     return { kind: "result", result: parsePredictionResult(row.predictedResult) };
   }

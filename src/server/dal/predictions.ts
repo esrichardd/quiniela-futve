@@ -23,7 +23,7 @@ import {
   teams,
 } from "@/server/db/schema";
 
-export type PoolMatchPredictionRow = Readonly<{
+export type PoolPredictionHeaderRow = Readonly<{
   poolId: string;
   poolName: string;
   competitionName: string;
@@ -34,19 +34,23 @@ export type PoolMatchPredictionRow = Readonly<{
   matchdayNumber: number | null;
   matchdayName: string | null;
   matchdayStatus: string | null;
-  matchId: string | null;
-  homeTeamName: string | null;
+  perfectMatchdayBonusPoints: number | null;
+}>;
+
+export type PredictionMatchdayMatchRow = Readonly<{
+  matchId: string;
+  homeTeamName: string;
   homeTeamShortName: string | null;
-  awayTeamName: string | null;
+  awayTeamName: string;
   awayTeamShortName: string | null;
-  startsAt: Date | null;
-  matchStatus: string | null;
+  startsAt: Date;
+  matchStatus: string;
+  matchdayStatus: string;
   predictedResult: string | null;
   predictedHomeScore: number | null;
   predictedAwayScore: number | null;
   pointsEarned: number | null;
   wasExactScore: boolean | null;
-  perfectMatchdayBonusPoints: number | null;
 }>;
 
 export type PredictionWriteMembershipContext = Readonly<{
@@ -55,7 +59,8 @@ export type PredictionWriteMembershipContext = Readonly<{
   predictionMode: string;
 }>;
 
-export type PredictionWriteMatchContext = Readonly<{
+export type PredictionWriteMatchContextRow = Readonly<{
+  matchId: string;
   matchdayStatus: string;
   matchStatus: string;
   startsAt: Date;
@@ -72,13 +77,16 @@ export type UpsertPoolMatchPredictionInput = Readonly<{
   predictedAwayScore: number | null;
 }>;
 
-export async function listPoolMatchPredictionRowsForUser(
+/**
+ * Pool/competition/season header plus the lightweight list of visible
+ * matchdays (id, number, name, status) for the tabs — no match rows. Used to
+ * resolve the selected matchday before fetching its full row set with
+ * {@link listPoolMatchPredictionRowsForMatchday}.
+ */
+export async function listPoolPredictionHeaderRowsForUser(
   poolId: string,
   userId: string,
-): Promise<ReadonlyArray<PoolMatchPredictionRow>> {
-  const homeTeams = alias(teams, "prediction_home_teams");
-  const awayTeams = alias(teams, "prediction_away_teams");
-
+): Promise<ReadonlyArray<PoolPredictionHeaderRow>> {
   return db
     .select({
       poolId: pools.id,
@@ -91,18 +99,6 @@ export async function listPoolMatchPredictionRowsForUser(
       matchdayNumber: matchdays.number,
       matchdayName: matchdays.name,
       matchdayStatus: matchdays.status,
-      matchId: matches.id,
-      homeTeamName: homeTeams.name,
-      homeTeamShortName: homeTeams.shortName,
-      awayTeamName: awayTeams.name,
-      awayTeamShortName: awayTeams.shortName,
-      startsAt: matches.startsAt,
-      matchStatus: matches.status,
-      predictedResult: poolMatchPredictions.predictedResult,
-      predictedHomeScore: poolMatchPredictions.predictedHomeScore,
-      predictedAwayScore: poolMatchPredictions.predictedAwayScore,
-      pointsEarned: poolMatchPredictionScores.pointsEarned,
-      wasExactScore: poolMatchPredictionScores.wasExactScore,
       perfectMatchdayBonusPoints: poolMatchdayPerfectBonuses.pointsAwarded,
     })
     .from(poolMemberships)
@@ -120,20 +116,6 @@ export async function listPoolMatchPredictionRowsForUser(
         inArray(matchdays.status, ["published", "finished"]),
       ),
     )
-    .leftJoin(matches, eq(matches.matchdayId, matchdays.id))
-    .leftJoin(homeTeams, eq(matches.homeTeamId, homeTeams.id))
-    .leftJoin(awayTeams, eq(matches.awayTeamId, awayTeams.id))
-    .leftJoin(
-      poolMatchPredictions,
-      and(
-        eq(poolMatchPredictions.matchId, matches.id),
-        eq(poolMatchPredictions.poolMembershipId, poolMemberships.id),
-      ),
-    )
-    .leftJoin(
-      poolMatchPredictionScores,
-      eq(poolMatchPredictionScores.poolMatchPredictionId, poolMatchPredictions.id),
-    )
     .leftJoin(
       poolMatchdayPerfectBonuses,
       and(
@@ -141,10 +123,57 @@ export async function listPoolMatchPredictionRowsForUser(
         eq(poolMatchdayPerfectBonuses.poolMembershipId, poolMemberships.id),
       ),
     )
-    .where(
-      and(eq(poolMemberships.poolId, poolId), eq(poolMemberships.userId, userId)),
+    .where(and(eq(poolMemberships.poolId, poolId), eq(poolMemberships.userId, userId)))
+    .orderBy(asc(matchdays.number));
+}
+
+/**
+ * Full match rows (with the caller's own prediction and score) for a single
+ * matchday. Scoped by `poolMembershipId` instead of joining `poolMemberships`
+ * again: authorization already happened in
+ * {@link listPoolPredictionHeaderRowsForUser}, which is the query that
+ * resolved this membership id in the first place.
+ */
+export async function listPoolMatchPredictionRowsForMatchday(
+  poolMembershipId: string,
+  matchdayId: string,
+): Promise<ReadonlyArray<PredictionMatchdayMatchRow>> {
+  const homeTeams = alias(teams, "prediction_home_teams");
+  const awayTeams = alias(teams, "prediction_away_teams");
+
+  return db
+    .select({
+      matchId: matches.id,
+      homeTeamName: homeTeams.name,
+      homeTeamShortName: homeTeams.shortName,
+      awayTeamName: awayTeams.name,
+      awayTeamShortName: awayTeams.shortName,
+      startsAt: matches.startsAt,
+      matchStatus: matches.status,
+      matchdayStatus: matchdays.status,
+      predictedResult: poolMatchPredictions.predictedResult,
+      predictedHomeScore: poolMatchPredictions.predictedHomeScore,
+      predictedAwayScore: poolMatchPredictions.predictedAwayScore,
+      pointsEarned: poolMatchPredictionScores.pointsEarned,
+      wasExactScore: poolMatchPredictionScores.wasExactScore,
+    })
+    .from(matches)
+    .innerJoin(matchdays, eq(matches.matchdayId, matchdays.id))
+    .innerJoin(homeTeams, eq(matches.homeTeamId, homeTeams.id))
+    .innerJoin(awayTeams, eq(matches.awayTeamId, awayTeams.id))
+    .leftJoin(
+      poolMatchPredictions,
+      and(
+        eq(poolMatchPredictions.matchId, matches.id),
+        eq(poolMatchPredictions.poolMembershipId, poolMembershipId),
+      ),
     )
-    .orderBy(asc(matchdays.number), asc(matches.startsAt), asc(matches.id));
+    .leftJoin(
+      poolMatchPredictionScores,
+      eq(poolMatchPredictionScores.poolMatchPredictionId, poolMatchPredictions.id),
+    )
+    .where(eq(matches.matchdayId, matchdayId))
+    .orderBy(asc(matches.startsAt), asc(matches.id));
 }
 
 export async function getPredictionWriteMembershipContext(
@@ -168,12 +197,14 @@ export async function getPredictionWriteMembershipContext(
   return record ?? null;
 }
 
-export async function getPredictionWriteMatchContext(
-  matchId: string,
+export async function listPredictionWriteMatchContexts(
+  matchIds: ReadonlyArray<string>,
   competitionSeasonId: string,
-): Promise<PredictionWriteMatchContext | null> {
-  const [record] = await db
+): Promise<ReadonlyArray<PredictionWriteMatchContextRow>> {
+  if (matchIds.length === 0) return [];
+  return db
     .select({
+      matchId: matches.id,
       matchdayStatus: matchdays.status,
       matchStatus: matches.status,
       startsAt: matches.startsAt,
@@ -182,13 +213,10 @@ export async function getPredictionWriteMatchContext(
     .innerJoin(matchdays, eq(matches.matchdayId, matchdays.id))
     .where(
       and(
-        eq(matches.id, matchId),
+        inArray(matches.id, [...matchIds]),
         eq(matches.competitionSeasonId, competitionSeasonId),
       ),
-    )
-    .limit(1);
-
-  return record ?? null;
+    );
 }
 
 function buildUpsertQuery(input: UpsertPoolMatchPredictionInput) {

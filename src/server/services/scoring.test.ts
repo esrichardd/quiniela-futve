@@ -5,7 +5,12 @@ const dalMocks = vi.hoisted(() => ({
   upsertMatchPredictionScores: vi.fn(),
   listComputableMatchIdsForMatchday: vi.fn(),
   listMatchdayBonusCandidateRows: vi.fn(),
+  listPoolIdsWithBonusesForMatchday: vi.fn(),
   replaceMatchdayBonuses: vi.fn(),
+}));
+
+const cacheMocks = vi.hoisted(() => ({
+  invalidatePoolRanking: vi.fn(),
 }));
 
 vi.mock("server-only", () => ({}));
@@ -15,6 +20,8 @@ vi.mock("@/server/dal/predictions", () => ({
 }));
 
 vi.mock("@/server/dal/scoring", () => dalMocks);
+
+vi.mock("@/server/cache/ranking", () => cacheMocks);
 
 import {
   recomputeMatchPredictionPoints,
@@ -28,6 +35,7 @@ describe("recomputeMatchPredictionPoints", () => {
   beforeEach(() => {
     dalMocks.listScoringRowsForMatch.mockReset();
     dalMocks.upsertMatchPredictionScores.mockReset();
+    cacheMocks.invalidatePoolRanking.mockReset();
   });
 
   it("does nothing when no predictions exist for the match", async () => {
@@ -36,12 +44,14 @@ describe("recomputeMatchPredictionPoints", () => {
     await recomputeMatchPredictionPoints(matchId, { homeScore: 1, awayScore: 0 });
 
     expect(dalMocks.upsertMatchPredictionScores).not.toHaveBeenCalled();
+    expect(cacheMocks.invalidatePoolRanking).not.toHaveBeenCalled();
   });
 
   it("computes points per prediction according to each pool's mode", async () => {
     dalMocks.listScoringRowsForMatch.mockResolvedValue([
       {
         poolMatchPredictionId: "prediction-simple",
+        poolId: "pool-1",
         poolMembershipId: "membership-1",
         predictionMode: "simple",
         resultPoints: 1,
@@ -52,6 +62,7 @@ describe("recomputeMatchPredictionPoints", () => {
       },
       {
         poolMatchPredictionId: "prediction-mixed-exact",
+        poolId: "pool-2",
         poolMembershipId: "membership-2",
         predictionMode: "mixed",
         resultPoints: 1,
@@ -62,6 +73,7 @@ describe("recomputeMatchPredictionPoints", () => {
       },
       {
         poolMatchPredictionId: "prediction-score-wrong",
+        poolId: "pool-3",
         poolMembershipId: "membership-3",
         predictionMode: "score",
         resultPoints: null,
@@ -94,11 +106,52 @@ describe("recomputeMatchPredictionPoints", () => {
         wasExactScore: false,
       }),
     ]);
+
+    // The same match can be predicted across several pools; every one of
+    // them needs its cached ranking invalidated.
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledTimes(3);
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledWith("pool-1");
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledWith("pool-2");
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledWith("pool-3");
+  });
+
+  it("invalidates a pool's ranking only once even with several predictions in it", async () => {
+    dalMocks.listScoringRowsForMatch.mockResolvedValue([
+      {
+        poolMatchPredictionId: "prediction-1",
+        poolId: "pool-1",
+        poolMembershipId: "membership-1",
+        predictionMode: "simple",
+        resultPoints: 1,
+        exactScorePoints: null,
+        predictedResult: "home",
+        predictedHomeScore: null,
+        predictedAwayScore: null,
+      },
+      {
+        poolMatchPredictionId: "prediction-2",
+        poolId: "pool-1",
+        poolMembershipId: "membership-2",
+        predictionMode: "simple",
+        resultPoints: 1,
+        exactScorePoints: null,
+        predictedResult: "away",
+        predictedHomeScore: null,
+        predictedAwayScore: null,
+      },
+    ]);
+    dalMocks.upsertMatchPredictionScores.mockResolvedValue(undefined);
+
+    await recomputeMatchPredictionPoints(matchId, { homeScore: 1, awayScore: 0 });
+
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledTimes(1);
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledWith("pool-1");
   });
 
   it("recomputes without accumulating when a result is corrected", async () => {
     const row = {
       poolMatchPredictionId: "prediction-1",
+      poolId: "pool-1",
       poolMembershipId: "membership-1",
       predictionMode: "score",
       resultPoints: null,
@@ -131,20 +184,37 @@ describe("recomputeMatchdayBonuses", () => {
   beforeEach(() => {
     dalMocks.listComputableMatchIdsForMatchday.mockReset();
     dalMocks.listMatchdayBonusCandidateRows.mockReset();
+    dalMocks.listPoolIdsWithBonusesForMatchday.mockReset();
     dalMocks.replaceMatchdayBonuses.mockReset();
+    cacheMocks.invalidatePoolRanking.mockReset();
   });
 
-  it("clears bonuses without querying candidates when there are no computable matches", async () => {
+  it("clears bonuses without querying candidates when there are no computable matches, invalidating the pools that lost their bonus", async () => {
     dalMocks.listComputableMatchIdsForMatchday.mockResolvedValue([]);
+    dalMocks.listPoolIdsWithBonusesForMatchday.mockResolvedValue(["pool-1", "pool-2"]);
     dalMocks.replaceMatchdayBonuses.mockResolvedValue(undefined);
 
     await recomputeMatchdayBonuses(matchdayId);
 
     expect(dalMocks.listMatchdayBonusCandidateRows).not.toHaveBeenCalled();
+    expect(dalMocks.listPoolIdsWithBonusesForMatchday).toHaveBeenCalledWith(matchdayId);
     expect(dalMocks.replaceMatchdayBonuses).toHaveBeenCalledWith(matchdayId, []);
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledTimes(2);
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledWith("pool-1");
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledWith("pool-2");
   });
 
-  it("awards the bonus to a membership with every computable match exact", async () => {
+  it("does nothing to the ranking cache when no computable matches and no pool held a bonus", async () => {
+    dalMocks.listComputableMatchIdsForMatchday.mockResolvedValue([]);
+    dalMocks.listPoolIdsWithBonusesForMatchday.mockResolvedValue([]);
+    dalMocks.replaceMatchdayBonuses.mockResolvedValue(undefined);
+
+    await recomputeMatchdayBonuses(matchdayId);
+
+    expect(cacheMocks.invalidatePoolRanking).not.toHaveBeenCalled();
+  });
+
+  it("awards the bonus to a membership with every computable match exact, invalidating that pool's ranking", async () => {
     dalMocks.listComputableMatchIdsForMatchday.mockResolvedValue(["match-1", "match-2"]);
     dalMocks.listMatchdayBonusCandidateRows.mockResolvedValue([
       {
@@ -177,6 +247,8 @@ describe("recomputeMatchdayBonuses", () => {
         pointsAwarded: 10,
       }),
     ]);
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledTimes(1);
+    expect(cacheMocks.invalidatePoolRanking).toHaveBeenCalledWith("pool-1");
   });
 
   it("does not award the bonus when one computable match was not exact", async () => {

@@ -13,42 +13,48 @@ import {
   poolMatchPredictions,
   poolMatchPredictionScores,
   poolMemberships,
-  poolPredictionRules,
   pools,
   teams,
   userProfiles,
 } from "@/server/db/schema";
 
 /**
- * One row per (matchday, match, pool membership) combination, unlike the
- * personal predictions read which is anchored to a single user. This is
- * intentional: the prediction transparency screen shows every member's
- * pick, so the query crosses every visible match with every membership of
- * the pool instead of filtering by a `userId`.
+ * Pool/competition/season header plus the lightweight list of visible
+ * matchdays (id, number, name, status) for the tabs — no match or member
+ * rows. `getPoolMembershipCore` (used for authorization in the service)
+ * only carries `poolName`, not `competitionName`/`seasonName`, so this query
+ * carries the full header instead. Always has at least one row when the
+ * pool exists, even with zero visible matchdays, thanks to the `leftJoin`.
  */
-export type PredictionTransparencyRow = Readonly<{
+export type PoolTransparencyMatchdayRow = Readonly<{
   poolId: string;
   poolName: string;
   competitionName: string;
   seasonName: string;
-  predictionMode: string;
-  poolMembershipId: string;
-  displayName: string | null;
-  // Null when the pool has no published/finished matchday yet: the row
-  // still carries the header fields above so the caller can build an
-  // empty-but-well-formed view instead of losing pool/competition/season
-  // names.
   matchdayId: string | null;
   matchdayNumber: number | null;
   matchdayName: string | null;
   matchdayStatus: string | null;
-  matchId: string | null;
-  homeTeamName: string | null;
+}>;
+
+/**
+ * One row per (match, pool membership) combination for a single matchday,
+ * unlike the personal predictions read which is anchored to a single user.
+ * This is intentional: the prediction transparency screen shows every
+ * member's pick, so the query crosses every match of the selected matchday
+ * with every membership of the pool instead of filtering by a `userId`.
+ */
+export type PredictionTransparencyMatchdayMatchRow = Readonly<{
+  poolMembershipId: string;
+  displayName: string | null;
+  matchId: string;
+  homeTeamName: string;
   homeTeamShortName: string | null;
-  awayTeamName: string | null;
+  awayTeamName: string;
   awayTeamShortName: string | null;
-  startsAt: Date | null;
-  matchStatus: string | null;
+  startsAt: Date;
+  matchStatus: string;
+  matchdayStatus: string;
   homeScore: number | null;
   awayScore: number | null;
   predictedResult: string | null;
@@ -59,25 +65,55 @@ export type PredictionTransparencyRow = Readonly<{
   perfectMatchdayBonusPoints: number | null;
 }>;
 
-export async function listPredictionTransparencyRowsForPool(
+export async function listVisibleMatchdaysForPool(
   poolId: string,
-): Promise<ReadonlyArray<PredictionTransparencyRow>> {
-  const homeTeams = alias(teams, "transparency_home_teams");
-  const awayTeams = alias(teams, "transparency_away_teams");
-
+): Promise<ReadonlyArray<PoolTransparencyMatchdayRow>> {
   return db
     .select({
       poolId: pools.id,
       poolName: pools.name,
       competitionName: competitions.name,
       seasonName: competitionSeasons.name,
-      predictionMode: poolPredictionRules.mode,
-      poolMembershipId: poolMemberships.id,
-      displayName: userProfiles.displayName,
       matchdayId: matchdays.id,
       matchdayNumber: matchdays.number,
       matchdayName: matchdays.name,
       matchdayStatus: matchdays.status,
+    })
+    .from(pools)
+    .innerJoin(
+      competitionSeasons,
+      eq(pools.competitionSeasonId, competitionSeasons.id),
+    )
+    .innerJoin(competitions, eq(competitionSeasons.competitionId, competitions.id))
+    .leftJoin(
+      matchdays,
+      and(
+        eq(matchdays.competitionSeasonId, competitionSeasons.id),
+        inArray(matchdays.status, ["published", "finished"]),
+      ),
+    )
+    .where(eq(pools.id, poolId))
+    .orderBy(asc(matchdays.number));
+}
+
+/**
+ * Full (match × membership) rows for a single matchday, scoped by `poolId`
+ * instead of re-deriving it from a join chain: authorization already
+ * happened in the service via `getPoolMembershipCore`, and the visible
+ * matchday itself was already resolved via
+ * {@link listVisibleMatchdaysForPool}.
+ */
+export async function listPredictionTransparencyRowsForMatchday(
+  poolId: string,
+  matchdayId: string,
+): Promise<ReadonlyArray<PredictionTransparencyMatchdayMatchRow>> {
+  const homeTeams = alias(teams, "transparency_home_teams");
+  const awayTeams = alias(teams, "transparency_away_teams");
+
+  return db
+    .select({
+      poolMembershipId: poolMemberships.id,
+      displayName: userProfiles.displayName,
       matchId: matches.id,
       homeTeamName: homeTeams.name,
       homeTeamShortName: homeTeams.shortName,
@@ -85,6 +121,7 @@ export async function listPredictionTransparencyRowsForPool(
       awayTeamShortName: awayTeams.shortName,
       startsAt: matches.startsAt,
       matchStatus: matches.status,
+      matchdayStatus: matchdays.status,
       homeScore: matches.homeScore,
       awayScore: matches.awayScore,
       predictedResult: poolMatchPredictions.predictedResult,
@@ -94,25 +131,15 @@ export async function listPredictionTransparencyRowsForPool(
       wasExactScore: poolMatchPredictionScores.wasExactScore,
       perfectMatchdayBonusPoints: poolMatchdayPerfectBonuses.pointsAwarded,
     })
-    .from(pools)
-    .innerJoin(
-      competitionSeasons,
-      eq(pools.competitionSeasonId, competitionSeasons.id),
-    )
-    .innerJoin(competitions, eq(competitionSeasons.competitionId, competitions.id))
-    .innerJoin(poolPredictionRules, eq(poolPredictionRules.poolId, pools.id))
-    .innerJoin(poolMemberships, eq(poolMemberships.poolId, pools.id))
+    .from(matches)
+    .innerJoin(matchdays, eq(matches.matchdayId, matchdays.id))
+    .innerJoin(homeTeams, eq(matches.homeTeamId, homeTeams.id))
+    .innerJoin(awayTeams, eq(matches.awayTeamId, awayTeams.id))
+    // Cross join every membership of the pool against every match of this
+    // matchday: the join condition only anchors on `poolId`, not on any
+    // column of `matches`, by design.
+    .innerJoin(poolMemberships, eq(poolMemberships.poolId, poolId))
     .innerJoin(userProfiles, eq(poolMemberships.userId, userProfiles.userId))
-    .leftJoin(
-      matchdays,
-      and(
-        eq(matchdays.competitionSeasonId, competitionSeasons.id),
-        inArray(matchdays.status, ["published", "finished"]),
-      ),
-    )
-    .leftJoin(matches, eq(matches.matchdayId, matchdays.id))
-    .leftJoin(homeTeams, eq(matches.homeTeamId, homeTeams.id))
-    .leftJoin(awayTeams, eq(matches.awayTeamId, awayTeams.id))
     .leftJoin(
       poolMatchPredictions,
       and(
@@ -131,9 +158,8 @@ export async function listPredictionTransparencyRowsForPool(
         eq(poolMatchdayPerfectBonuses.poolMembershipId, poolMemberships.id),
       ),
     )
-    .where(eq(pools.id, poolId))
+    .where(eq(matches.matchdayId, matchdayId))
     .orderBy(
-      asc(matchdays.number),
       asc(matches.startsAt),
       asc(matches.id),
       asc(poolMemberships.createdAt),

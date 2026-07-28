@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const rankingDalMocks = vi.hoisted(() => ({
-  listRankingRowsForPool: vi.fn(),
+const rankingCacheMocks = vi.hoisted(() => ({
+  getCachedRankingRows: vi.fn(),
 }));
 
 const poolsDalMocks = vi.hoisted(() => ({
@@ -19,7 +19,7 @@ vi.mock("@/server/auth/session", () => ({
   requireVerifiedAppUser: sessionMocks.requireVerifiedAppUser,
 }));
 
-vi.mock("@/server/dal/ranking", () => rankingDalMocks);
+vi.mock("@/server/cache/ranking", () => rankingCacheMocks);
 
 vi.mock("@/server/dal/pools", () => poolsDalMocks);
 
@@ -32,7 +32,7 @@ const appUser = { id: "user-1" };
 describe("getPoolRanking", () => {
   beforeEach(() => {
     poolsDalMocks.getPoolMembershipCore.mockReset();
-    rankingDalMocks.listRankingRowsForPool.mockReset();
+    rankingCacheMocks.getCachedRankingRows.mockReset();
     sessionMocks.requireVerifiedAppUser.mockReset();
     sessionMocks.requireVerifiedAppUser.mockResolvedValue(appUser);
   });
@@ -50,7 +50,7 @@ describe("getPoolRanking", () => {
     await expect(getPoolRanking(poolId)).rejects.toBeInstanceOf(
       PoolMembershipRequiredError,
     );
-    expect(rankingDalMocks.listRankingRowsForPool).not.toHaveBeenCalled();
+    expect(rankingCacheMocks.getCachedRankingRows).not.toHaveBeenCalled();
   });
 
   it("always resolves membership using the session's user id", async () => {
@@ -70,7 +70,7 @@ describe("getPoolRanking", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-1",
     });
-    rankingDalMocks.listRankingRowsForPool.mockResolvedValue([
+    rankingCacheMocks.getCachedRankingRows.mockResolvedValue([
       { poolMembershipId: "membership-1", displayName: "Ana", role: "player", totalPoints: 0 },
     ]);
 
@@ -93,7 +93,7 @@ describe("getPoolRanking", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-2",
     });
-    rankingDalMocks.listRankingRowsForPool.mockResolvedValue([
+    rankingCacheMocks.getCachedRankingRows.mockResolvedValue([
       { poolMembershipId: "membership-1", displayName: "Ana", role: "pool_admin", totalPoints: 10 },
       { poolMembershipId: "membership-2", displayName: "Beto", role: "player", totalPoints: 30 },
       { poolMembershipId: "membership-3", displayName: "Cari", role: "player", totalPoints: 20 },
@@ -124,7 +124,7 @@ describe("getPoolRanking", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-3",
     });
-    rankingDalMocks.listRankingRowsForPool.mockResolvedValue([
+    rankingCacheMocks.getCachedRankingRows.mockResolvedValue([
       { poolMembershipId: "membership-1", displayName: "Ana", role: "player", totalPoints: 20 },
       { poolMembershipId: "membership-2", displayName: "Beto", role: "player", totalPoints: 20 },
       { poolMembershipId: "membership-3", displayName: "Cari", role: "player", totalPoints: 10 },
@@ -140,7 +140,7 @@ describe("getPoolRanking", () => {
       poolName: "Quiniela",
       poolMembershipId: "membership-2",
     });
-    rankingDalMocks.listRankingRowsForPool.mockResolvedValue([
+    rankingCacheMocks.getCachedRankingRows.mockResolvedValue([
       { poolMembershipId: "membership-1", displayName: "Ana", role: "pool_admin", totalPoints: 10 },
       { poolMembershipId: "membership-2", displayName: "Beto", role: "player", totalPoints: 5 },
     ]);

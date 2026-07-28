@@ -19,14 +19,15 @@ import type {
 import { PoolMembershipRequiredError } from "@/server/auth/permissions";
 import { requireVerifiedAppUser } from "@/server/auth/session";
 import {
-  getPredictionWriteMatchContext,
   getPredictionWriteMembershipContext,
-  listPoolMatchPredictionRowsForUser,
+  listPoolMatchPredictionRowsForMatchday,
+  listPoolPredictionHeaderRowsForUser,
+  listPredictionWriteMatchContexts,
   parseMatchdayStatus,
   parseMatchStatus,
   parsePredictionMode,
   upsertPoolMatchPredictionRecords,
-  type PoolMatchPredictionRow,
+  type PredictionMatchdayMatchRow,
   type UpsertPoolMatchPredictionInput,
 } from "@/server/dal/predictions";
 
@@ -41,12 +42,12 @@ export async function getCurrentUserPoolPredictions(
   now: Date = new Date(),
 ): Promise<PoolPredictionsView> {
   const appUser = await requireVerifiedAppUser();
-  const rows = await listPoolMatchPredictionRowsForUser(poolId, appUser.id);
-  const core = rows[0];
+  const headerRows = await listPoolPredictionHeaderRowsForUser(poolId, appUser.id);
+  const core = headerRows[0];
   if (!core) throw new PoolMembershipRequiredError();
 
-  const grouped = new Map<string, PredictionMatchday>();
-  for (const row of rows) {
+  const visibleMatchdays: Array<PredictionMatchday> = [];
+  for (const row of headerRows) {
     const { matchdayId, matchdayNumber, matchdayStatus } = row;
     if (
       !matchdayId ||
@@ -55,33 +56,30 @@ export async function getCurrentUserPoolPredictions(
     ) {
       continue;
     }
-    const current = grouped.get(matchdayId);
-    const match = mapPredictionMatch(row, now);
-    if (current) {
-      if (match) {
-        grouped.set(matchdayId, {
-          ...current,
-          matches: [...current.matches, match],
-        });
-      }
-    } else {
-      grouped.set(matchdayId, {
-        id: matchdayId,
-        number: matchdayNumber,
-        name: row.matchdayName,
-        status: matchdayStatus,
-        matches: match ? [match] : [],
-        perfectMatchdayBonusPoints:
-          matchdayStatus === "finished" ? row.perfectMatchdayBonusPoints : null,
-      });
-    }
+    visibleMatchdays.push({
+      id: matchdayId,
+      number: matchdayNumber,
+      name: row.matchdayName,
+      status: matchdayStatus,
+      matches: [],
+      perfectMatchdayBonusPoints:
+        matchdayStatus === "finished" ? row.perfectMatchdayBonusPoints : null,
+    });
   }
 
-  const visibleMatchdays = [...grouped.values()];
   const selected =
-    selectedMatchdayId && grouped.has(selectedMatchdayId)
+    selectedMatchdayId && visibleMatchdays.some((matchday) => matchday.id === selectedMatchdayId)
       ? selectedMatchdayId
       : (visibleMatchdays[0]?.id ?? null);
+
+  const matchdays: ReadonlyArray<PredictionMatchday> = selected
+    ? await withSelectedMatchdayMatches(
+        visibleMatchdays,
+        core.poolMembershipId,
+        selected,
+        now,
+      )
+    : visibleMatchdays;
 
   return {
     poolId: core.poolId,
@@ -90,8 +88,31 @@ export async function getCurrentUserPoolPredictions(
     seasonName: core.seasonName,
     predictionMode: parsePredictionMode(core.predictionMode),
     selectedMatchdayId: selected,
-    matchdays: visibleMatchdays,
+    matchdays,
   };
+}
+
+/**
+ * Fetches match rows for the selected matchday only (`PERF-N02`) and
+ * attaches them to the corresponding entry. Every other matchday keeps its
+ * `matches: []` placeholder, matching the UI which only ever renders the
+ * selected matchday's matches.
+ */
+async function withSelectedMatchdayMatches(
+  matchdays: ReadonlyArray<PredictionMatchday>,
+  poolMembershipId: string,
+  selectedMatchdayId: string,
+  now: Date,
+): Promise<ReadonlyArray<PredictionMatchday>> {
+  const matchRows = await listPoolMatchPredictionRowsForMatchday(
+    poolMembershipId,
+    selectedMatchdayId,
+  );
+  const matches = matchRows.map((row) => mapPredictionMatch(row, now));
+
+  return matchdays.map((matchday) =>
+    matchday.id === selectedMatchdayId ? { ...matchday, matches } : matchday,
+  );
 }
 
 /**
@@ -117,14 +138,18 @@ export async function savePredictions(
   const mode = parsePredictionMode(membershipContext.predictionMode);
   const now = new Date();
 
+  const uniqueMatchIds = [...new Set(items.map((item) => item.matchId))];
+  const contextRows = await listPredictionWriteMatchContexts(
+    uniqueMatchIds,
+    membershipContext.competitionSeasonId,
+  );
+  const contextsByMatchId = new Map(contextRows.map((row) => [row.matchId, row]));
+
   const outcomes: Record<string, PredictionOutcome> = {};
   const validRecords: Array<UpsertPoolMatchPredictionInput> = [];
 
   for (const item of items) {
-    const matchContext = await getPredictionWriteMatchContext(
-      item.matchId,
-      membershipContext.competitionSeasonId,
-    );
+    const matchContext = contextsByMatchId.get(item.matchId);
     if (!matchContext) {
       outcomes[item.matchId] = { status: "error", error: "match_unavailable" };
       continue;
@@ -171,21 +196,7 @@ export async function savePredictions(
   return outcomes;
 }
 
-function mapPredictionMatch(
-  row: PoolMatchPredictionRow,
-  now: Date,
-): PredictionMatch | null {
-  if (
-    !row.matchId ||
-    !row.homeTeamName ||
-    !row.awayTeamName ||
-    !row.startsAt ||
-    !row.matchStatus ||
-    !row.matchdayStatus
-  ) {
-    return null;
-  }
-
+function mapPredictionMatch(row: PredictionMatchdayMatchRow, now: Date): PredictionMatch {
   const matchdayStatus = parseMatchdayStatus(row.matchdayStatus);
   const matchStatus = parseMatchStatus(row.matchStatus);
   const canEdit = isPredictionEditable(
@@ -214,7 +225,7 @@ function mapPredictionMatch(
   };
 }
 
-function mapCurrentPrediction(row: PoolMatchPredictionRow): MatchPrediction | null {
+function mapCurrentPrediction(row: PredictionMatchdayMatchRow): MatchPrediction | null {
   if (row.predictedResult) {
     return { kind: "result", result: parsePredictionResult(row.predictedResult) };
   }
