@@ -206,7 +206,7 @@
       "end": "There are no more members."
     },
     "unnamedMember": "Member",
-    "joinedAt": "Joined on {date}",
+    "joinedAt": "Joined on <date></date>",
     "currentPrize": "Current pooled prize: {amount}",
     "predictionExplanation": {
       "simple": "Only a correct general result earns points.",

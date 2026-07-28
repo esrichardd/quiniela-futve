@@ -1,6 +1,7 @@
 import { CalendarDays, CheckCircle2, Shield, Trophy, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import LocalDateTime from "@/components/local-date-time";
 import {
   formatMinorCurrency,
   formatPercentage,
@@ -79,9 +80,9 @@ export default async function PoolDetail({
         <Stat
           icon={<CalendarDays aria-hidden="true" className="size-5" />}
           label={t("detail.createdAt")}
-          value={new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-            new Date(pool.createdAt),
-          )}
+          value={
+            <LocalDateTime iso={pool.createdAt} locale={locale} dateStyle="medium" />
+          }
         />
       </div>
 
@@ -137,10 +138,14 @@ export default async function PoolDetail({
                     {member.displayName ?? t("detail.unnamedMember")}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {t("detail.joinedAt", {
-                      date: new Intl.DateTimeFormat(locale, {
-                        dateStyle: "medium",
-                      }).format(new Date(member.joinedAt)),
+                    {t.rich("detail.joinedAt", {
+                      date: () => (
+                        <LocalDateTime
+                          iso={member.joinedAt}
+                          locale={locale}
+                          dateStyle="medium"
+                        />
+                      ),
                     })}
                   </p>
                 </div>
@@ -326,7 +331,7 @@ function Stat({
   icon,
   label,
   value,
-}: Readonly<{ icon: React.ReactNode; label: string; value: string }>) {
+}: Readonly<{ icon: React.ReactNode; label: string; value: React.ReactNode }>) {
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-soft">
       <div className="flex items-center gap-2 text-brand">{icon}</div>

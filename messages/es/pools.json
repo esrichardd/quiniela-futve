@@ -206,7 +206,7 @@
       "end": "No hay más miembros."
     },
     "unnamedMember": "Miembro",
-    "joinedAt": "Se unió el {date}",
+    "joinedAt": "Se unió el <date></date>",
     "currentPrize": "Premio acumulado actual: {amount}",
     "predictionExplanation": {
       "simple": "Solo cuenta acertar el resultado general.",

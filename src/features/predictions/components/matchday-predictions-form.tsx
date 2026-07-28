@@ -5,6 +5,7 @@ import { useActionState, useMemo, useRef } from "react";
 import { AlertCircle, CheckCircle2, LoaderCircle } from "lucide-react";
 import { useTranslations } from "next-intl";
 
+import LocalDateTime from "@/components/local-date-time";
 import { saveMatchdayPredictionsAction } from "@/features/predictions/actions";
 import { predictionResults } from "@/features/predictions/constants";
 import type {
@@ -15,7 +16,7 @@ import { initialSaveMatchdayPredictionsState } from "@/features/predictions/type
 import type { PredictionMode } from "@/features/pools/types";
 
 export type PredictionMatchViewModel = PredictionMatch &
-  Readonly<{ dateLabel: string; statusLabel: string }>;
+  Readonly<{ statusLabel: string }>;
 
 type PredictionBatchItem =
   | Readonly<{ matchId: string; kind: "result"; result: string }>
@@ -100,7 +101,13 @@ export default function MatchdayPredictionsForm({
         {matches.map((match) => (
           <li key={match.matchId} className="py-4">
             <p className="text-center text-[10px] text-muted-foreground sm:text-xs">
-              {match.dateLabel} · {match.statusLabel}
+              <LocalDateTime
+                iso={match.startsAt}
+                locale={locale}
+                dateStyle="medium"
+                timeStyle="short"
+              />{" "}
+              · {match.statusLabel}
             </p>
             <div className="mt-1 grid grid-cols-2 gap-3">
               <p className="text-center text-sm font-semibold leading-tight sm:text-base">

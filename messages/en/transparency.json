@@ -9,7 +9,7 @@
     "participant": "Participant",
     "pick": "Pick"
   },
-  "locked": "Revealed once predictions close, at {time}.",
+  "locked": "Revealed once predictions close, at <time></time>.",
   "perfectMatchdayBanner": "Perfect matchday: {names}",
   "emptyTitle": "There is nothing to reveal yet",
   "emptyBody": "Once a match's prediction window closes, you'll see what every member picked here."

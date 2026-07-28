@@ -9,7 +9,7 @@
     "participant": "Participante",
     "pick": "Pronóstico"
   },
-  "locked": "Se revela cuando cierre la carga de pronósticos, a las {time}.",
+  "locked": "Se revela cuando cierre la carga de pronósticos, a las <time></time>.",
   "perfectMatchdayBanner": "Jornada perfecta: {names}",
   "emptyTitle": "Todavía no hay nada que revelar",
   "emptyBody": "Cuando cierre la carga de pronósticos de un partido, aquí verás qué puso cada miembro."

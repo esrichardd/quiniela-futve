@@ -10,22 +10,15 @@ import PoolNavigation from "./pool-navigation";
 export default async function PoolMatchdays({
   view,
   locale,
-  timeZone,
 }: Readonly<{
   view: PoolPredictionsView;
   locale: string;
-  timeZone: string;
 }>) {
   const [t, catalog] = await Promise.all([
     getTranslations("pools"),
     getTranslations("competitionCatalog"),
   ]);
   const selected = view.matchdays.find((item) => item.id === view.selectedMatchdayId);
-  const formatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone,
-  });
 
   return (
     <section>
@@ -80,7 +73,6 @@ export default async function PoolMatchdays({
                     perfectMatchdayBonusPoints={selected.perfectMatchdayBonusPoints}
                     matches={selected.matches.map((match) => ({
                       ...match,
-                      dateLabel: formatter.format(new Date(match.startsAt)),
                       statusLabel: catalog(`matches.status.${match.matchStatus}`),
                     }))}
                   />

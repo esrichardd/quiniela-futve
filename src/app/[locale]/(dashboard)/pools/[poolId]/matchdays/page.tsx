@@ -27,7 +27,7 @@ export default async function PoolMatchdaysPage({ params, searchParams }: PagePr
   const { locale, poolId } = await params;
   if (!isLocale(locale) || !z.string().uuid().safeParse(poolId).success) notFound();
   setRequestLocale(locale);
-  const appUser = await requireDashboardUser(locale);
+  await requireDashboardUser(locale);
   const query = await searchParams;
   if (Array.isArray(query.matchday)) notFound();
   if (query.matchday && !z.string().uuid().safeParse(query.matchday).success) notFound();
@@ -38,5 +38,5 @@ export default async function PoolMatchdaysPage({ params, searchParams }: PagePr
     if (error instanceof PoolMembershipRequiredError) notFound();
     throw error;
   }
-  return <PoolMatchdays view={view} locale={locale} timeZone={appUser.preferences.timeZone} />;
+  return <PoolMatchdays view={view} locale={locale} />;
 }

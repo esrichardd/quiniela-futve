@@ -1,6 +1,7 @@
 import { CalendarDays, Plus, ShieldCheck, Ticket, Trophy, Users } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
+import LocalDateTime from "@/components/local-date-time";
 import { formatMinorCurrency } from "@/features/pools/format";
 import type { PoolListPage } from "@/features/pools/types";
 import { Link } from "@/i18n/navigation";
@@ -127,9 +128,11 @@ export default async function DashboardHome({ locale, page, isPlatformAdmin }: D
                     {t("list.created")}
                   </dt>
                   <dd className="mt-1 font-bold">
-                    {new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(
-                      new Date(pool.createdAt),
-                    )}
+                    <LocalDateTime
+                      iso={pool.createdAt}
+                      locale={locale}
+                      dateStyle="medium"
+                    />
                   </dd>
                 </div>
               </dl>

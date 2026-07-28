@@ -12,6 +12,7 @@ import {
 } from "../actions";
 import { matchStatuses } from "../constants";
 import type { AdminSeasonDetail } from "../types";
+import LocalDateTime from "@/components/local-date-time";
 import { Link } from "@/i18n/navigation";
 
 import CatalogActionForm from "./catalog-action-form";
@@ -23,18 +24,11 @@ const inputClass =
 export default async function AdminSeason({
   season,
   locale,
-  timeZone,
 }: Readonly<{
   season: AdminSeasonDetail;
   locale: string;
-  timeZone: string;
 }>) {
   const t = await getTranslations("competitionCatalog");
-  const dateTimeFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone,
-  });
 
   return (
     <section>
@@ -241,7 +235,13 @@ export default async function AdminSeason({
                         <div className="lg:col-span-2">
                           <p className="font-bold">{match.homeTeamName} — {match.awayTeamName}</p>
                           <p className="text-xs text-muted-foreground">
-                            {dateTimeFormatter.format(new Date(match.startsAt))} · {timeZone}
+                            <LocalDateTime
+                              iso={match.startsAt}
+                              locale={locale}
+                              dateStyle="medium"
+                              timeStyle="short"
+                              timeZoneName="short"
+                            />
                           </p>
                         </div>
                         <DateTimeField

@@ -1,7 +1,8 @@
 import { CalendarDays, CheckCircle2, Lock, Trophy } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
-import { PREDICTION_LOCK_BUFFER_MINUTES } from "@/features/predictions/constants";
+import LocalDateTime from "@/components/local-date-time";
+import { getPredictionClosesAt } from "@/features/predictions/rules";
 import PoolNavigation from "@/features/pools/components/pool-navigation";
 import type {
   MemberMatchPrediction,
@@ -22,11 +23,6 @@ export default async function PoolTransparency({
     getTranslations("pools"),
   ]);
   const selected = view.matchdays.find((matchday) => matchday.id === view.selectedMatchdayId);
-  const dateFormatter = new Intl.DateTimeFormat(locale, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-  const timeFormatter = new Intl.DateTimeFormat(locale, { timeStyle: "short" });
 
   const nameByMembership = new Map<string, string | null>();
   for (const matchday of view.matchdays) {
@@ -86,18 +82,7 @@ export default async function PoolTransparency({
 
               <div className="mt-5 space-y-4">
                 {selected.matches.map((match) => (
-                  <MatchCard
-                    key={match.matchId}
-                    match={match}
-                    dateLabel={dateFormatter.format(new Date(match.startsAt))}
-                    timeLabel={timeFormatter.format(new Date(match.startsAt))}
-                    lockedUntilLabel={dateFormatter.format(
-                      new Date(
-                        new Date(match.startsAt).getTime() -
-                          PREDICTION_LOCK_BUFFER_MINUTES * 60_000,
-                      ),
-                    )}
-                  />
+                  <MatchCard key={match.matchId} match={match} locale={locale} />
                 ))}
               </div>
             </section>
@@ -134,16 +119,13 @@ async function PerfectMatchdayBanner({
  */
 async function MatchCard({
   match,
-  dateLabel,
-  timeLabel,
-  lockedUntilLabel,
+  locale,
 }: Readonly<{
   match: TransparencyMatch;
-  dateLabel: string;
-  timeLabel: string;
-  lockedUntilLabel: string;
+  locale: string;
 }>) {
   const t = await getTranslations("transparency");
+  const closesAt = getPredictionClosesAt(new Date(match.startsAt)).toISOString();
 
   const isFinished = match.matchStatus === "finished";
   const pointsEarnedValues = match.members
@@ -163,9 +145,11 @@ async function MatchCard({
           {match.homeTeamShortName ?? match.homeTeamName}
         </p>
         <p className="text-sm font-bold tabular-nums text-foreground">
-          {isFinished && match.homeScore !== null && match.awayScore !== null
-            ? `${match.homeScore} – ${match.awayScore}`
-            : timeLabel}
+          {isFinished && match.homeScore !== null && match.awayScore !== null ? (
+            `${match.homeScore} – ${match.awayScore}`
+          ) : (
+            <LocalDateTime iso={match.startsAt} locale={locale} timeStyle="short" />
+          )}
         </p>
         <p className="text-left text-sm font-semibold leading-tight">
           {match.awayTeamShortName ?? match.awayTeamName}
@@ -175,12 +159,29 @@ async function MatchCard({
       {!match.isRevealed ? (
         <div className="flex items-center gap-2 px-4 py-3 text-sm text-muted-foreground">
           <Lock aria-hidden="true" className="size-4 shrink-0" />
-          <span>{t("locked", { time: lockedUntilLabel })}</span>
+          <span>
+            {t.rich("locked", {
+              time: () => (
+                <LocalDateTime
+                  iso={closesAt}
+                  locale={locale}
+                  dateStyle="medium"
+                  timeStyle="short"
+                />
+              ),
+            })}
+          </span>
         </div>
       ) : (
         <table className="w-full text-left text-sm">
           <caption className="sr-only">
-            {match.homeTeamName} – {match.awayTeamName}, {dateLabel}
+            {match.homeTeamName} – {match.awayTeamName},{" "}
+            <LocalDateTime
+              iso={match.startsAt}
+              locale={locale}
+              dateStyle="medium"
+              timeStyle="short"
+            />
           </caption>
           <thead>
             <tr className="border-b border-border text-xs font-semibold uppercase tracking-wide text-muted-foreground">

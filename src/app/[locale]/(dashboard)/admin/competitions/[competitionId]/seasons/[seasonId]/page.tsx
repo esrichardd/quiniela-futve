@@ -32,7 +32,7 @@ export default async function AdminSeasonPage({ params }: PageProps) {
     !z.string().uuid().safeParse(seasonId).success
   ) notFound();
   setRequestLocale(locale);
-  const appUser = await requirePlatformAdmin(locale);
+  await requirePlatformAdmin(locale);
   let season;
   try {
     season = await getAdminSeasonDetail(seasonId);
@@ -41,11 +41,5 @@ export default async function AdminSeasonPage({ params }: PageProps) {
     throw error;
   }
   if (season.competitionId !== competitionId) notFound();
-  return (
-    <AdminSeason
-      season={season}
-      locale={locale}
-      timeZone={appUser.preferences.timeZone}
-    />
-  );
+  return <AdminSeason season={season} locale={locale} />;
 }
