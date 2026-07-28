@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/next";
 
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { isLocale, locales } from "@/i18n/routing";
+import { siteUrl } from "@/lib/site";
 
 import "../globals.css";
 
@@ -17,7 +18,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-const siteUrl = new URL("https://www.quinielafutve.com");
 
 type LocaleLayoutProps = Readonly<{
   children: React.ReactNode;
