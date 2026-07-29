@@ -65,7 +65,7 @@ export default function LoginForm({ initialError }: LoginFormProps) {
         <div className="auth-divider-line h-px flex-1" />
       </div>
 
-      <form action={formAction} className="space-y-4">
+      <form action={formAction} autoComplete="on" className="space-y-4">
         <input type="hidden" name="locale" value={locale} />
         <div>
           <label
@@ -78,7 +78,7 @@ export default function LoginForm({ initialError }: LoginFormProps) {
             id="login-email"
             name="email"
             type="email"
-            autoComplete="email"
+            autoComplete="username"
             required
             disabled={pending}
             value={email}
