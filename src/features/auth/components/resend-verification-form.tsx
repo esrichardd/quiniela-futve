@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { resendVerificationEmailAction } from "@/features/auth/actions";
 import { initialAuthFormState } from "@/features/auth/types";
+import { Link } from "@/i18n/navigation";
 
 export default function ResendVerificationForm() {
   const t = useTranslations("auth");
@@ -71,6 +72,13 @@ export default function ResendVerificationForm() {
             : t("verifyEmailResend.submit")}
         </button>
       </form>
+
+      <Link
+        href="/login"
+        className="auth-link mx-auto mt-4 block w-fit rounded-lg px-3 py-2 text-sm font-medium underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {t("verifyEmailResend.backToLogin")}
+      </Link>
     </section>
   );
 }

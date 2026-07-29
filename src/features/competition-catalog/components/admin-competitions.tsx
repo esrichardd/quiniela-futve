@@ -44,7 +44,7 @@ export default async function AdminCompetitions({
                   <li key={season.id}>
                     <Link
                       href={`/admin/competitions/${competition.id}/seasons/${season.id}`}
-                      className="flex items-center justify-between gap-4 px-4 py-3 text-foreground hover:bg-muted"
+                      className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted"
                     >
                       <span>
                         <span className="font-semibold">{season.name}</span>

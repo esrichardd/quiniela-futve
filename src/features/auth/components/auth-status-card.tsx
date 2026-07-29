@@ -52,7 +52,7 @@ export default function AuthStatusCard({
       {secondaryActionLabel && secondaryActionHref ? (
         <Link
           href={secondaryActionHref}
-          className="mt-4 inline-flex rounded-lg px-3 py-2 text-sm font-medium text-brand underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="auth-link mt-4 inline-flex rounded-lg px-3 py-2 text-sm font-medium underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {secondaryActionLabel}
         </Link>

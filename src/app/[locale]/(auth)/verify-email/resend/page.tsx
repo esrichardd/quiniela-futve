@@ -6,7 +6,6 @@ import { NextIntlClientProvider } from "next-intl";
 import AuthLayout from "@/features/auth/components/auth-layout";
 import ResendVerificationForm from "@/features/auth/components/resend-verification-form";
 import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
-import { Link } from "@/i18n/navigation";
 import { isLocale } from "@/i18n/routing";
 
 type VerifyEmailResendPageProps = Readonly<{
@@ -43,7 +42,6 @@ export default async function VerifyEmailResendPage({
 
   setRequestLocale(locale);
 
-  const t = await getTranslations("auth");
   const common = await getTranslations("common");
   const messages = await getMessages();
 
@@ -56,14 +54,8 @@ export default async function VerifyEmailResendPage({
           "verifyEmailResend",
         ])}
       >
-        <div className="flex w-full max-w-md flex-col gap-4">
+        <div className="w-full max-w-md">
           <ResendVerificationForm />
-          <Link
-            href="/login"
-            className="mx-auto rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {t("verifyEmailResend.backToLogin")}
-          </Link>
         </div>
       </NextIntlClientProvider>
     </AuthLayout>

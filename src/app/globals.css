@@ -147,6 +147,7 @@
   --color-subtle-text: var(--c-subtle);
   --color-gold: var(--c-gold);
   --color-link: var(--c-link);
+  --color-link-hover: var(--c-link-hover);
   --color-live: var(--c-live);
   --color-card-bg: var(--c-card);
   --color-card: var(--c-card);

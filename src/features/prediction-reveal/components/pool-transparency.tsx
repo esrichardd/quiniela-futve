@@ -57,8 +57,8 @@ export default async function PoolTransparency({
                 aria-current={matchday.id === view.selectedMatchdayId ? "page" : undefined}
                 className={`shrink-0 rounded-xl border px-4 py-3 text-sm font-semibold ${
                   matchday.id === view.selectedMatchdayId
-                    ? "border-brand bg-brand/10 text-foreground"
-                    : "border-border bg-card text-muted-foreground hover:text-foreground"
+                    ? "border-brand bg-brand/10 text-link"
+                    : "border-border bg-card text-link hover:text-link-hover"
                 }`}
               >
                 {matchday.name ?? poolsT("matchdays.defaultName", { number: matchday.number })}
