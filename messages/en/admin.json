@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "title": "Administration overview — Quiniela FUTVE",
+    "description": "Review the main user and pool metrics."
+  },
+  "eyebrow": "Platform administration",
+  "title": "Overview",
+  "subtitle": "A quick view of user growth and pool activity.",
+  "actions": {
+    "competitions": "Manage competitions"
+  },
+  "metrics": {
+    "registeredUsers": "Registered users",
+    "verifiedUsers": "Verified emails",
+    "createdPools": "Created pools",
+    "totalMemberships": "Pool memberships",
+    "competitions": "Competitions",
+    "seasons": "Seasons"
+  },
+  "breakdown": {
+    "title": "Pool types",
+    "subtitle": "Breakdown by prediction mode.",
+    "empty": "No pools have been created yet."
+  },
+  "modes": {
+    "simple": "Result",
+    "score": "Exact score",
+    "mixed": "Mixed"
+  },
+  "pools": {
+    "title": "Pools and participants",
+    "subtitle": "People currently registered in each pool.",
+    "name": "Pool",
+    "competition": "Competition",
+    "type": "Type",
+    "members": "People",
+    "created": "Created",
+    "details": "Details",
+    "viewDetails": "View details",
+    "empty": "No pools have been created yet."
+  },
+  "details": {
+    "metadata": {
+      "title": "Pool details — Administration — Quiniela FUTVE",
+      "description": "Review a pool's creator and participants."
+    },
+    "back": "Back to overview",
+    "creatorTitle": "Pool creator",
+    "membersTitle": "Registered people",
+    "created": "Created",
+    "memberCount": "People",
+    "joined": "Joined:",
+    "unknownUser": "Unnamed user",
+    "emailUnavailable": "Email unavailable",
+    "emptyMembers": "This pool does not have any participants yet."
+  }
+}

@@ -74,6 +74,7 @@ const resolveCurrentAppUser = cache(
 
     return getOrProvisionAppUser({
       authUser: {
+        email: session.user.email,
         id: session.user.id,
         emailVerified: session.user.emailVerified,
         name: session.user.name,

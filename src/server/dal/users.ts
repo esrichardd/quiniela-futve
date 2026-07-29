@@ -18,13 +18,14 @@ export type UserPreferences = InferSelectModel<typeof userPreferences>;
 export type NewUserPreferences = InferInsertModel<typeof userPreferences>;
 export type UserAuditEvent = InferSelectModel<typeof userAuditEvents>;
 export type AppUserProfile = Readonly<
-  Pick<UserProfile, "banned" | "banExpiresAt" | "globalRole">
+  Pick<UserProfile, "banned" | "banExpiresAt" | "globalRole" | "emailVerifiedAt">
 >;
 export type AppUserPreferences = Readonly<
   Pick<UserPreferences, "locale" | "theme" | "timeZone">
 >;
 export type AppUserRecord = Readonly<{
   id: string;
+  email: string | null;
   profile: AppUserProfile;
   preferences: AppUserPreferences | null;
 }>;
@@ -48,6 +49,8 @@ export async function getAppUserRecord(
   const [record] = await db
     .select({
       id: userProfiles.userId,
+      email: userProfiles.email,
+      emailVerifiedAt: userProfiles.emailVerifiedAt,
       banned: userProfiles.banned,
       banExpiresAt: userProfiles.banExpiresAt,
       globalRole: userProfiles.globalRole,
@@ -82,9 +85,11 @@ export async function getAppUserRecord(
 
   return {
     id: record.id,
+    email: record.email,
     profile: {
       banned: record.banned,
       banExpiresAt: record.banExpiresAt,
+      emailVerifiedAt: record.emailVerifiedAt,
       globalRole: record.globalRole,
     },
     preferences,
@@ -121,6 +126,22 @@ export async function updateUserProfileDetails(
     NewUserProfile,
     "avatarUrl" | "displayName" | "firstName" | "lastName"
   >,
+): Promise<UserProfile | null> {
+  const [updatedProfile] = await db
+    .update(userProfiles)
+    .set({
+      ...values,
+      updatedAt: new Date(),
+    })
+    .where(eq(userProfiles.userId, userId))
+    .returning();
+
+  return updatedProfile ?? null;
+}
+
+export async function updateUserIdentitySnapshot(
+  userId: string,
+  values: Pick<NewUserProfile, "email" | "emailVerifiedAt">,
 ): Promise<UserProfile | null> {
   const [updatedProfile] = await db
     .update(userProfiles)

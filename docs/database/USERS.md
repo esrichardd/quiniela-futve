@@ -67,12 +67,14 @@ Ownership: app-owned.
 | Columna          | Tipo                       | Requerido | Descripcion                                            |
 | ---------------- | -------------------------- | --------- | ------------------------------------------------------ |
 | `user_id`        | `text`                     | si        | Identificador del usuario emitido por Neon Auth.       |
+| `email`          | `text`                     | no        | Instantanea del email recibida desde Neon Auth para administracion. |
 | `display_name`   | `text`                     | no        | Nombre visible preferido dentro de la aplicacion.      |
 | `first_name`     | `text`                     | no        | Nombre del usuario para perfil de aplicacion.          |
 | `last_name`      | `text`                     | no        | Apellido del usuario para perfil de aplicacion.        |
 | `birth_date`     | `date`                     | no        | Fecha de nacimiento del usuario.                       |
 | `gender`         | `text`                     | no        | Genero declarado por el usuario.                       |
 | `avatar_url`     | `text`                     | no        | URL de imagen visible para UI cuando aplique.          |
+| `email_verified_at` | `timestamp with time zone` | no     | Momento en que la aplicacion observo el email verificado. |
 | `global_role`    | `text`                     | si        | Rol global app-owned: `user` o `super_admin`.          |
 | `banned`         | `boolean`                  | si        | Indica si el usuario esta bloqueado por la aplicacion. |
 | `ban_reason`     | `text`                     | no        | Motivo administrativo del bloqueo.                     |
@@ -109,7 +111,8 @@ Reglas:
 - Estos datos personales no deben exponerse en DTOs publicos salvo que una pantalla o caso de uso lo necesite explicitamente.
 - La edad debe derivarse en servidor a partir de `birth_date`; no se persiste como columna.
 - `global_role` representa autorizacion global, no permisos contextuales.
-- No guardar email como dato app-owned salvo que exista una necesidad de producto documentada.
+- `email` y `email_verified_at` son una instantanea app-owned para metricas y vistas administrativas; Neon Auth sigue siendo la fuente de verdad de identidad y verificacion.
+- La instantanea se sincroniza durante registro, inicio de sesion y recuperacion de sesion. Un valor nulo significa que la aplicacion aun no ha observado esa cuenta verificada, no que Neon Auth la considere necesariamente no verificada.
 
 ## `user_preferences`
 

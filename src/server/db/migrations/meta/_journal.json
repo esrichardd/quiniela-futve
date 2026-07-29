@@ -43,6 +43,13 @@
       "when": 1784760100000,
       "tag": "0005_add_scoring",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785349535194,
+      "tag": "0006_narrow_black_bolt",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,7 @@ import {
   getUserPreferences,
   getUserProfile,
   updateUserProfileDetails,
+  updateUserIdentitySnapshot,
   type AppUserPreferences,
   type AppUserProfile,
   type UserPreferences,
@@ -19,6 +20,7 @@ export type AuthProvider = "email" | "google" | "unknown";
 
 export type AuthUserSnapshot = Readonly<{
   id: string;
+  email: string;
   emailVerified: boolean;
   name?: string | null;
   image?: string | null;
@@ -60,7 +62,7 @@ export function isUserBanned(
 }
 
 export async function getAppUser(
-  authUser: Pick<AuthUserSnapshot, "emailVerified" | "id">,
+  authUser: Pick<AuthUserSnapshot, "email" | "emailVerified" | "id">,
 ): Promise<AppUser | null> {
   const record = await getAppUserRecord(authUser.id);
 
@@ -68,7 +70,33 @@ export async function getAppUser(
     return null;
   }
 
-  return createAppUser(authUser, record.profile, record.preferences);
+  const email = normalizeNullableText(authUser.email);
+  const emailVerifiedAt = authUser.emailVerified
+    ? record.profile.emailVerifiedAt ?? new Date()
+    : record.profile.emailVerifiedAt;
+  const profileNeedsSync =
+    record.email !== email ||
+    !sameDate(record.profile.emailVerifiedAt, emailVerifiedAt);
+
+  if (!profileNeedsSync) {
+    return createAppUser(authUser, record.profile, record.preferences);
+  }
+
+  const updatedProfile = await updateUserIdentitySnapshot(authUser.id, {
+    email,
+    emailVerifiedAt,
+  });
+
+  if (!updatedProfile) {
+    throw new Error("User identity snapshot could not be updated.");
+  }
+
+  return createAppUser(authUser, {
+    banned: updatedProfile.banned,
+    banExpiresAt: updatedProfile.banExpiresAt,
+    emailVerifiedAt: updatedProfile.emailVerifiedAt,
+    globalRole: updatedProfile.globalRole,
+  }, record.preferences);
 }
 
 export async function getOrProvisionAppUser(
@@ -116,6 +144,8 @@ async function ensureUserProfile(
   const firstName = normalizeNullableText(registrationProfile?.firstName);
   const lastName = normalizeNullableText(registrationProfile?.lastName);
   const createdProfile = await createUserProfileIfMissing({
+    email: normalizeNullableText(authUser.email),
+    emailVerifiedAt: authUser.emailVerified ? new Date() : null,
     userId: authUser.id,
     displayName,
     firstName,
@@ -142,8 +172,25 @@ async function ensureUserProfile(
     throw new Error("User profile could not be resolved.");
   }
 
+  const email = normalizeNullableText(authUser.email);
+  const emailVerifiedAt = authUser.emailVerified
+    ? existingProfile.emailVerifiedAt ?? new Date()
+    : existingProfile.emailVerifiedAt;
+  const profileWithIdentity =
+    existingProfile.email !== email ||
+    !sameDate(existingProfile.emailVerifiedAt, emailVerifiedAt)
+      ? await updateUserIdentitySnapshot(authUser.id, {
+          email,
+          emailVerifiedAt,
+        })
+      : existingProfile;
+
+  if (!profileWithIdentity) {
+    throw new Error("User identity snapshot could not be updated.");
+  }
+
   const profileWithDetails = await backfillMissingProfileFields({
-    profile: existingProfile,
+    profile: profileWithIdentity,
     displayName,
     avatarUrl,
     firstName,
@@ -213,6 +260,10 @@ async function backfillMissingProfileFields(input: {
   return updatedProfile;
 }
 
+function sameDate(first: Date | null, second: Date | null): boolean {
+  return first?.getTime() === second?.getTime();
+}
+
 export async function recordEmailVerificationRequired(
   userId: string,
 ): Promise<void> {
@@ -233,6 +284,7 @@ function createAppUser(
     profile: {
       banned: profile.banned,
       banExpiresAt: profile.banExpiresAt,
+      emailVerifiedAt: profile.emailVerifiedAt,
       globalRole: profile.globalRole,
     },
     preferences: {

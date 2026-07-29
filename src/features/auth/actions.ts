@@ -51,6 +51,7 @@ export async function signInAction(
     } else if (data?.user) {
       const appUser = await getOrProvisionAppUser({
         authUser: {
+          email: data.user.email,
           emailVerified: data.user.emailVerified,
           id: data.user.id,
           image: data.user.image,
@@ -117,6 +118,7 @@ export async function signUpAction(
 
     await ensureAppUser({
       authUser: {
+        email: data.user.email,
         emailVerified: data.user.emailVerified,
         id: data.user.id,
         image: data.user.image,

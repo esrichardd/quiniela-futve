@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "title": "Resumen de administración — Quiniela FUTVE",
+    "description": "Consulta las métricas principales de usuarios y quinielas."
+  },
+  "eyebrow": "Administración de plataforma",
+  "title": "Resumen general",
+  "subtitle": "Una vista rápida del crecimiento de usuarios y la actividad de las quinielas.",
+  "actions": {
+    "competitions": "Gestionar competiciones"
+  },
+  "metrics": {
+    "registeredUsers": "Usuarios registrados",
+    "verifiedUsers": "Emails verificados",
+    "createdPools": "Quinielas creadas",
+    "totalMemberships": "Inscripciones en quinielas",
+    "competitions": "Competiciones",
+    "seasons": "Temporadas"
+  },
+  "breakdown": {
+    "title": "Tipos de quiniela",
+    "subtitle": "Distribución por modo de pronóstico.",
+    "empty": "Todavía no hay quinielas creadas."
+  },
+  "modes": {
+    "simple": "Resultado",
+    "score": "Marcador exacto",
+    "mixed": "Mixta"
+  },
+  "pools": {
+    "title": "Quinielas y participantes",
+    "subtitle": "Personas registradas actualmente en cada quiniela.",
+    "name": "Quiniela",
+    "competition": "Competición",
+    "type": "Tipo",
+    "members": "Personas",
+    "created": "Creada",
+    "details": "Detalles",
+    "viewDetails": "Ver detalles",
+    "empty": "Todavía no hay quinielas creadas."
+  },
+  "details": {
+    "metadata": {
+      "title": "Detalle de quiniela — Administración — Quiniela FUTVE",
+      "description": "Consulta el creador y los participantes de una quiniela."
+    },
+    "back": "Volver al resumen",
+    "creatorTitle": "Creador de la quiniela",
+    "membersTitle": "Personas registradas",
+    "created": "Creada",
+    "memberCount": "Personas",
+    "joined": "Registro:",
+    "unknownUser": "Usuario sin nombre",
+    "emailUnavailable": "Email no disponible",
+    "emptyMembers": "Esta quiniela todavía no tiene participantes."
+  }
+}

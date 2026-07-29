@@ -20,11 +20,14 @@ export default async function AdminLayout({
   const messages = await getMessages();
   return (
     <NextIntlClientProvider
-      messages={pickNestedMessageNamespaces(messages, "competitionCatalog", [
-        "errors",
-        "status",
-        "success",
-      ])}
+      messages={{
+        ...pickNestedMessageNamespaces(messages, "competitionCatalog", [
+          "errors",
+          "status",
+          "success",
+        ]),
+        admin: messages.admin,
+      }}
     >
       {children}
     </NextIntlClientProvider>

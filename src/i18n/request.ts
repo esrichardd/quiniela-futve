@@ -10,6 +10,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   const auth = (await import(`../../messages/${locale}/auth.json`)).default;
   const dashboard = (await import(`../../messages/${locale}/dashboard.json`))
     .default;
+  const admin = (await import(`../../messages/${locale}/admin.json`)).default;
   const pools = (await import(`../../messages/${locale}/pools.json`)).default;
   const competitionCatalog = (
     await import(`../../messages/${locale}/competition-catalog.json`)
@@ -26,6 +27,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale,
     messages: {
       auth,
+      admin,
       common,
       dashboard,
       home,

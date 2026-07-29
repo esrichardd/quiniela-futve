@@ -14,12 +14,17 @@ export const userProfiles = pgTable(
   "user_profiles",
   {
     userId: text("user_id").primaryKey(),
+    email: text("email"),
     displayName: text("display_name"),
     firstName: text("first_name"),
     lastName: text("last_name"),
     birthDate: date("birth_date", { mode: "string" }),
     gender: text("gender"),
     avatarUrl: text("avatar_url"),
+    emailVerifiedAt: timestamp("email_verified_at", {
+      withTimezone: true,
+      mode: "date",
+    }),
     globalRole: text("global_role").notNull().default("user"),
     banned: boolean("banned").notNull().default(false),
     banReason: text("ban_reason"),

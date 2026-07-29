@@ -34,7 +34,7 @@ export default async function DashboardHome({ locale, page, isPlatformAdmin }: D
         <div className="flex flex-wrap gap-2">
           {isPlatformAdmin ? (
             <Link
-              href="/admin/competitions"
+              href="/admin"
               className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-bold text-foreground shadow-soft hover:border-brand/40 hover:bg-brand/5"
             >
               <ShieldCheck aria-hidden="true" className="size-4 text-brand" />

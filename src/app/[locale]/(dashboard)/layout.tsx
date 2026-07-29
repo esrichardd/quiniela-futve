@@ -27,7 +27,10 @@ export default async function DashboardLayout({
 
   return (
     <NextIntlClientProvider
-      messages={pickNestedMessageNamespaces(messages, "dashboard", ["status"])}
+      messages={{
+        ...pickNestedMessageNamespaces(messages, "dashboard", ["status"]),
+        ...pickNestedMessageNamespaces(messages, "pools", ["status"]),
+      }}
     >
       <DashboardShell locale={locale}>{children}</DashboardShell>
     </NextIntlClientProvider>
