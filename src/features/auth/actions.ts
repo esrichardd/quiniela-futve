@@ -76,7 +76,7 @@ export async function signInAction(
     return errorState(mapAuthError(error));
   }
 
-  redirect(destination);
+  return { status: "success", redirectTo: destination };
 }
 
 export async function signUpAction(
@@ -284,7 +284,7 @@ export async function signOutAction(formData: FormData): Promise<void> {
 }
 
 function errorState(
-  error: Exclude<AuthFormState, { status: "idle" }>["error"],
+  error: AuthFormErrorCode,
 ): AuthFormState {
   return { status: "error", error };
 }

@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 
 import { signInAction } from "@/features/auth/actions";
 import {
@@ -19,9 +20,15 @@ type LoginFormProps = Readonly<{
   initialError?: AuthFormErrorCode;
 }>;
 
+type PasswordCredentialConstructor = new (data: {
+  id: string;
+  password: string;
+}) => Credential;
+
 export default function LoginForm({ initialError }: LoginFormProps) {
   const t = useTranslations("auth");
   const locale = useLocale();
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,6 +39,39 @@ export default function LoginForm({ initialError }: LoginFormProps) {
     signInAction,
     initialState,
   );
+
+  useEffect(() => {
+    if (state.status !== "success") {
+      return;
+    }
+
+    const redirectTo = state.redirectTo;
+
+    async function storeCredentialsAndRedirect() {
+      try {
+        const PasswordCredential = (
+          window as Window & {
+            PasswordCredential?: PasswordCredentialConstructor;
+          }
+        ).PasswordCredential;
+
+        if (PasswordCredential && navigator.credentials) {
+          await navigator.credentials.store(
+            new PasswordCredential({
+              id: email,
+              password,
+            }),
+          );
+        }
+      } catch {
+        // Credential storage is optional and must not block sign-in.
+      }
+
+      router.replace(redirectTo);
+    }
+
+    void storeCredentialsAndRedirect();
+  }, [email, password, router, state]);
 
   return (
     <section className="auth-card w-full max-w-md rounded-2xl p-6 sm:p-8">

@@ -17,6 +17,10 @@ export type AuthFormState =
       status: "idle";
     }>
   | Readonly<{
+      status: "success";
+      redirectTo: string;
+    }>
+  | Readonly<{
       status: "error";
       error: AuthFormErrorCode;
     }>;
