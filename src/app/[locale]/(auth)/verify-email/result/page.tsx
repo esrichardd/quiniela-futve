@@ -70,6 +70,10 @@ export default async function VerifyEmailResultPage({
         }
         actionLabel={t("verifyEmailResult.action")}
         actionHref="/login"
+        secondaryActionLabel={
+          verificationFailed ? t("verifyEmailResend.action") : undefined
+        }
+        secondaryActionHref={verificationFailed ? "/verify-email/resend" : undefined}
         icon={verificationFailed ? CircleAlert : BadgeCheck}
       />
     </AuthLayout>

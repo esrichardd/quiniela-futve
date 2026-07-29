@@ -13,6 +13,7 @@ Este documento describe el flujo implementado de autenticacion y correo. Neon Au
 - Proteccion server-side del dashboard para sesiones ausentes, usuarios bloqueados y correos no verificados.
 - Creacion idempotente de `user_profiles` y `user_preferences`.
 - Emails de verificacion y recuperacion personalizados con Resend.
+- Reenvio de enlaces de verificacion para cuentas aun no verificadas.
 - UI y emails localizados en `es` y `en`.
 
 OAuth con Google no forma parte de esta fase. Los botones visibles estan deshabilitados y localizados como funcionalidad futura.
@@ -61,6 +62,12 @@ AUTH_EMAIL_FROM="Quiniela FUTVE <onboarding@resend.dev>"
 5. El webhook entrega el template de verificacion mediante Resend.
 6. Neon valida el token cuando el usuario abre el link y redirige al resultado localizado.
 7. El dashboard vuelve a comprobar sesion, bloqueo y email verificado en servidor.
+
+Si el enlace expira, la pantalla `/[locale]/verify-email/result?error=...` ofrece un acceso
+a `/[locale]/verify-email/resend`. Esa pantalla permite introducir el correo y solicitar un
+nuevo enlace mediante `auth.sendVerificationEmail`. Neon Auth conserva el estado de
+verificacion y aplica sus propios limites de envio; la aplicacion solo valida el correo y el
+locale, y reutiliza el webhook `send.magic_link` para entregar el correo.
 
 ### Login
 

@@ -42,6 +42,30 @@ export function mapAuthError(error: unknown): AuthFormErrorCode {
   }
 
   if (
+    code === "email_already_verified" ||
+    signal.includes("EMAIL_ALREADY_VERIFIED") ||
+    signal.includes("EMAIL ALREADY VERIFIED")
+  ) {
+    return "email_already_verified";
+  }
+
+  if (
+    code === "verification_email_not_enabled" ||
+    signal.includes("VERIFICATION_EMAIL_NOT_ENABLED") ||
+    signal.includes("VERIFICATION EMAIL ISN'T ENABLED")
+  ) {
+    return "email_verification_disabled";
+  }
+
+  if (
+    code === "invalid_callback_url" ||
+    signal.includes("INVALID_CALLBACK_URL") ||
+    signal.includes("INVALID CALLBACKURL")
+  ) {
+    return "invalid_callback_url";
+  }
+
+  if (
     code === "identity_not_found" ||
     code === "invalid_credentials" ||
     code === "user_not_found" ||
@@ -67,6 +91,7 @@ export function mapAuthError(error: unknown): AuthFormErrorCode {
 
   if (
     code === "validation_failed" ||
+    code === "validation_error" ||
     code === "weak_password" ||
     signal.includes("PASSWORD_TOO_SHORT") ||
     signal.includes("PASSWORD TOO SHORT") ||

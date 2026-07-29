@@ -7,9 +7,10 @@ import {
   forgotPasswordSchema,
   loginSchema,
   registerSchema,
+  resendVerificationEmailSchema,
   resetPasswordSchema,
 } from "@/features/auth/schemas";
-import type { AuthFormState } from "@/features/auth/types";
+import type { AuthFormErrorCode, AuthFormState } from "@/features/auth/types";
 import { defaultLocale, isLocale } from "@/i18n/routing";
 import { auth } from "@/server/auth/server";
 import {
@@ -170,6 +171,74 @@ export async function requestPasswordResetAction(
   redirect(`/${locale}/forgot-password/sent`);
 }
 
+export async function resendVerificationEmailAction(
+  _previousState: AuthFormState,
+  formData: FormData,
+): Promise<AuthFormState> {
+  const localeValue = formData.get("locale");
+  const locale =
+    typeof localeValue === "string" && isLocale(localeValue)
+      ? localeValue
+      : defaultLocale;
+  const rawEmail = formData.get("email");
+
+  console.info("[auth] verification resend requested", {
+    email: maskEmail(rawEmail),
+    locale,
+  });
+
+  const parsedInput = resendVerificationEmailSchema.safeParse({
+    email: rawEmail,
+    locale,
+  });
+
+  if (!parsedInput.success) {
+    console.warn("[auth] verification resend rejected by local validation", {
+      email: maskEmail(rawEmail),
+      issues: parsedInput.error.issues.map(({ code, path }) => ({ code, path })),
+      locale,
+    });
+    return errorState("invalid_form");
+  }
+
+  const { email } = parsedInput.data;
+
+  try {
+    console.info("[auth] requesting verification email from Neon Auth", {
+      email: maskEmail(email),
+      locale,
+    });
+
+    const { error } = await auth.sendVerificationEmail({
+      callbackURL: `/${locale}/verify-email/result`,
+      email,
+    });
+
+    if (error) {
+      console.error("[auth] Neon Auth rejected verification email request", {
+        ...getAuthErrorLogDetails(error),
+        email: maskEmail(email),
+        locale,
+      });
+      return errorState(mapVerificationEmailError(error));
+    }
+
+    console.info("[auth] Neon Auth accepted verification email request", {
+      email: maskEmail(email),
+      locale,
+    });
+  } catch (error) {
+    console.error("[auth] verification email request threw an error", {
+      ...getAuthErrorLogDetails(error),
+      email: maskEmail(email),
+      locale,
+    });
+    return errorState(mapVerificationEmailError(error));
+  }
+
+  redirect(`/${locale}/verify-email/sent`);
+}
+
 export async function resetPasswordAction(
   _previousState: AuthFormState,
   formData: FormData,
@@ -218,4 +287,35 @@ function errorState(
   error: Exclude<AuthFormState, { status: "idle" }>["error"],
 ): AuthFormState {
   return { status: "error", error };
+}
+
+function mapVerificationEmailError(error: unknown): AuthFormErrorCode {
+  const mapped = mapAuthError(error);
+  return mapped === "invalid_form" ? "unknown_error" : mapped;
+}
+
+function maskEmail(value: unknown): string {
+  if (typeof value !== "string") return "[invalid]";
+
+  const [localPart, domain] = value.trim().split("@", 2);
+  if (!localPart || !domain) return "[invalid]";
+
+  return `${localPart.slice(0, 1)}***@${domain}`;
+}
+
+function getAuthErrorLogDetails(error: unknown): Readonly<{
+  code?: string;
+  message?: string;
+  status?: number;
+}> {
+  if (!error || typeof error !== "object") {
+    return {};
+  }
+
+  const details = error as Record<string, unknown>;
+  return {
+    code: typeof details.code === "string" ? details.code : undefined,
+    message: typeof details.message === "string" ? details.message : undefined,
+    status: typeof details.status === "number" ? details.status : undefined,
+  };
 }

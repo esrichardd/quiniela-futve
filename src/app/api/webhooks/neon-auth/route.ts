@@ -64,16 +64,27 @@ export async function POST(request: Request): Promise<Response> {
       return jsonError("unsupported_link_type", 422);
     }
 
+    console.info("[auth] verified Neon Auth email webhook", {
+      eventId: payload.event_id,
+      linkType: payload.event_data.link_type,
+    });
+
     const email = await renderAuthEmail(
       payload.event_data.link_type,
       payload.event_data.link_url,
     );
 
-    await sendAuthEmail({
+    const resendMessageId = await sendAuthEmail({
       eventId: payload.event_id,
       html: email.html,
       subject: email.subject,
       to: payload.user.email,
+    });
+
+    console.info("[auth] verification email accepted by Resend", {
+      eventId: payload.event_id,
+      linkType: payload.event_data.link_type,
+      resendMessageId,
     });
 
     return Response.json({ success: true });

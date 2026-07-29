@@ -27,6 +27,11 @@ export const forgotPasswordSchema = z.object({
   locale: localeSchema,
 });
 
+export const resendVerificationEmailSchema = z.object({
+  email: emailSchema,
+  locale: localeSchema,
+});
+
 export const registerSchema = z
   .object({
     confirmPassword: z.string(),

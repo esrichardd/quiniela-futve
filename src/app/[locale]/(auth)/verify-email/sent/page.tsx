@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
-import { BadgeCheck } from "lucide-react";
+import { MailCheck } from "lucide-react";
 import { notFound } from "next/navigation";
-import {
-  getTranslations,
-  setRequestLocale,
-} from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import AuthLayout from "@/features/auth/components/auth-layout";
 import AuthStatusCard from "@/features/auth/components/auth-status-card";
 import { isLocale } from "@/i18n/routing";
 
-type VerifyEmailPageProps = Readonly<{
+type VerifyEmailSentPageProps = Readonly<{
   params: Promise<{
     locale: string;
   }>;
@@ -18,7 +15,7 @@ type VerifyEmailPageProps = Readonly<{
 
 export async function generateMetadata({
   params,
-}: VerifyEmailPageProps): Promise<Metadata> {
+}: VerifyEmailSentPageProps): Promise<Metadata> {
   const { locale } = await params;
 
   if (!isLocale(locale)) {
@@ -28,12 +25,14 @@ export async function generateMetadata({
   const t = await getTranslations({ locale, namespace: "auth" });
 
   return {
-    title: t("verifyEmail.metadata.title"),
-    description: t("verifyEmail.metadata.description"),
+    title: t("verifyEmailSent.metadata.title"),
+    description: t("verifyEmailSent.metadata.description"),
   };
 }
 
-export default async function VerifyEmailPage({ params }: VerifyEmailPageProps) {
+export default async function VerifyEmailSentPage({
+  params,
+}: VerifyEmailSentPageProps) {
   const { locale } = await params;
 
   if (!isLocale(locale)) {
@@ -48,14 +47,12 @@ export default async function VerifyEmailPage({ params }: VerifyEmailPageProps) 
   return (
     <AuthLayout homeLabel={common("navigation.home")}>
       <AuthStatusCard
-        title={t("verifyEmail.title")}
-        subtitle={t("verifyEmail.subtitle")}
-        note={t("verifyEmail.note")}
-        actionLabel={t("verifyEmail.action")}
+        title={t("verifyEmailSent.title")}
+        subtitle={t("verifyEmailSent.subtitle")}
+        note={t("verifyEmailSent.note")}
+        actionLabel={t("verifyEmailSent.action")}
         actionHref="/login"
-        secondaryActionLabel={t("verifyEmailResend.action")}
-        secondaryActionHref="/verify-email/resend"
-        icon={BadgeCheck}
+        icon={MailCheck}
       />
     </AuthLayout>
   );

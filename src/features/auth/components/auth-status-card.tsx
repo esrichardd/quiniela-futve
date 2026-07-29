@@ -10,6 +10,8 @@ type AuthStatusCardProps = Readonly<{
   note: string;
   actionLabel: string;
   actionHref: ComponentProps<typeof Link>["href"];
+  secondaryActionLabel?: string;
+  secondaryActionHref?: ComponentProps<typeof Link>["href"];
   icon: ComponentType<LucideProps>;
 }>;
 
@@ -19,6 +21,8 @@ export default function AuthStatusCard({
   note,
   actionLabel,
   actionHref,
+  secondaryActionLabel,
+  secondaryActionHref,
   icon: Icon,
 }: AuthStatusCardProps) {
   return (
@@ -44,6 +48,15 @@ export default function AuthStatusCard({
         <ArrowLeft aria-hidden="true" className="size-4" />
         {actionLabel}
       </Link>
+
+      {secondaryActionLabel && secondaryActionHref ? (
+        <Link
+          href={secondaryActionHref}
+          className="mt-4 inline-flex rounded-lg px-3 py-2 text-sm font-medium text-brand underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {secondaryActionLabel}
+        </Link>
+      ) : null}
     </section>
   );
 }
