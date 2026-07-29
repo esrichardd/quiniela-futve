@@ -30,6 +30,7 @@ import {
 } from "@/server/auth/permissions";
 import { requireVerifiedAppUser } from "@/server/auth/session";
 import { getCachedActiveSeasonOptions } from "@/server/cache/season-catalog";
+import { invalidatePoolRanking } from "@/server/cache/ranking";
 import { isCompetitionSeasonActive } from "@/server/dal/competition-catalog";
 import {
   createPlayerMembershipIfMissing,
@@ -149,6 +150,7 @@ export async function joinPool(code: string): Promise<string> {
     poolId,
     userId: appUser.id,
   });
+  invalidatePoolRanking(poolId);
 
   return poolId;
 }

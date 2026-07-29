@@ -19,7 +19,9 @@ export async function getCachedRankingRows(
 ): Promise<ReadonlyArray<RankingRowRecord>> {
   return unstable_cache(
     async (id: string) => listRankingRowsForPool(id),
-    ["pool-ranking-rows-v1"],
+    // Bump the key version when changing invalidation behavior so entries
+    // created before the change cannot keep serving stale membership rows.
+    ["pool-ranking-rows-v2"],
     {
       tags: [poolRankingCacheTag(poolId)],
       revalidate: false,
