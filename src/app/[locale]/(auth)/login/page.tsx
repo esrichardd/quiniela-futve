@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import {
   getMessages,
@@ -12,6 +12,9 @@ import LoginForm from "@/features/auth/components/login-form";
 import type { AuthFormErrorCode } from "@/features/auth/types";
 import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
 import { isLocale } from "@/i18n/routing";
+import { getAuthenticatedRedirectPath } from "@/server/auth/session";
+
+export const dynamic = "force-dynamic";
 
 type LoginPageProps = Readonly<{
   params: Promise<{
@@ -44,6 +47,12 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
 
   if (!isLocale(locale)) {
     notFound();
+  }
+
+  const redirectPath = await getAuthenticatedRedirectPath(locale);
+
+  if (redirectPath) {
+    redirect(redirectPath);
   }
 
   setRequestLocale(locale);

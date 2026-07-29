@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import {
   getMessages,
@@ -11,6 +11,9 @@ import AuthLayout from "@/features/auth/components/auth-layout";
 import RegisterForm from "@/features/auth/components/register-form";
 import { pickNestedMessageNamespaces } from "@/i18n/client-messages";
 import { isLocale } from "@/i18n/routing";
+import { getAuthenticatedRedirectPath } from "@/server/auth/session";
+
+export const dynamic = "force-dynamic";
 
 type RegisterPageProps = Readonly<{
   params: Promise<{
@@ -40,6 +43,12 @@ export default async function RegisterPage({ params }: RegisterPageProps) {
 
   if (!isLocale(locale)) {
     notFound();
+  }
+
+  const redirectPath = await getAuthenticatedRedirectPath(locale);
+
+  if (redirectPath) {
+    redirect(redirectPath);
   }
 
   setRequestLocale(locale);

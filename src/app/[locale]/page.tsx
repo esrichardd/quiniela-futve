@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 
 import "@/features/landing/landing.css";
@@ -9,6 +9,9 @@ import HeroSection from "@/features/landing/components/hero-section";
 import HowItWorks from "@/features/landing/components/how-it-works";
 import Navbar from "@/features/landing/components/navbar";
 import { isLocale } from "@/i18n/routing";
+import { getAuthenticatedRedirectPath } from "@/server/auth/session";
+
+export const dynamic = "force-dynamic";
 
 type HomePageProps = Readonly<{
   params: Promise<{
@@ -21,6 +24,12 @@ export default async function HomePage({ params }: HomePageProps) {
 
   if (!isLocale(locale)) {
     notFound();
+  }
+
+  const redirectPath = await getAuthenticatedRedirectPath(locale);
+
+  if (redirectPath) {
+    redirect(redirectPath);
   }
 
   setRequestLocale(locale);

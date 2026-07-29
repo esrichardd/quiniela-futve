@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 
+import type { Locale } from "@/i18n/routing";
 import { auth } from "@/server/auth/server";
 import {
   getOrProvisionAppUser,
@@ -47,6 +48,20 @@ const resolveAuthSession = cache(async (): Promise<AuthSession | null> => {
 
 export function getAuthSession(): Promise<AuthSession | null> {
   return resolveAuthSession();
+}
+
+export async function getAuthenticatedRedirectPath(
+  locale: Locale,
+): Promise<string | null> {
+  const session = await getAuthSession();
+
+  if (!session?.user) {
+    return null;
+  }
+
+  return session.user.emailVerified
+    ? `/${locale}/home`
+    : `/${locale}/verify-email`;
 }
 
 const resolveCurrentAppUser = cache(
