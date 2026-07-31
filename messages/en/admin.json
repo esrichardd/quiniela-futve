@@ -52,6 +52,20 @@
     "joined": "Joined:",
     "unknownUser": "Unnamed user",
     "emailUnavailable": "Email unavailable",
-    "emptyMembers": "This pool does not have any participants yet."
+    "emptyMembers": "This pool does not have any participants yet.",
+    "matchdaysTitle": "Participation by matchday",
+    "matchdaysSubtitle": "People who submitted at least one prediction for each matchday. Results are not included.",
+    "matchday": "Matchday",
+    "status": "Status",
+    "matches": "Matches",
+    "submitted": "Predictions submitted",
+    "submittedValue": "{submitted, number} of {total, number}",
+    "defaultMatchday": "Matchday {number}",
+    "emptyMatchdays": "This season does not have any matchdays yet.",
+    "statuses": {
+      "draft": "Draft",
+      "published": "Published",
+      "finished": "Finished"
+    }
   }
 }

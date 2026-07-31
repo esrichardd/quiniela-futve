@@ -1,13 +1,16 @@
 import "server-only";
 
 import { alias } from "drizzle-orm/pg-core";
-import { asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 
 import { db } from "@/server/db/client";
 import {
   competitions,
   competitionSeasons,
+  matchdays,
+  matches,
   poolMemberships,
+  poolMatchPredictions,
   poolPredictionRules,
   poolPrizeConfigurations,
   pools,
@@ -127,6 +130,16 @@ export type AdminPoolDetails = Readonly<{
     email: string | null;
   }>;
   members: ReadonlyArray<AdminPoolMember>;
+  matchdays: ReadonlyArray<AdminMatchdayProgress>;
+}>;
+
+export type AdminMatchdayProgress = Readonly<{
+  id: string;
+  number: number;
+  name: string | null;
+  status: string;
+  matchCount: number;
+  submittedMemberCount: number;
 }>;
 
 export async function getAdminPoolDetails(
@@ -171,6 +184,32 @@ export async function getAdminPoolDetails(
     .where(eq(pools.id, poolId))
     .orderBy(asc(poolMemberships.createdAt), asc(poolMemberships.id));
 
+  const matchdayProgress = await db
+    .select({
+      id: matchdays.id,
+      number: matchdays.number,
+      name: matchdays.name,
+      status: matchdays.status,
+      matchCount: sql<number>`count(distinct ${matches.id})::integer`,
+      submittedMemberCount: sql<number>`count(distinct ${poolMatchPredictions.poolMembershipId})::integer`,
+    })
+    .from(pools)
+    .innerJoin(
+      matchdays,
+      eq(matchdays.competitionSeasonId, pools.competitionSeasonId),
+    )
+    .leftJoin(matches, eq(matches.matchdayId, matchdays.id))
+    .leftJoin(
+      poolMatchPredictions,
+      and(
+        eq(poolMatchPredictions.poolId, pools.id),
+        eq(poolMatchPredictions.matchId, matches.id),
+      ),
+    )
+    .where(eq(pools.id, poolId))
+    .groupBy(matchdays.id, matchdays.number, matchdays.name, matchdays.status)
+    .orderBy(asc(matchdays.number), asc(matchdays.id));
+
   const firstRow = rows[0];
   if (!firstRow) {
     return null;
@@ -202,6 +241,7 @@ export async function getAdminPoolDetails(
           ]
         : [],
     ),
+    matchdays: matchdayProgress,
   };
 }
 

@@ -240,7 +240,6 @@ export default async function AdminSeason({
                               locale={locale}
                               dateStyle="medium"
                               timeStyle="short"
-                              timeZoneName="short"
                             />
                           </p>
                         </div>

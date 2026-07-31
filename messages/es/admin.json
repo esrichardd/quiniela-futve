@@ -52,6 +52,20 @@
     "joined": "Registro:",
     "unknownUser": "Usuario sin nombre",
     "emailUnavailable": "Email no disponible",
-    "emptyMembers": "Esta quiniela todavía no tiene participantes."
+    "emptyMembers": "Esta quiniela todavía no tiene participantes.",
+    "matchdaysTitle": "Participación por jornada",
+    "matchdaysSubtitle": "Personas que cargaron al menos un pronóstico en cada jornada. Los resultados no se incluyen.",
+    "matchday": "Jornada",
+    "status": "Estado",
+    "matches": "Partidos",
+    "submitted": "Pronósticos cargados",
+    "submittedValue": "{submitted, number} de {total, number}",
+    "defaultMatchday": "Jornada {number}",
+    "emptyMatchdays": "Esta temporada todavía no tiene jornadas.",
+    "statuses": {
+      "draft": "Borrador",
+      "published": "Publicada",
+      "finished": "Finalizada"
+    }
   }
 }

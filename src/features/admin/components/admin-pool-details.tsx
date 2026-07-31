@@ -127,6 +127,57 @@ export default async function AdminPoolDetailsView({
           )}
         </section>
       </div>
+
+      <section className="mt-6 rounded-2xl border border-border bg-card p-5 shadow-soft">
+        <div>
+          <h2 className="text-lg font-bold">{admin("details.matchdaysTitle")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {admin("details.matchdaysSubtitle")}
+          </p>
+        </div>
+        {pool.matchdays.length > 0 ? (
+          <div className="mt-5 overflow-x-auto">
+            <table className="w-full min-w-[560px] text-left text-sm">
+              <thead className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="pb-3 pr-4 font-semibold">{admin("details.matchday")}</th>
+                  <th className="pb-3 pr-4 font-semibold">{admin("details.status")}</th>
+                  <th className="pb-3 pr-4 text-right font-semibold">{admin("details.matches")}</th>
+                  <th className="pb-3 text-right font-semibold">{admin("details.submitted")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {pool.matchdays.map((matchday) => (
+                  <tr key={matchday.id}>
+                    <td className="py-3 pr-4 font-semibold">
+                      {matchday.name ??
+                        admin("details.defaultMatchday", {
+                          number: matchday.number,
+                        })}
+                    </td>
+                    <td className="py-3 pr-4 text-muted-foreground">
+                      {admin(`details.statuses.${matchday.status}`)}
+                    </td>
+                    <td className="py-3 pr-4 text-right">
+                      {matchday.matchCount}
+                    </td>
+                    <td className="py-3 text-right font-bold">
+                      {admin("details.submittedValue", {
+                        submitted: matchday.submittedMemberCount,
+                        total: pool.members.length,
+                      })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-xl bg-muted p-4 text-sm text-muted-foreground">
+            {admin("details.emptyMatchdays")}
+          </p>
+        )}
+      </section>
     </section>
   );
 }
