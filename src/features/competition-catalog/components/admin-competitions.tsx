@@ -1,7 +1,10 @@
 import { CalendarPlus, ChevronRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
-import { createSeasonAction } from "../actions";
+import {
+  createSeasonAction,
+  refreshCompetitionCatalogAction,
+} from "../actions";
 import type { AdminCompetition } from "../types";
 import { Link } from "@/i18n/navigation";
 
@@ -24,6 +27,15 @@ export default async function AdminCompetitions({
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
         {t("admin.subtitle")}
       </p>
+
+      <CatalogActionForm
+        action={refreshCompetitionCatalogAction}
+        submitLabel={t("actions.refreshCatalog")}
+        pendingLabel={t("actions.refreshingCatalog")}
+        className="mt-5 flex flex-col items-start gap-2"
+      >
+        <input type="hidden" name="refresh" value="competition-catalog" />
+      </CatalogActionForm>
 
       <div className="mt-8 space-y-6">
         {competitions.map((competition) => (

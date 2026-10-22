@@ -17,7 +17,9 @@
   },
   "actions": {
     "back": "Back to competitions",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "refreshCatalog": "Refresh pool catalog",
+    "refreshingCatalog": "Refreshing…"
   },
   "competition": {
     "active": "Active",
@@ -101,6 +103,7 @@
     "operation_failed": "We could not complete the operation. Try again."
   },
   "success": {
+    "catalog_cache_refreshed": "Catalog refreshed. Reload the pool creation wizard.",
     "season_status_updated": "Season status updated.",
     "team_created": "Team registered and added.",
     "team_added": "Team added to the season.",

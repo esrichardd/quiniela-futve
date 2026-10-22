@@ -17,7 +17,9 @@
   },
   "actions": {
     "back": "Volver a competiciones",
-    "saving": "Guardando…"
+    "saving": "Guardando…",
+    "refreshCatalog": "Actualizar catálogo para quinielas",
+    "refreshingCatalog": "Actualizando…"
   },
   "competition": {
     "active": "Activa",
@@ -101,6 +103,7 @@
     "operation_failed": "No pudimos completar la operación. Inténtalo nuevamente."
   },
   "success": {
+    "catalog_cache_refreshed": "Catálogo actualizado. Recarga el asistente de creación de quinielas.",
     "season_status_updated": "Estado de temporada actualizado.",
     "team_created": "Equipo registrado y agregado.",
     "team_added": "Equipo agregado a la temporada.",

@@ -100,6 +100,11 @@ export async function listAdminCompetitions(): Promise<
   }));
 }
 
+export async function refreshCompetitionCatalogCache(): Promise<void> {
+  await requireAdminActor();
+  invalidateCompetitionCatalog();
+}
+
 export async function getAdminSeasonDetail(
   seasonId: string,
 ): Promise<AdminSeasonDetail> {

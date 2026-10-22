@@ -29,6 +29,7 @@ import {
   createMatchday,
   createSeason,
   createTeam,
+  refreshCompetitionCatalogCache,
   transitionMatchday,
   updateMatch,
   updateSeasonStatus,
@@ -56,6 +57,21 @@ export async function updateSeasonStatusAction(
   formData: FormData,
 ): Promise<CatalogActionState> {
   return runMutation(formData, updateSeasonStatusSchema, updateSeasonStatus, "season_status_updated");
+}
+
+export async function refreshCompetitionCatalogAction(
+  _previous: CatalogActionState,
+  formData: FormData,
+): Promise<CatalogActionState> {
+  const locale = parseLocale(formData);
+  if (!locale) return errorState("invalid_input");
+  try {
+    await refreshCompetitionCatalogCache();
+    revalidatePath(`/${locale}/pools/create`);
+    return { status: "success", message: "catalog_cache_refreshed" };
+  } catch (error) {
+    return mapError(error);
+  }
 }
 
 export async function createTeamAction(
